@@ -1,50 +1,66 @@
 package edu.northwestern.bioinformatics.bering;
 
+import org.apache.ddlutils.model.Column;
+import org.apache.ddlutils.model.Table;
+import org.springframework.beans.propertyeditors.CustomBooleanEditor;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.beans.PropertyEditor;
 
 /**
  * @author Moses Hohman
  */
 public class TableDefinition {
     private String name;
-    private List<ColumnDefinition> columns;
-    private static final String NULLABLE_KEY = "nullable";
-    private static final String LIMIT_KEY = "limit";
+    private List<Column> columns;
+    private Adapter adapter;
+    private static final String NULLABLE_KEY  = "nullable";
+    private static final String LIMIT_KEY     = "limit";
+    private static final String PRECISION_KEY = "precision";
 
-    public TableDefinition(String name) {
+    public TableDefinition(String name, Adapter adapter) {
         this.name = name;
-        columns = new LinkedList<ColumnDefinition>();
-        columns.add(new PrimaryKeyDefinition("id", "integer"));
+        this.adapter = adapter;
+
+        columns = new LinkedList<Column>();
+        columns.add(adapter.createPrimaryKeyColumn("id"));
     }
 
-    public void addColumn(String name, String type) {
-        addColumn(null, name, type);
+    public void addColumn(String columnName, String type) {
+        addColumn(null, columnName, type);
     }
 
-    public void addColumn(Map<String, String> parameters, String name, String type) {
-        ColumnDefinition definition = new ColumnDefinition(name, type);
+    public void addColumn(Map<String, String> parameters, String columnName, String type) {
+        Column col = new Column();
+        col.setName(columnName);
+        col.setTypeCode(adapter.getTypeCode(type));
         if (parameters != null && !parameters.isEmpty()) {
             if (parameters.containsKey(NULLABLE_KEY)) {
-                definition.setNullable("true".equals(parameters.get(NULLABLE_KEY)));
+                PropertyEditor editor = new CustomBooleanEditor(false);
+                editor.setAsText(parameters.get(NULLABLE_KEY));
+                col.setRequired(!((Boolean) editor.getValue()));
             }
             if (parameters.containsKey(LIMIT_KEY)) {
-                definition.setLimit(Integer.parseInt(parameters.get(LIMIT_KEY)));
+                col.setSize(parameters.get(LIMIT_KEY));
+            }
+            if (parameters.containsKey(PRECISION_KEY)) {
+                col.setScale(new Integer(parameters.get(PRECISION_KEY)));
             }
         }
-        columns.add(definition);
+        columns.add(col);
     }
 
-    public String toSql() {
-        StringBuilder result = new StringBuilder("CREATE TABLE ");
-        result.append(name).append(" (\n");
-        for (int i = 0; i < columns.size(); i++) {
-            if (i!=0) {
-                result.append(",\n");
-            }
-            result.append("\t").append(columns.get(i).toSql());
+    public Table toTable() {
+        Table t =  new Table();
+        for (Column column : columns) {
+            t.addColumn(column);
         }
-        return result.append("\n)").toString();
+        return t;
+    }
+
+    public String getName() {
+        return name;
     }
 }

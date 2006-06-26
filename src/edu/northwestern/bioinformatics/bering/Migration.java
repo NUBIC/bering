@@ -6,21 +6,19 @@ import groovy.lang.Closure;
  * @author Moses Hohman
  */
 public class Migration {
-    private Adapter adapter = new MockAdapter();
+    private Adapter adapter;
 
     protected void createTable(String name, Closure addContents) {
-        TableDefinition definition = new TableDefinition(name);
+        TableDefinition definition = new TableDefinition(name, adapter);
         addContents.call(definition);
-        adapter.execute(definition.toSql());
+        adapter.createTable(definition);
     }
 
     protected void dropTable(String name) {
-        adapter.execute("DROP TABLE " + name);
+        adapter.dropTable(name);
     }
 
-    private class MockAdapter implements Adapter {
-        public void execute(String sql) {
-            System.out.println(sql);
-        }
+    public void setAdapter(Adapter adapter) {
+        this.adapter = adapter;
     }
 }
