@@ -7,6 +7,7 @@ public class ColumnDefinition {
     private String name;
     private String type;
     private boolean nullable = true;
+    private Integer limit;
 
     public ColumnDefinition(String name, String type) {
         this.name = name;
@@ -29,6 +30,14 @@ public class ColumnDefinition {
         this.nullable = nullable;
     }
 
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
     private String getSqlType() {
         // TODO: fill this out
         String result = "UNSUPPORTED TYPE";
@@ -43,6 +52,9 @@ public class ColumnDefinition {
     public String toSql() {
         StringBuilder result = new StringBuilder(name);
         result.append(" ").append(getSqlType());
+        if (limit != null) {
+            result.append("(").append(limit).append(")");
+        }
         if (!nullable) {
             result.append(" ").append("NOT NULL");
         }
