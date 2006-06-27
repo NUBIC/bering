@@ -2,11 +2,16 @@ package edu.northwestern.bioinformatics.bering;
 
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
+import org.apache.ddlutils.alteration.AddColumnChange;
+import org.apache.ddlutils.alteration.TableChange;
+import org.apache.ddlutils.alteration.RemoveColumnChange;
+import org.apache.ddlutils.model.Column;
 import org.apache.ddlutils.model.Database;
 import org.apache.ddlutils.model.Table;
 
 import javax.sql.DataSource;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,15 +19,15 @@ import java.util.Map;
  * @author rsutphin
  */
 public class DatabaseAdapter implements Adapter {
-    private static final Map<String, Integer> namesToJdbcTypes = new HashMap<String, Integer>();
+    private static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
     static {
-        namesToJdbcTypes.put("string",    Types.VARCHAR);
-        namesToJdbcTypes.put("integer",   Types.INTEGER);
-        namesToJdbcTypes.put("float",     Types.NUMERIC);
-        namesToJdbcTypes.put("boolean",   Types.BOOLEAN);
-        namesToJdbcTypes.put("date",      Types.DATE);
-        namesToJdbcTypes.put("time",      Types.TIME);
-        namesToJdbcTypes.put("timestamp", Types.TIMESTAMP);
+        NAMES_TO_JDBC_TYPES.put("string",    Types.VARCHAR);
+        NAMES_TO_JDBC_TYPES.put("integer",   Types.INTEGER);
+        NAMES_TO_JDBC_TYPES.put("float",     Types.NUMERIC);
+        NAMES_TO_JDBC_TYPES.put("boolean",   Types.BOOLEAN);
+        NAMES_TO_JDBC_TYPES.put("date",      Types.DATE);
+        NAMES_TO_JDBC_TYPES.put("time",      Types.TIME);
+        NAMES_TO_JDBC_TYPES.put("timestamp", Types.TIMESTAMP);
     }
 
     private Platform platform;
@@ -38,20 +43,40 @@ public class DatabaseAdapter implements Adapter {
     }
 
     public void dropTable(String name) {
-        Table toDrop = new Table();
-        toDrop.setName(name);
+        platform.dropTables(createDatabaseWithSingleTable(createNamedTable(name)), false);
+    }
 
-        Database db = new Database();
-        db.addTable(toDrop);
-        platform.dropTables(db, false);
+    public void addColumn(String tableName, Column column) {
+        Table table = createNamedTable(tableName);
+        TableChange addColumn = new AddColumnChange(table, column, null, null);
+        platform.changeDatabase(Arrays.asList(addColumn), false);
+    }
+
+    public void removeColumn(String tableName, String columnName) {
+        Table table = createNamedTable(tableName);
+        Column column = new Column();
+        column.setName(columnName);
+        TableChange removeColumn = new RemoveColumnChange(table, column);
+        platform.changeDatabase(Arrays.asList(removeColumn), false);
     }
 
     public int getTypeCode(String typeName) {
-        Integer code = namesToJdbcTypes.get(typeName);
+        Integer code = NAMES_TO_JDBC_TYPES.get(typeName);
         if (code == null) {
             throw new IllegalArgumentException("Unknown type: " + typeName);
         }
         return code;
+    }
 
+    private Table createNamedTable(String name) {
+        Table table = new Table();
+        table.setName(name);
+        return table;
+    }
+
+    private Database createDatabaseWithSingleTable(Table table) {
+        Database db = new Database();
+        db.addTable(table);
+        return db;
     }
 }
