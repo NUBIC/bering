@@ -2,7 +2,6 @@ package edu.northwestern.bioinformatics.bering;
 
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.model.Column;
 import org.apache.ddlutils.model.Database;
 import org.apache.ddlutils.model.Table;
 
@@ -39,9 +38,11 @@ public class DatabaseAdapter implements Adapter {
     }
 
     public void dropTable(String name) {
-        Database db = new Database();
         Table toDrop = new Table();
         toDrop.setName(name);
+
+        Database db = new Database();
+        db.addTable(toDrop);
         platform.dropTables(db, false);
     }
 
