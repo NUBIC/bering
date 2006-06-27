@@ -45,14 +45,6 @@ public class DatabaseAdapter implements Adapter {
         platform.dropTables(db, false);
     }
 
-    public Column createPrimaryKeyColumn(String name) {
-        Column col = new Column();
-        col.setPrimaryKey(true);
-        col.setName("id");
-        col.setTypeCode(Types.INTEGER);
-        return col;
-    }
-
     public int getTypeCode(String typeName) {
         Integer code = namesToJdbcTypes.get(typeName);
         if (code == null) {

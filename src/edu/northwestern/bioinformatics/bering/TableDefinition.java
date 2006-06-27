@@ -4,10 +4,10 @@ import org.apache.ddlutils.model.Column;
 import org.apache.ddlutils.model.Table;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 
+import java.beans.PropertyEditor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.beans.PropertyEditor;
 
 /**
  * @author Moses Hohman
@@ -25,7 +25,15 @@ public class TableDefinition {
         this.adapter = adapter;
 
         columns = new LinkedList<Column>();
-        columns.add(adapter.createPrimaryKeyColumn("id"));
+        columns.add(createPrimaryKeyColumn());
+    }
+
+    private Column createPrimaryKeyColumn() {
+        Column col = new Column();
+        col.setPrimaryKey(true);
+        col.setName("id");
+        col.setTypeCode(adapter.getTypeCode("integer"));
+        return col;
     }
 
     public void addColumn(String columnName, String type) {
@@ -54,6 +62,7 @@ public class TableDefinition {
 
     public Table toTable() {
         Table t =  new Table();
+        t.setName(getName());
         for (Column column : columns) {
             t.addColumn(column);
         }

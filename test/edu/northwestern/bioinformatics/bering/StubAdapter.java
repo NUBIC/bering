@@ -1,19 +1,18 @@
 package edu.northwestern.bioinformatics.bering;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 /**
  * @author Moses Hohman
  */
 public class StubAdapter implements Adapter {
-    private Queue<String> statements = new LinkedList<String>();
-
-    public void execute(String sql) {
-        statements.add(sql);
+    public void createTable(TableDefinition def) {
+        throw new UnsupportedOperationException("createTable not implemented");
     }
 
-    public Queue<String> getStatements() {
-        return statements;
+    public void dropTable(String name) {
+        throw new UnsupportedOperationException("dropTable not implemented");
+    }
+
+    public int getTypeCode(String typeName) {
+        return 0;
     }
 }
