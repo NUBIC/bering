@@ -5,7 +5,7 @@ import java.io.File;
 /**
  * @author rsutphin
  */
-public class MigrationFile implements Comparable<MigrationFile> {
+public abstract class MigrationFile implements Comparable<MigrationFile> {
     private File file;
     private String name;
     private Integer index;
