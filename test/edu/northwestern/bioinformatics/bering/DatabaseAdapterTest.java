@@ -45,7 +45,7 @@ public class DatabaseAdapterTest extends TestCase {
         String tableName = "authors";
         assertTableNotPresent(tableName);
 
-        TableDefinition def = new TableDefinition(tableName, adapter);
+        TableDefinition def = new TableDefinition(tableName, new StubMigration());
         def.addColumn("name", "string");
         def.addColumn("birthdate", "timestamp");
         adapter.createTable(def);
@@ -72,7 +72,7 @@ public class DatabaseAdapterTest extends TestCase {
         int count = 0;
         while (rs.next()) {
             count++;
-            assertEquals(new Integer(14), rs.getObject("author_id"));
+            assertEquals(14, rs.getObject("author_id"));
         }
         assertEquals("Wrong number of results", 1, count);
     }
@@ -115,24 +115,5 @@ public class DatabaseAdapterTest extends TestCase {
         newCol.setName(name);
         newCol.setTypeCode(type);
         return newCol;
-    }
-
-    public void testTypes() throws Exception {
-        assertEquals(Types.BOOLEAN,   adapter.getTypeCode("boolean"));
-        assertEquals(Types.DATE,      adapter.getTypeCode("date"));
-        assertEquals(Types.TIME,      adapter.getTypeCode("time"));
-        assertEquals(Types.TIMESTAMP, adapter.getTypeCode("timestamp"));
-        assertEquals(Types.VARCHAR,   adapter.getTypeCode("string"));
-        assertEquals(Types.NUMERIC,   adapter.getTypeCode("float"));
-        assertEquals(Types.INTEGER,   adapter.getTypeCode("integer"));
-    }
-
-    public void testInvalidTypeThrowsException() throws Exception {
-        try {
-            adapter.getTypeCode("fancytype");
-            fail("No exception thrown");
-        } catch (IllegalArgumentException iae) {
-            assertTrue(iae.getMessage().indexOf("fancytype") >= 0);
-        }
     }
 }

@@ -10,8 +10,6 @@ public interface Adapter {
 
     void dropTable(String name);
 
-    int getTypeCode(String typeName);
-
     void addColumn(String tableName, Column column);
 
     void removeColumn(String tableName, String columnName);

@@ -11,7 +11,12 @@ import java.util.Map;
  * @author Moses Hohman
  */
 public class TableDefinitionTest extends TestCase {
-    private TableDefinition definition = new TableDefinition("frogs", new StubAdapter());
+    private TableDefinition definition;
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        definition = new TableDefinition("frogs", new StubMigration());
+    }
 
     public void testNewTableContainsPrimaryKey() {
         Table created = definition.toTable();

@@ -15,24 +15,19 @@ import java.util.Map;
 public class TableDefinition {
     private String name;
     private List<Column> columns;
-    private Adapter adapter;
-    private static final String NULLABLE_KEY  = "nullable";
-    private static final String LIMIT_KEY     = "limit";
-    private static final String PRECISION_KEY = "precision";
+    private Migration context;
 
-    public TableDefinition(String name, Adapter adapter) {
+    public TableDefinition(String name, Migration context) {
         this.name = name;
-        this.adapter = adapter;
+        this.context = context;
 
         columns = new LinkedList<Column>();
         columns.add(createPrimaryKeyColumn());
     }
 
     private Column createPrimaryKeyColumn() {
-        Column col = new Column();
+        Column col = context.createColumn(null, "id", "integer");
         col.setPrimaryKey(true);
-        col.setName("id");
-        col.setTypeCode(adapter.getTypeCode("integer"));
         return col;
     }
 
@@ -41,23 +36,7 @@ public class TableDefinition {
     }
 
     public void addColumn(Map<String, String> parameters, String columnName, String type) {
-        Column col = new Column();
-        col.setName(columnName);
-        col.setTypeCode(adapter.getTypeCode(type));
-        if (parameters != null && !parameters.isEmpty()) {
-            if (parameters.containsKey(NULLABLE_KEY)) {
-                PropertyEditor editor = new CustomBooleanEditor(false);
-                editor.setAsText(parameters.get(NULLABLE_KEY));
-                col.setRequired(!((Boolean) editor.getValue()));
-            }
-            if (parameters.containsKey(LIMIT_KEY)) {
-                col.setSize(parameters.get(LIMIT_KEY));
-            }
-            if (parameters.containsKey(PRECISION_KEY)) {
-                col.setScale(new Integer(parameters.get(PRECISION_KEY)));
-            }
-        }
-        columns.add(col);
+        columns.add(context.createColumn(parameters, columnName, type));
     }
 
     public Table toTable() {

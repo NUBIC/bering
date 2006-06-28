@@ -3,33 +3,19 @@ package edu.northwestern.bioinformatics.bering;
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
 import org.apache.ddlutils.alteration.AddColumnChange;
-import org.apache.ddlutils.alteration.TableChange;
 import org.apache.ddlutils.alteration.RemoveColumnChange;
+import org.apache.ddlutils.alteration.TableChange;
 import org.apache.ddlutils.model.Column;
 import org.apache.ddlutils.model.Database;
 import org.apache.ddlutils.model.Table;
 
 import javax.sql.DataSource;
-import java.sql.Types;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author rsutphin
  */
 public class DatabaseAdapter implements Adapter {
-    private static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
-    static {
-        NAMES_TO_JDBC_TYPES.put("string",    Types.VARCHAR);
-        NAMES_TO_JDBC_TYPES.put("integer",   Types.INTEGER);
-        NAMES_TO_JDBC_TYPES.put("float",     Types.NUMERIC);
-        NAMES_TO_JDBC_TYPES.put("boolean",   Types.BOOLEAN);
-        NAMES_TO_JDBC_TYPES.put("date",      Types.DATE);
-        NAMES_TO_JDBC_TYPES.put("time",      Types.TIME);
-        NAMES_TO_JDBC_TYPES.put("timestamp", Types.TIMESTAMP);
-    }
-
     private Platform platform;
 
     public DatabaseAdapter(DataSource dataSource) {
@@ -58,14 +44,6 @@ public class DatabaseAdapter implements Adapter {
         column.setName(columnName);
         TableChange removeColumn = new RemoveColumnChange(table, column);
         platform.changeDatabase(Arrays.asList(removeColumn), false);
-    }
-
-    public int getTypeCode(String typeName) {
-        Integer code = NAMES_TO_JDBC_TYPES.get(typeName);
-        if (code == null) {
-            throw new IllegalArgumentException("Unknown type: " + typeName);
-        }
-        return code;
     }
 
     private Table createNamedTable(String name) {
