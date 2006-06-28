@@ -12,7 +12,8 @@ public class ReleaseTest extends BeringTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        existingRelease = new Release(getClassRelativeFile(getClass(), "../test_db/001_out_the_door/001_add_frogs.groovy").getParentFile());
+        existingRelease = new Release(
+            getClassRelativeFile(getClass(), "../test_db/001_out_the_door"));
     }
 
     public void testNameAndIndexWithName() throws Exception {
