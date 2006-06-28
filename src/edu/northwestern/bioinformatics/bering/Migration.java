@@ -14,7 +14,7 @@ import org.springframework.beans.propertyeditors.CustomBooleanEditor;
  * @author Moses Hohman
  */
 public abstract class Migration {
-    private static final String NULLABLE_KEY  = "null";
+    private static final String NULLABLE_KEY  = "nullable";
     private static final String LIMIT_KEY     = "limit";
     private static final String PRECISION_KEY = "precision";
 

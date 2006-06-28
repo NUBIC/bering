@@ -22,7 +22,7 @@ public class MigrationTest extends TestCase {
     }
 
     public void testCreateNotNullColumn() throws Exception {
-        Column actual = migration.createColumn(Collections.singletonMap("null", "false"), "notnull", "string");
+        Column actual = migration.createColumn(Collections.singletonMap("nullable", "false"), "notnull", "string");
         assertTrue(actual.isRequired());
     }
 
