@@ -31,6 +31,11 @@ public abstract class Migration {
 
     private Adapter adapter;
 
+    ////// METHODS FOR MIGRATIONS TO OVERRIDE
+
+    public abstract void up();
+    public abstract void down() throws IrreversibleMigration;
+
     ////// METHODS FOR MIGRATIONS TO CALL
 
     protected void createTable(String name, Closure addContents) {
@@ -54,6 +59,8 @@ public abstract class Migration {
     protected void removeColumn(String tableName, String columnName) {
         adapter.removeColumn(tableName, columnName);
     }
+
+    ////// IMPLEMENTATION METHODS
 
     // TODO: maybe this should be moved somewhere else
     // visible to collaborators (e.g., TableDefinition)
