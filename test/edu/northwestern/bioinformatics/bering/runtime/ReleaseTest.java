@@ -43,10 +43,10 @@ public class ReleaseTest extends BeringTestCase {
     public void testScriptsFound() throws Exception {
         Release out = existingRelease.initialize();
         assertEquals(2, out.getScripts().size());
-        assertEquals(1, (int) out.getScripts().get(0).getIndex());
-        assertEquals("add_frogs", out.getScripts().get(0).getName());
-        assertEquals(2, (int) out.getScripts().get(1).getIndex());
-        assertEquals("add_ponds", out.getScripts().get(1).getName());
+        assertEquals(1, (int) out.getScript(1).getIndex());
+        assertEquals("add_frogs", out.getScript(1).getName());
+        assertEquals(2, (int) out.getScript(2).getIndex());
+        assertEquals("add_ponds", out.getScript(2).getName());
     }
 
     private Release createRelease(String dirname) {

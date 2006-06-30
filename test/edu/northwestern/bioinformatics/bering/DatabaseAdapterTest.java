@@ -1,5 +1,6 @@
 package edu.northwestern.bioinformatics.bering;
 
+import static edu.northwestern.bioinformatics.bering.DatabaseAdapter.VERSION_TABLE_NAME;
 import junit.framework.TestCase;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.apache.ddlutils.model.Column;
@@ -10,6 +11,8 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+
+import edu.northwestern.bioinformatics.bering.runtime.Version;
 
 /**
  * @author rsutphin
@@ -94,6 +97,61 @@ public class DatabaseAdapterTest extends TestCase {
             }
         }
         assertEquals(1, count);
+    }
+
+    public void testLoadVersionTableWithNoTable() throws Exception {
+        Version actual = adapter.loadVersions();
+        assertEquals(0, actual.getReleaseNumbers().size());
+
+        assertTablePresent(VERSION_TABLE_NAME);
+    }
+
+    public void testLoadVersionTable() throws Exception {
+        stmt.execute("CREATE TABLE " + VERSION_TABLE_NAME + " (release INTEGER NOT NULL, migration INTEGER NOT NULL)");
+        stmt.execute("INSERT INTO " + VERSION_TABLE_NAME
+            + " (release, migration) VALUES (1, 5)");
+        stmt.execute("INSERT INTO " + VERSION_TABLE_NAME
+            + " (release, migration) VALUES (2, 2)");
+        stmt.execute("INSERT INTO " + VERSION_TABLE_NAME
+            + " (release, migration) VALUES (4, 6)");
+        stmt.execute("INSERT INTO " + VERSION_TABLE_NAME
+            + " (release, migration) VALUES (7, 1)");
+
+        Version actual = adapter.loadVersions();
+        assertEquals("Wrong number of versions found", 4, actual.getReleaseNumbers().size());
+        assertEquals(5, (int) actual.getMigrationNumber(1));
+        assertEquals(2, (int) actual.getMigrationNumber(2));
+        assertEquals(6, (int) actual.getMigrationNumber(4));
+        assertEquals(1, (int) actual.getMigrationNumber(7));
+    }
+
+    public void testUpdateVersionTableWithNoPreviousVersion() throws Exception {
+        stmt.execute("CREATE TABLE " + VERSION_TABLE_NAME + " (release INTEGER NOT NULL, migration INTEGER NOT NULL)");
+
+        adapter.updateVersion(2, 4);
+        ResultSet rs = stmt.executeQuery("SELECT release, migration FROM " + VERSION_TABLE_NAME + " WHERE release=2");
+        boolean any = false;
+        while (rs.next()) {
+            any = true;
+            assertEquals(2, rs.getInt("release"));
+            assertEquals(4, rs.getInt("migration"));
+        }
+        assertTrue("Result not stored", any);
+    }
+
+    public void testUpdateVersionTableWithPreviousVersion() throws Exception {
+        stmt.execute("CREATE TABLE " + VERSION_TABLE_NAME + " (release INTEGER NOT NULL, migration INTEGER NOT NULL)");
+        stmt.execute("INSERT INTO " + VERSION_TABLE_NAME + "(release, migration) VALUES (3, 7)");
+
+        adapter.updateVersion(3, 2);
+        ResultSet rs = stmt.executeQuery("SELECT release, migration FROM " + VERSION_TABLE_NAME + " WHERE release=3");
+        boolean any = false;
+        while (rs.next()) {
+            any = true;
+            assertEquals(3, rs.getInt("release"));
+            assertEquals(2, rs.getInt("migration"));
+        }
+        assertTrue("Result not present", any);
     }
 
     private void assertTablePresent(String tableName) throws SQLException {

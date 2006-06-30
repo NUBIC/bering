@@ -2,9 +2,11 @@ package edu.northwestern.bioinformatics.bering.runtime;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 /**
@@ -12,11 +14,11 @@ import java.util.regex.Pattern;
  */
 public class MigrationFinder {
     private File root;
-    private List<Release> releases;
+    private SortedMap<Integer, Release> releases;
 
     public MigrationFinder(File root) {
         this.root = root;
-        this.releases = new ArrayList<Release>();
+        this.releases = new TreeMap<Integer, Release>();
         initialize();
     }
 
@@ -26,13 +28,21 @@ public class MigrationFinder {
             throw new IllegalArgumentException(root.getAbsolutePath() + " does not exist, so it cannot be used as a migration base directory");
         }
         for (File dir : releaseDirectories) {
-            releases.add(new Release(dir).initialize());
+            Release release = new Release(dir).initialize();
+            releases.put(release.getIndex(), release);
         }
-        Collections.sort(releases);
     }
 
-    public List<Release> getReleases() {
-        return releases;
+    public Collection<Release> getReleases() {
+        return new ArrayList<Release>(releases.values());
+    }
+
+    public int getMaxReleaseIndex() {
+        return releases.lastKey();
+    }
+
+    public Release getRelease(int releaseNumber) {
+        return releases.get(releaseNumber);
     }
 
     private static final class DigitDirectoriesOnly implements FileFilter {

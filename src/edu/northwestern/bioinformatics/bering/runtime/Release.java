@@ -5,24 +5,28 @@ import java.io.FilenameFilter;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * @author rsutphin
  */
 public class Release extends MigrationFile {
-    private List<Script> scripts;
+    private SortedMap<Integer, Script> scripts;
 
     public Release(File directory) {
         super(directory);
-        this.scripts = new LinkedList<Script>();
+        this.scripts = new TreeMap<Integer, Script>();
     }
 
     // This is separate from the constructor to aid testing
     public Release initialize() {
         for (File scriptFile : listScripts()) {
-            scripts.add(new Script(scriptFile));
+            Script script = new Script(scriptFile);
+            scripts.put(script.getIndex(), script);
         }
-        Collections.sort(scripts);
         return this;
     }
 
@@ -34,8 +38,17 @@ public class Release extends MigrationFile {
         return scriptFiles;
     }
 
-    public List<Script> getScripts() {
-        return scripts;
+    public Collection<Script> getScripts() {
+        return scripts.values();
+    }
+
+    public Script getScript(int number) {
+        return scripts.get(number);
+    }
+
+    public Integer getMaxScriptIndex() {
+        if (getScripts().size() == 0) return 0;
+        return scripts.lastKey();
     }
 
     private static class GroovyFilesOnly implements FilenameFilter {
