@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<antlib>
+   <typedef name="migrate" classname="edu.northwestern.bioinformatics.bering.ant.MigrateTask"/>
+</antlib>
