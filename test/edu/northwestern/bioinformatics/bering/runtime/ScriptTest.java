@@ -19,7 +19,7 @@ public class ScriptTest extends BeringTestCase {
     }
 
     public void testNameAndIndexWithName() throws Exception {
-        assertEquals(1, (int) existingScript.getIndex());
+        assertEquals(1, (int) existingScript.getNumber());
         assertEquals("add_frogs", existingScript.getName());
     }
 

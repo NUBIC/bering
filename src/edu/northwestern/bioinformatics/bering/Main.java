@@ -49,7 +49,7 @@ public class Main {
 
         public static Target create(MigrationFinder finder, Integer requestedReleaseNumber, Integer requestedMigrationNumber) {
             int relN = requestedReleaseNumber == null
-                ? finder.getMaxReleaseIndex()
+                ? finder.getMaxReleaseNumber()
                 : requestedReleaseNumber;
 
             Release requestedRelease = finder.getRelease(relN);
@@ -58,7 +58,7 @@ public class Main {
             }
 
             int migN = requestedMigrationNumber == null
-                ? requestedRelease.getMaxScriptIndex()
+                ? requestedRelease.getMaxScriptNumber()
                 : requestedReleaseNumber;
 
             Script requestedMigrationScript = requestedRelease.getScript(migN);

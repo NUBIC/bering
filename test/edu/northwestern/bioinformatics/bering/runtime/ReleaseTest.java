@@ -18,13 +18,13 @@ public class ReleaseTest extends BeringTestCase {
 
     public void testNameAndIndexWithName() throws Exception {
         Release r = createRelease("../test_db/001_out_the_door");
-        assertEquals(1, (int) r.getIndex());
+        assertEquals(1, (int) r.getNumber());
         assertEquals("out_the_door", r.getName());
     }
 
     public void testNameAndIndexWithoutName() throws Exception {
         Release r = createRelease("../test_db/001");
-        assertEquals(1, (int) r.getIndex());
+        assertEquals(1, (int) r.getNumber());
         assertNull(r.getName());
     }
 
@@ -43,9 +43,9 @@ public class ReleaseTest extends BeringTestCase {
     public void testScriptsFound() throws Exception {
         Release out = existingRelease.initialize();
         assertEquals(2, out.getScripts().size());
-        assertEquals(1, (int) out.getScript(1).getIndex());
+        assertEquals(1, (int) out.getScript(1).getNumber());
         assertEquals("add_frogs", out.getScript(1).getName());
-        assertEquals(2, (int) out.getScript(2).getIndex());
+        assertEquals(2, (int) out.getScript(2).getNumber());
         assertEquals("add_ponds", out.getScript(2).getName());
     }
 

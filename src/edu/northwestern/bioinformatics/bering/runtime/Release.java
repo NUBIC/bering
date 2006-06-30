@@ -2,13 +2,9 @@ package edu.northwestern.bioinformatics.bering.runtime;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * @author rsutphin
@@ -25,7 +21,7 @@ public class Release extends MigrationFile {
     public Release initialize() {
         for (File scriptFile : listScripts()) {
             Script script = new Script(scriptFile);
-            scripts.put(script.getIndex(), script);
+            scripts.put(script.getNumber(), script);
         }
         return this;
     }
@@ -46,7 +42,7 @@ public class Release extends MigrationFile {
         return scripts.get(number);
     }
 
-    public Integer getMaxScriptIndex() {
+    public Integer getMaxScriptNumber() {
         if (getScripts().size() == 0) return 0;
         return scripts.lastKey();
     }

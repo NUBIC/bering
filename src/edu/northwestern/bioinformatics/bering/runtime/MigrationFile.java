@@ -8,7 +8,7 @@ import java.io.File;
 public abstract class MigrationFile implements Comparable<MigrationFile> {
     private File file;
     private String name;
-    private Integer index;
+    private Integer number;
 
     public MigrationFile(File file) {
         this.file = file;
@@ -33,15 +33,15 @@ public abstract class MigrationFile implements Comparable<MigrationFile> {
 
     protected void initIndexAndName(String indexString, String nameString) {
         name = nameString;
-        index = new Integer(indexString);
+        number = new Integer(indexString);
     }
 
     public String getName() {
         return name;
     }
 
-    public Integer getIndex() {
-        return index;
+    public Integer getNumber() {
+        return number;
     }
 
     public File getFile() {
@@ -49,6 +49,6 @@ public abstract class MigrationFile implements Comparable<MigrationFile> {
     }
 
     public int compareTo(MigrationFile o) {
-        return getIndex() - o.getIndex();
+        return getNumber() - o.getNumber();
     }
 }

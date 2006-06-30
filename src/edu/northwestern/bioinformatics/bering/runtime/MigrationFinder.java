@@ -3,7 +3,6 @@ package edu.northwestern.bioinformatics.bering.runtime;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Collection;
@@ -29,7 +28,7 @@ public class MigrationFinder {
         }
         for (File dir : releaseDirectories) {
             Release release = new Release(dir).initialize();
-            releases.put(release.getIndex(), release);
+            releases.put(release.getNumber(), release);
         }
     }
 
@@ -37,7 +36,7 @@ public class MigrationFinder {
         return new ArrayList<Release>(releases.values());
     }
 
-    public int getMaxReleaseIndex() {
+    public int getMaxReleaseNumber() {
         return releases.lastKey();
     }
 
