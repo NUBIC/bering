@@ -12,11 +12,17 @@ import org.apache.ddlutils.model.Table;
 import org.apache.commons.beanutils.DynaBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.dao.DataAccessException;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.sql.Types;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 
@@ -37,23 +43,51 @@ public class DatabaseAdapter implements Adapter {
     }
 
     private Platform platform;
+    private Connection conn;
+    private boolean defaultAutocommit;
+    private JdbcTemplate jdbc;
 
-    // TODO: may need to change this to a single connection, or find some other way to
-    // handle transactions
-    public DatabaseAdapter(DataSource dataSource) {
-        this.platform = PlatformFactory.createNewPlatformInstance(dataSource);
+    public DatabaseAdapter(Connection conn) {
+        this.conn = conn;
+        DataSource ds = new SingleConnectionDataSource(conn, true);
+        this.jdbc = new JdbcTemplate(ds);
+        this.platform = PlatformFactory.createNewPlatformInstance(ds);
+    }
+
+    public void close() throws SQLException {
+        // use the connection directly because the data source used by JdbcTemplate
+        // is suppressing close (deliberately)
+        conn.close();
     }
 
     public void beginTransaction() {
-        throw new UnsupportedOperationException("beginTransaction not implemented");
+        jdbc.execute(new ConnectionCallback() {
+            public Object doInConnection(Connection connection) throws SQLException, DataAccessException {
+                defaultAutocommit = connection.getAutoCommit();
+                connection.setAutoCommit(false);
+                return null;
+            }
+        });
     }
 
     public void commit() {
-        throw new UnsupportedOperationException("commit not implemented");
+        jdbc.execute(new ConnectionCallback() {
+            public Object doInConnection(Connection connection) throws SQLException, DataAccessException {
+                connection.commit();
+                connection.setAutoCommit(defaultAutocommit);
+                return null;
+            }
+        });
     }
 
     public void rollback() {
-        throw new UnsupportedOperationException("rollback not implemented");
+        jdbc.execute(new ConnectionCallback() {
+            public Object doInConnection(Connection connection) throws SQLException, DataAccessException {
+                connection.rollback();
+                connection.setAutoCommit(defaultAutocommit);
+                return null;
+            }
+        });
     }
 
     public void createTable(TableDefinition def) {

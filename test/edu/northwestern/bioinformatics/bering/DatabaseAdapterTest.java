@@ -30,7 +30,7 @@ public class DatabaseAdapterTest extends TestCase {
         // in-memory databases apparently persist across connections within the same JVM
         // hence the random number added to the name
         conn = DriverManager.getConnection("jdbc:hsqldb:mem:test" + Math.random(), "sa", "");
-        adapter = new DatabaseAdapter(new SingleConnectionDataSource(conn, true));
+        adapter = new DatabaseAdapter(conn);
         stmt = conn.createStatement();
 
         stmt.execute("CREATE TABLE " + TABLE_NAME + " (id INTEGER PRIMARY KEY, title VARCHAR(50))");
