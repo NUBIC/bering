@@ -153,6 +153,19 @@ public class DatabaseAdapterTest extends TestCase {
         }
         assertTrue("Result not present", any);
     }
+    
+    public void testUpdateVersionTableToMigrationZero() throws Exception {
+        stmt.execute("CREATE TABLE " + VERSION_TABLE_NAME + " (release INTEGER NOT NULL, migration INTEGER NOT NULL)");
+        stmt.execute("INSERT INTO " + VERSION_TABLE_NAME + "(release, migration) VALUES (3, 7)");
+
+        adapter.updateVersion(3, 0);
+        ResultSet rs = stmt.executeQuery("SELECT release, migration FROM " + VERSION_TABLE_NAME + " WHERE release=3");
+        boolean any = false;
+        while (rs.next()) {
+            any = true;
+        }
+        assertFalse("Should be no results", any);
+    }
 
     private void assertTablePresent(String tableName) throws SQLException {
         stmt.execute("SELECT * FROM " + tableName);

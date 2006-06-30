@@ -3,6 +3,8 @@ package edu.northwestern.bioinformatics.bering.runtime;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Collection;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * @author rsutphin
@@ -15,7 +17,11 @@ public class Version {
     }
 
     public void updateRelease(Integer releaseNumber, Integer migrationNumber) {
-        versionTable.put(releaseNumber, migrationNumber);
+        if (migrationNumber < 1) {
+            versionTable.remove(releaseNumber);
+        } else {
+            versionTable.put(releaseNumber, migrationNumber);
+        }
     }
 
     public Integer getMigrationNumber(Integer releaseNumber) {
@@ -31,7 +37,7 @@ public class Version {
         return versionTable.containsKey(releaseNumber);
     }
 
-    public Collection<Integer> getReleaseNumbers() {
-        return versionTable.keySet();
+    public SortedSet<Integer> getReleaseNumbers() {
+        return new TreeSet<Integer>(versionTable.keySet());
     }
 }

@@ -115,7 +115,9 @@ public class DatabaseAdapter implements Adapter {
         Database db = createDatabaseWithSingleTable(VERSION_TABLE);
         platform.evaluateBatch("DELETE FROM " + VERSION_TABLE_NAME + " WHERE " + RELEASE_COLUMN_NAME + " = " + release, false);
 
-        DynaBean newVersion = null;
+        if (migration < 1) return;
+
+        DynaBean newVersion;
         try {
             newVersion = SqlDynaClass.newInstance(VERSION_TABLE).newInstance();
         } catch (IllegalAccessException e) {

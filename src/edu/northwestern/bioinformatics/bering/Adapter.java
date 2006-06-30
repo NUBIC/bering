@@ -25,5 +25,12 @@ public interface Adapter {
 
     Version loadVersions();
 
+    /**
+     * Update note that the database is now at the <code>migration</code> state
+     * for a particular release.  If <code>migration</code> is zero, the database has had
+     * none of the migrations for that release applied.
+     * @param release
+     * @param migration
+     */
     void updateVersion(Integer release, Integer migration);
 }
