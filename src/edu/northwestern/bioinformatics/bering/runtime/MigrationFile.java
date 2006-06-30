@@ -13,16 +13,19 @@ public abstract class MigrationFile implements Comparable<MigrationFile> {
     public MigrationFile(File file) {
         this.file = file;
 
-        String filename = stripExtension(file.getName());
+        // allow nulls for testing
+        if (file != null) {
+            String filename = stripExtension(file.getName());
 
-        int firstUnderscore = filename.indexOf('_');
-        if (firstUnderscore < 0) {
-            initIndexAndName(filename, null);
-        } else {
-            initIndexAndName(
-                filename.substring(0, firstUnderscore),
-                filename.substring(firstUnderscore + 1)
-            );
+            int firstUnderscore = filename.indexOf('_');
+            if (firstUnderscore < 0) {
+                initIndexAndName(filename, null);
+            } else {
+                initIndexAndName(
+                    filename.substring(0, firstUnderscore),
+                    filename.substring(firstUnderscore + 1)
+                );
+            }
         }
     }
 

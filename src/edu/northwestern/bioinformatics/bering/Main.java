@@ -3,6 +3,7 @@ package edu.northwestern.bioinformatics.bering;
 import edu.northwestern.bioinformatics.bering.runtime.MigrationFinder;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 import edu.northwestern.bioinformatics.bering.runtime.Target;
+import edu.northwestern.bioinformatics.bering.runtime.Migrator;
 
 import java.io.File;
 
@@ -18,9 +19,6 @@ public class Main {
      * If <code>targetMigrationNumber</code> is null, the database will be migrated to the
      * last script in <code>targetReleaseNumber</code>.  If <code>targetReleaseNumber</code>
      * is null, the target will be the latest release.
-     * <p>
-     *
-     * </p>
      *
      * @param targetReleaseNumber
      * @param targetMigrationNumber
@@ -36,9 +34,11 @@ public class Main {
         Version current = adapter.loadVersions();
 
         // walk through scripts, running ones that haven't been run, up to / down to desired release/version
-        if (target.getReleaseNumber() >= current.getReleaseNumbers().last()) {
-            // TODO
-        }
+        createMigrator(finder, current, target).migrate();
+    }
+
+    protected Migrator createMigrator(MigrationFinder finder, Version current, Target target) {
+        return new Migrator(adapter, finder, current, target);
     }
 
     ////// CONFIGURATION
@@ -50,5 +50,4 @@ public class Main {
     public void setAdapter(Adapter adapter) {
         this.adapter = adapter;
     }
-
 }

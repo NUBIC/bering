@@ -12,16 +12,19 @@ import org.codehaus.groovy.control.CompilationFailedException;
  * @author rsutphin
  */
 public class Script extends MigrationFile {
+    private Release release;
+
     private static GroovyClassLoader loader;
     static {
         loader = new GroovyClassLoader(Script.class.getClassLoader());
     }
 
-    public Script(File file) {
+    public Script(File file, Release release) {
         super(file);
         if (getName() == null) {
             throw new IllegalArgumentException("A name is required for scripts: " + file.getPath());
         }
+        this.release = release;
     }
 
     public String getClassName() {
@@ -53,6 +56,10 @@ public class Script extends MigrationFile {
         }
     }
 
+    public Release getRelease() {
+        return release;
+    }
+
     public Migration createMigrationInstance() {
         try {
             return loadClass().newInstance();
@@ -61,5 +68,22 @@ public class Script extends MigrationFile {
         } catch (IllegalAccessException e) {
             throw new MigrationLoadingException(e);
         }
+    }
+
+    public void up() {
+        createMigrationInstance().up();
+    }
+
+    public void down() {
+        createMigrationInstance().down();
+    }
+
+    public String toString() {
+        return new StringBuilder()
+            .append(getClass().getSimpleName()).append('[')
+            .append(getRelease().getNumber()).append('-')
+            .append(getNumber()).append(' ')
+            .append(getName()).append(']')
+            .toString();
     }
 }

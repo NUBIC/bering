@@ -20,10 +20,14 @@ public class Release extends MigrationFile {
     // This is separate from the constructor to aid testing
     public Release initialize() {
         for (File scriptFile : listScripts()) {
-            Script script = new Script(scriptFile);
-            scripts.put(script.getNumber(), script);
+            Script script = new Script(scriptFile, this);
+            addScript(script);
         }
         return this;
+    }
+
+    protected void addScript(Script script) {
+        scripts.put(script.getNumber(), script);
     }
 
     private File[] listScripts() {

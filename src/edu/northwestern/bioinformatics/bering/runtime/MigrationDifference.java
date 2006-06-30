@@ -17,15 +17,15 @@ public class MigrationDifference {
 
     public MigrationDifference(Release release, Integer currentMigration, Integer targetMigration) {
         this.release = release;
-        this.targetMigration = targetMigration == null ? release.getScripts().size() : targetMigration;
         this.currentMigration = currentMigration == null ? 0 : currentMigration;
+        this.targetMigration = targetMigration == null ? release.getMaxScriptNumber() : targetMigration;
     }
 
     public boolean isUp() {
         return targetMigration >= currentMigration;
     }
 
-    public List<Migration> getMigrationsToRun() {
+    public List<Script> getScriptsToRun() {
         List<Integer> scriptNumbers;
         if (targetMigration == currentMigration) {
             scriptNumbers = Collections.emptyList();
@@ -34,11 +34,12 @@ public class MigrationDifference {
         } else {
             scriptNumbers = getDownNumbers();
         }
-        List<Migration> migrations = new LinkedList<Migration>();
+        List<Script> scripts = new LinkedList<Script>();
         for (Integer n : scriptNumbers) {
-            migrations.add(release.getScript(n).createMigrationInstance());
+            Script script = release.getScript(n);
+            if (script != null) scripts.add(script);
         }
-        return migrations;
+        return scripts;
     }
 
     private List<Integer> getUpNumbers() {

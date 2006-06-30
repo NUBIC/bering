@@ -6,11 +6,42 @@ import java.io.File;
 import java.net.URL;
 import java.net.URISyntaxException;
 import java.net.URI;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.LinkedList;
+
+import org.easymock.classextension.EasyMock;
 
 /**
  * @author rsutphin
  */
 public abstract class BeringTestCase extends TestCase {
+    private List<Object> mocks;
+
+    private List<Object> getMocks() {
+        if (mocks == null) { mocks = new LinkedList<Object>(); }
+        return mocks;
+    }
+
+    protected <T> T registerMockFor(Class<T> toMock) {
+        T mock = EasyMock.createMock(toMock);
+        getMocks().add(mock);
+        return mock;
+    }
+
+    protected void replayMocks() {
+        for (Object o : getMocks()) EasyMock.replay(o);
+    }
+
+    protected void verifyMocks() {
+        for (Object o : getMocks()) EasyMock.verify(o);
+    }
+
+    protected void resetMocks() {
+        for (Object o : getMocks()) EasyMock.reset(o);
+    }
+
     public static void assertPositive(String message, long value) {
         assertTrue(prependMessage(message) + value + " is not positive", value > 0);
     }

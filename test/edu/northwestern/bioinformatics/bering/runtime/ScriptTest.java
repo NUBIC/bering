@@ -15,7 +15,7 @@ public class ScriptTest extends BeringTestCase {
         super.setUp();
         existingScript = new Script(
             getClassRelativeFile(getClass(),
-                "../test_db/001_out_the_door/001_add_frogs.groovy"));
+                "../test_db/001_out_the_door/001_add_frogs.groovy"), null);
     }
 
     public void testNameAndIndexWithName() throws Exception {
@@ -62,6 +62,6 @@ public class ScriptTest extends BeringTestCase {
     }
 
     private Script createScript(String filename) {
-        return new Script(new File(filename));
+        return new Script(new File(filename), null);
     }
 }

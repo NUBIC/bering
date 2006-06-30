@@ -36,6 +36,14 @@ public class VersionTest extends BeringTestCase {
         assertReleaseNumbers(1);
     }
 
+    public void testGetLastReleaseNumber() throws Exception {
+        assertEquals(3, (int) version.getLastReleaseNumber());
+    }
+
+    public void testGetDefaultLastReleaseNumber() throws Exception {
+        assertEquals(0, (int) new Version().getLastReleaseNumber());
+    }
+
     private void assertReleaseNumbers(Integer... expected) {
         assertEquals(
             new TreeSet<Integer>(Arrays.asList(expected)),

@@ -31,7 +31,7 @@ public class Target {
             : requestedMigrationNumber;
 
         Script requestedMigrationScript = requestedRelease.getScript(effectiveMigrationNumber);
-        if (requestedMigrationScript == null) {
+        if (effectiveMigrationNumber > 0 && requestedMigrationScript == null) {
             throw new MigrationLoadingException("There's no migration number " + effectiveMigrationNumber + " in release " + effectiveReleaseNumber);
         }
 

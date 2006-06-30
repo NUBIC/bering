@@ -40,4 +40,12 @@ public class Version {
     public SortedSet<Integer> getReleaseNumbers() {
         return new TreeSet<Integer>(versionTable.keySet());
     }
+
+    public Integer getLastReleaseNumber() {
+        if (versionTable.size() > 0) {
+            return versionTable.lastKey();
+        } else {
+            return 0;
+        }
+    }
 }

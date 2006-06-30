@@ -44,6 +44,18 @@ public class DatabaseAdapter implements Adapter {
         this.platform = PlatformFactory.createNewPlatformInstance(dataSource);
     }
 
+    public void beginTransaction() {
+        throw new UnsupportedOperationException("beginTransaction not implemented");
+    }
+
+    public void commit() {
+        throw new UnsupportedOperationException("commit not implemented");
+    }
+
+    public void rollback() {
+        throw new UnsupportedOperationException("rollback not implemented");
+    }
+
     public void createTable(TableDefinition def) {
         Database db = new Database();
         db.addTable(def.toTable());

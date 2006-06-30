@@ -7,13 +7,11 @@ import edu.northwestern.bioinformatics.bering.runtime.Version;
  * @author Moses Hohman
  */
 public interface Adapter {
-/*  // TODO:
     void beginTransaction();
 
     void commit();
 
     void rollback();
-*/
 
     void createTable(TableDefinition def);
 

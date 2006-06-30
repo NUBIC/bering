@@ -22,18 +22,25 @@ public class MigrationFinder {
     }
 
     private void initialize() {
-        File[] releaseDirectories = root.listFiles(DigitDirectoriesOnly.INSTANCE);
-        if (releaseDirectories == null) {
-            throw new IllegalArgumentException(root.getAbsolutePath() + " does not exist, so it cannot be used as a migration base directory");
-        }
-        for (File dir : releaseDirectories) {
-            Release release = new Release(dir).initialize();
-            releases.put(release.getNumber(), release);
+        // allow nulls for testing
+        if (root != null) {
+            File[] releaseDirectories = root.listFiles(DigitDirectoriesOnly.INSTANCE);
+            if (releaseDirectories == null) {
+                throw new IllegalArgumentException(root.getAbsolutePath() + " does not exist, so it cannot be used as a migration base directory");
+            }
+            for (File dir : releaseDirectories) {
+                Release release = new Release(dir).initialize();
+                addRelease(release);
+            }
         }
     }
 
+    protected void addRelease(Release release) {
+        releases.put(release.getNumber(), release);
+    }
+
     public Collection<Release> getReleases() {
-        return new ArrayList<Release>(releases.values());
+        return releases.values();
     }
 
     public int getMaxReleaseNumber() {
