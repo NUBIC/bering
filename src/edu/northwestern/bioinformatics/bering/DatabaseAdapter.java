@@ -51,11 +51,6 @@ public class DatabaseAdapter implements Adapter {
         dataSource = new SingleConnectionDataSource(connection, true);
         this.jdbc = new JdbcTemplate(dataSource);
         this.platform = PlatformFactory.createNewPlatformInstance(dataSource);
-        try {
-            System.out.println("connection type is " + dataSource.getConnection());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void close() throws SQLException {
