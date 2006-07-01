@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<project name="bering" default="jar">
+
+    <property name="source-level" value="1.5"/>
+
+    <property name="release-version" value="SNAPSHOT"/> <!-- override on the command-line if necessary -->
+    <property name="release-name" value="bering-${release-version}"/>
+    <property name="src-release-name" value="${release-name}-src"/>
+    <property name="compiled-src" value="build/compiled-src"/>
+    <property name="compiled-test" value="build/compiled-test"/>
+
+    <path id="libs">
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="libs.test">
+        <pathelement location="${compiled-src}"/>
+        <fileset dir="lib-test">
+            <include name="**/*.jar"/>
+        </fileset>
+        <path refid="libs"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="build"/>
+        <delete dir="dist"/>
+    </target>
+
+    <target name="init" description="create directories for compilation">
+        <mkdir dir="build/compiled-src"/>
+        <mkdir dir="build/compiled-test"/>
+    </target>
+
+    <target name="resources" depends="init" description="copy resources into classpath">
+        <copy todir="${compiled-src}">
+            <fileset dir="resources"/>
+        </copy>
+    </target>
+
+    <target name="resources-test" depends="init" description="copy test resources into test classpath">
+        <copy todir="${compiled-test}">
+            <fileset dir="test">
+                <include name="**/test_db/**"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile" depends="resources" description="compile application code">
+        <javac source="${source-level}" srcdir="src" destdir="${compiled-src}" debug="true" classpathref="libs"/>
+    </target>
+
+    <target name="compile-tests" depends="compile, resources-test" description="compile test code">
+        <javac source="${source-level}" srcdir="test" destdir="${compiled-test}" debug="true" classpathref="libs.test"/>
+    </target>
+
+    <target name="test" depends="compile-tests" description="run unit tests">
+        <junit haltonfailure="true" fork="true" forkmode="once">
+            <classpath>
+                <pathelement location="${compiled-test}"/>
+                <path refid="libs.test"/>
+            </classpath>
+            <formatter type="plain" usefile="false"/>
+            <batchtest>
+                <fileset dir="test">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="jar" depends="test" description="build jar">
+        <mkdir dir="dist"/>
+        <jar destfile="dist/${release-name}.jar" basedir="${compiled-src}">
+            <manifest>
+                <attribute name="Implementation-Title" value="Bering"/>
+                <attribute name="Implementation-Version" value="${release-version}"/>
+                <attribute name="Bering-Version" value="${release-version}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="dist" depends="jar" description="build release .zip and .tar.gz files">
+        <patternset id="release-pattern">
+            <include name="LGPL.txt"/>
+            <include name="LICENSE"/>
+            <include name="dist/bering*.jar"/>
+            <include name="doc/**"/>
+            <include name="lib/**"/>
+        </patternset>
+        <patternset id="src-release-pattern">
+            <include name="build.xml"/>
+            <include name="lib-test/**"/>
+            <include name="resources/**"/>
+            <include name="src/**"/>
+            <include name="test/**"/>
+        </patternset>
+        <fileset id="release-fileset" dir=".">
+            <patternset refid="release-pattern"/>
+        </fileset>
+
+        <zip destfile="dist/${release-name}.zip">
+            <zipfileset refid="release-fileset" prefix="${release-name}"/>
+        </zip>
+        <zip destfile="dist/${src-release-name}.zip">
+            <zipfileset refid="release-fileset" prefix="${release-name}"/>
+            <zipfileset dir="." prefix="${release-name}">
+                <patternset refid="src-release-pattern"/>
+            </zipfileset>
+        </zip>
+
+        <tar destfile="dist/${release-name}.tar.gz" compression="gzip">
+            <tarfileset prefix="${release-name}" dir=".">
+                <patternset refid="release-pattern"/>
+            </tarfileset>
+        </tar>
+        <tar destfile="dist/${src-release-name}.tar.gz" compression="gzip">
+            <tarfileset prefix="${release-name}" dir=".">
+                <patternset refid="release-pattern"/>
+                <patternset refid="src-release-pattern"/>
+            </tarfileset>
+        </tar>
+    </target>
+</project>

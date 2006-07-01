@@ -1,22 +1,19 @@
 package edu.northwestern.bioinformatics.bering;
 
 import groovy.lang.Closure;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.beans.PropertyEditor;
-import java.sql.Types;
-
 import org.apache.ddlutils.model.Column;
-import org.springframework.beans.propertyeditors.CustomBooleanEditor;
+
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Moses Hohman
  */
 public abstract class Migration {
-    private static final String NULLABLE_KEY  = "nullable";
-    private static final String LIMIT_KEY     = "limit";
-    private static final String PRECISION_KEY = "precision";
+    public static final String NULLABLE_KEY  = "nullable";
+    public static final String LIMIT_KEY     = "limit";
+    public static final String PRECISION_KEY = "precision";
 
     private static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
     static {
@@ -29,7 +26,7 @@ public abstract class Migration {
         NAMES_TO_JDBC_TYPES.put("timestamp", Types.TIMESTAMP);
     }
 
-    private Adapter adapter;
+    protected Adapter adapter;
 
     ////// METHODS FOR MIGRATIONS TO OVERRIDE
 
@@ -52,7 +49,7 @@ public abstract class Migration {
         addColumn(null, tableName, columnName, columnType);
     }
 
-    protected void addColumn(Map<String, String> parameters, String tableName, String columnName, String columnType) {
+    protected void addColumn(Map<String, Object> parameters, String tableName, String columnName, String columnType) {
         adapter.addColumn(tableName, createColumn(parameters, columnName, columnType));
     }
 
@@ -64,21 +61,19 @@ public abstract class Migration {
 
     // TODO: maybe this should be moved somewhere else
     // visible to collaborators (e.g., TableDefinition)
-    Column createColumn(Map<String, String> parameters, String columnName, String columnType) {
+    Column createColumn(Map<String, Object> parameters, String columnName, String columnType) {
         Column col = new Column();
         col.setName(columnName);
         col.setTypeCode(getTypeCode(columnType));
         if (parameters != null && !parameters.isEmpty()) {
             if (parameters.containsKey(NULLABLE_KEY)) {
-                PropertyEditor editor = new CustomBooleanEditor(false);
-                editor.setAsText(parameters.get(NULLABLE_KEY));
-                col.setRequired(!((Boolean) editor.getValue()));
+                col.setRequired(!((Boolean) parameters.get(NULLABLE_KEY)));
             }
             if (parameters.containsKey(LIMIT_KEY)) {
-                col.setSize(parameters.get(LIMIT_KEY));
+                col.setSize(String.valueOf(parameters.get(LIMIT_KEY)));
             }
             if (parameters.containsKey(PRECISION_KEY)) {
-                col.setScale(new Integer(parameters.get(PRECISION_KEY)));
+                col.setScale((Integer) parameters.get(PRECISION_KEY));
             }
         }
         return col;

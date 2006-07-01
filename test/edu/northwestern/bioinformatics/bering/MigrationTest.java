@@ -1,11 +1,13 @@
 package edu.northwestern.bioinformatics.bering;
 
+import static edu.northwestern.bioinformatics.bering.Migration.NULLABLE_KEY;
+import static edu.northwestern.bioinformatics.bering.Migration.LIMIT_KEY;
+import static edu.northwestern.bioinformatics.bering.Migration.PRECISION_KEY;
 import junit.framework.TestCase;
+import org.apache.ddlutils.model.Column;
 
 import java.sql.Types;
 import java.util.Collections;
-
-import org.apache.ddlutils.model.Column;
 
 /**
  * @author rsutphin
@@ -22,17 +24,17 @@ public class MigrationTest extends TestCase {
     }
 
     public void testCreateNotNullColumn() throws Exception {
-        Column actual = migration.createColumn(Collections.singletonMap("nullable", "false"), "notnull", "string");
-        assertTrue(actual.isRequired());
+        Column actual = migration.createColumn(Collections.singletonMap(NULLABLE_KEY, (Object) Boolean.FALSE), "notnull", "string");
+        assertTrue("required not set correctly", actual.isRequired());
     }
 
     public void testCreateColumnWithLimit() throws Exception {
-        Column actual = migration.createColumn(Collections.singletonMap("limit", "255"), "notnull", "string");
+        Column actual = migration.createColumn(Collections.singletonMap(LIMIT_KEY, (Object) 255), "notnull", "string");
         assertEquals(255, actual.getSizeAsInt());
     }
 
     public void testCreateColumnWithPrecision() throws Exception {
-        Column actual = migration.createColumn(Collections.singletonMap("precision", "9"), "notnull", "string");
+        Column actual = migration.createColumn(Collections.singletonMap(PRECISION_KEY, (Object) 9), "notnull", "string");
         assertEquals(9, actual.getScale());
     }
 

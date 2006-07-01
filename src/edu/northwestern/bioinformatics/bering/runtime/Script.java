@@ -1,22 +1,25 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.Migration;
+import edu.northwestern.bioinformatics.bering.Adapter;
+import groovy.lang.GroovyClassLoader;
+import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.control.CompilerConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 
-import groovy.lang.GroovyClassLoader;
-import org.codehaus.groovy.control.CompilationFailedException;
-
 /**
- * @author rsutphin
+ * @author Rhett Sutphin
+ * @author Moses Hohman
  */
 public class Script extends MigrationFile {
     private Release release;
 
     private static GroovyClassLoader loader;
     static {
-        loader = new GroovyClassLoader(Script.class.getClassLoader());
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+        loader = new GroovyClassLoader(Script.class.getClassLoader(), compilerConfiguration);
     }
 
     public Script(File file, Release release) {
@@ -38,10 +41,8 @@ public class Script extends MigrationFile {
     }
 
     public Class<? extends Migration> loadClass() {
-        String className = getClassName();
         try {
-            loader.parseClass(getFile());
-            Class<?> migrationClass = Class.forName(className);
+            Class<?> migrationClass = loader.parseClass(getFile());
             if (Migration.class.isAssignableFrom(migrationClass)) {
                 return (Class<? extends Migration>) migrationClass;
             } else {
@@ -51,8 +52,6 @@ public class Script extends MigrationFile {
             throw new MigrationLoadingException("Could not read " + getFile(), e);
         } catch (CompilationFailedException e) {
             throw new MigrationLoadingException("Compiling " + getFile() + " failed", e);
-        } catch (ClassNotFoundException e) {
-            throw new MigrationLoadingException("Parsing " + getFile() + " succeeded, but could not load a class named " + className, e);
         }
     }
 
@@ -60,9 +59,11 @@ public class Script extends MigrationFile {
         return release;
     }
 
-    public Migration createMigrationInstance() {
+    public Migration createMigrationInstance(Adapter adapter) {
         try {
-            return loadClass().newInstance();
+            Migration instance = loadClass().newInstance();
+            instance.setAdapter(adapter);
+            return instance;
         } catch (InstantiationException e) {
             throw new MigrationLoadingException(e);
         } catch (IllegalAccessException e) {
@@ -70,12 +71,12 @@ public class Script extends MigrationFile {
         }
     }
 
-    public void up() {
-        createMigrationInstance().up();
+    public void up(Adapter adapter) {
+        createMigrationInstance(adapter).up();
     }
 
-    public void down() {
-        createMigrationInstance().down();
+    public void down(Adapter adapter) {
+        createMigrationInstance(adapter).down();
     }
 
     public String toString() {

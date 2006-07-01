@@ -1,30 +1,30 @@
 package edu.northwestern.bioinformatics.bering;
 
-import org.apache.ddlutils.Platform;
-import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.dynabean.SqlDynaClass;
-import org.apache.ddlutils.alteration.AddColumnChange;
-import org.apache.ddlutils.alteration.RemoveColumnChange;
-import org.apache.ddlutils.alteration.TableChange;
-import org.apache.ddlutils.model.Column;
-import org.apache.ddlutils.model.Database;
-import org.apache.ddlutils.model.Table;
+import edu.northwestern.bioinformatics.bering.runtime.Version;
 import org.apache.commons.beanutils.DynaBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.apache.ddlutils.Platform;
+import org.apache.ddlutils.PlatformFactory;
+import org.apache.ddlutils.alteration.AddColumnChange;
+import org.apache.ddlutils.alteration.RemoveColumnChange;
+import org.apache.ddlutils.alteration.TableChange;
+import org.apache.ddlutils.dynabean.SqlDynaClass;
+import org.apache.ddlutils.model.Column;
+import org.apache.ddlutils.model.Database;
+import org.apache.ddlutils.model.Table;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.datasource.ConnectionProxy;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.dao.DataAccessException;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.sql.Types;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import edu.northwestern.bioinformatics.bering.runtime.Version;
+import java.sql.Types;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * @author rsutphin
@@ -43,21 +43,25 @@ public class DatabaseAdapter implements Adapter {
     }
 
     private Platform platform;
-    private Connection conn;
+    private DataSource dataSource;
     private boolean defaultAutocommit;
     private JdbcTemplate jdbc;
 
-    public DatabaseAdapter(Connection conn) {
-        this.conn = conn;
-        DataSource ds = new SingleConnectionDataSource(conn, true);
-        this.jdbc = new JdbcTemplate(ds);
-        this.platform = PlatformFactory.createNewPlatformInstance(ds);
+    public DatabaseAdapter(Connection connection) {
+        dataSource = new SingleConnectionDataSource(connection, true);
+        this.jdbc = new JdbcTemplate(dataSource);
+        this.platform = PlatformFactory.createNewPlatformInstance(dataSource);
+        try {
+            System.out.println("connection type is " + dataSource.getConnection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void close() throws SQLException {
         // use the connection directly because the data source used by JdbcTemplate
         // is suppressing close (deliberately)
-        conn.close();
+        getTargetConnection().close();
     }
 
     public void beginTransaction() {
@@ -146,15 +150,15 @@ public class DatabaseAdapter implements Adapter {
             return new Version();
         }
 
-        Version v = new Version();
+        Version version = new Version();
         log.debug(VERSION_TABLE_NAME + " table exists; reading current rows");
         while (results.hasNext()) {
             DynaBean dynaBean = results.next();
-            v.updateRelease(
+            version.updateRelease(
                 (Integer) dynaBean.get(RELEASE_COLUMN_NAME),
                 (Integer) dynaBean.get("migration"));
         }
-        return v;
+        return version;
     }
 
     public void updateVersion(Integer release, Integer migration) {
@@ -176,5 +180,9 @@ public class DatabaseAdapter implements Adapter {
         newVersion.set(RELEASE_COLUMN_NAME, release);
         newVersion.set("migration", migration);
         platform.insert(db, newVersion);
+    }
+
+    private Connection getTargetConnection() throws SQLException {
+        return ((ConnectionProxy) dataSource.getConnection()).getTargetConnection();
     }
 }

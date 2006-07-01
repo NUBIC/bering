@@ -30,8 +30,8 @@ public class TableDefinitionTest extends TestCase {
     }
 
     public void testAddColumnWithLimit() throws Exception {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("limit", "50");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("limit", 50);
         definition.addColumn(params, "name", "string");
 
         Column col = definition.toTable().findColumn("name");
@@ -40,8 +40,8 @@ public class TableDefinitionTest extends TestCase {
     }
 
     public void testAddColumnWithPrecision() throws Exception {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("precision", "50");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("precision", 50);
         definition.addColumn(params, "name", "string");
 
         Column col = definition.toTable().findColumn("name");
@@ -50,8 +50,8 @@ public class TableDefinitionTest extends TestCase {
     }
 
     public void testAddNonNullableColumn() throws Exception {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("nullable", "false");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("nullable", false);
         definition.addColumn(params, "name", "string");
 
         Column col = definition.toTable().findColumn("name");
@@ -60,8 +60,8 @@ public class TableDefinitionTest extends TestCase {
     }
 
     public void testAddNullableColumn() throws Exception {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("nullable", "true");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("nullable", true);
         definition.addColumn(params, "name", "string");
 
         Column col = definition.toTable().findColumn("name");

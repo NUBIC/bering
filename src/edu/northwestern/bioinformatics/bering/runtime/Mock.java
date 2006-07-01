@@ -1,7 +1,7 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
-import java.io.File;
-import java.util.Collection;
+import edu.northwestern.bioinformatics.bering.IrreversibleMigration;
+import edu.northwestern.bioinformatics.bering.Adapter;
 
 /**
  * @author rsutphin
@@ -15,6 +15,14 @@ public class Mock {
         public Script(Release release, Integer number) {
             super(null, release);
             this.number = number;
+        }
+
+        public Class<? extends Migration> loadClass() {
+            return Mock.Script.Migration.class;
+        }
+
+        public edu.northwestern.bioinformatics.bering.Migration createMigrationInstance(Adapter adapter) {
+            return new Mock.Script.Migration();
         }
 
         public String getName() {
@@ -33,12 +41,14 @@ public class Mock {
             return downCalled;
         }
 
-        public void up() {
-            upCalled = true;
-        }
+        private class Migration extends edu.northwestern.bioinformatics.bering.Migration {
+            public void up() {
+                upCalled = true;
+            }
 
-        public void down() {
-            downCalled = true;
+            public void down() throws IrreversibleMigration {
+                downCalled = true;
+            }
         }
     }
 

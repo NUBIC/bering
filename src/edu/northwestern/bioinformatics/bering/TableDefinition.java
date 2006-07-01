@@ -2,9 +2,7 @@ package edu.northwestern.bioinformatics.bering;
 
 import org.apache.ddlutils.model.Column;
 import org.apache.ddlutils.model.Table;
-import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 
-import java.beans.PropertyEditor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +33,7 @@ public class TableDefinition {
         addColumn(null, columnName, type);
     }
 
-    public void addColumn(Map<String, String> parameters, String columnName, String type) {
+    public void addColumn(Map<String, Object> parameters, String columnName, String type) {
         columns.add(context.createColumn(parameters, columnName, type));
     }
 

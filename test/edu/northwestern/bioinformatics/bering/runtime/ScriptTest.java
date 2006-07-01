@@ -1,7 +1,10 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
+import edu.northwestern.bioinformatics.bering.Adapter;
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
+import edu.northwestern.bioinformatics.bering.IrreversibleMigration;
 import edu.northwestern.bioinformatics.bering.Migration;
+import org.easymock.EasyMock;
 
 import java.io.File;
 
@@ -56,9 +59,52 @@ public class ScriptTest extends BeringTestCase {
         assertTrue(Migration.class.isAssignableFrom(loaded));
     }
 
-    public void testGetMigrationInstance() throws Exception {
-        Migration migration = existingScript.createMigrationInstance();
+    public void testCreateMigrationInstance() throws Exception {
+        Migration migration = existingScript.createMigrationInstance(null);
         assertNotNull(migration);
+    }
+
+    public void testUpSetsAdapterOnMigration() {
+        StubScript script = new StubScript();
+        Adapter adapter = EasyMock.createMock(Adapter.class);
+        script.up(adapter);
+        assertEquals(adapter, script.getSingletonMigration().getAdapter());
+    }
+
+    public void testDownSetsAdapterOnMigration() {
+        StubScript script = new StubScript();
+        Adapter adapter = EasyMock.createMock(Adapter.class);
+        script.down(adapter);
+        assertEquals(adapter, script.getSingletonMigration().getAdapter());
+    }
+
+    private static class StubScript extends Script {
+        private StubMigration migration = new StubMigration();
+
+        public StubScript() {
+            super(new File("001_stub_script.groovy"), null);
+        }
+
+        public StubMigration getSingletonMigration() {
+            return migration;
+        }
+
+        public Migration createMigrationInstance(Adapter adapter) {
+            migration.setAdapter(adapter);
+            return migration;
+        }
+
+        private static class StubMigration extends Migration {
+            public Adapter getAdapter() {
+                return adapter;
+            }
+
+            public void up() {
+            }
+
+            public void down() throws IrreversibleMigration {
+            }
+        }
     }
 
     private Script createScript(String filename) {

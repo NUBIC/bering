@@ -7,7 +7,8 @@ import java.util.Collections;
 import java.util.ArrayList;
 
 /**
- * @author rsutphin
+ * @author Rhett Sutphin
+ * @author Moses Hohman
  */
 public class Migrator {
     private Adapter adapter;
@@ -82,6 +83,7 @@ public class Migrator {
         }
 
         public void execute() {
+            System.out.println("Executing migration: " + script.getClassName());
             adapter.beginTransaction();
             try {
                 run();
@@ -111,7 +113,7 @@ public class Migrator {
         }
 
         protected void run() {
-            getScript().up();
+            getScript().up(adapter);
         }
     }
 
@@ -121,7 +123,7 @@ public class Migrator {
         }
 
         protected void run() {
-            getScript().down();
+            getScript().down(adapter);
         }
     }
 }

@@ -1,18 +1,16 @@
 package edu.northwestern.bioinformatics.bering;
 
 import static edu.northwestern.bioinformatics.bering.DatabaseAdapter.VERSION_TABLE_NAME;
+import edu.northwestern.bioinformatics.bering.runtime.Version;
 import junit.framework.TestCase;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.apache.ddlutils.model.Column;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.sql.SQLException;
-import java.sql.ResultSet;
-
-import edu.northwestern.bioinformatics.bering.runtime.Version;
 
 /**
  * @author rsutphin
@@ -153,7 +151,7 @@ public class DatabaseAdapterTest extends TestCase {
         }
         assertTrue("Result not present", any);
     }
-    
+
     public void testUpdateVersionTableToMigrationZero() throws Exception {
         stmt.execute("CREATE TABLE " + VERSION_TABLE_NAME + " (release INTEGER NOT NULL, migration INTEGER NOT NULL)");
         stmt.execute("INSERT INTO " + VERSION_TABLE_NAME + "(release, migration) VALUES (3, 7)");
