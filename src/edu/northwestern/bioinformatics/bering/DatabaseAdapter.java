@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.sql.Savepoint;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -43,12 +44,13 @@ public class DatabaseAdapter implements Adapter {
     }
 
     private Platform platform;
-    private DataSource dataSource;
+    private Connection connection;
     private boolean defaultAutocommit;
     private JdbcTemplate jdbc;
 
     public DatabaseAdapter(Connection connection) {
-        dataSource = new SingleConnectionDataSource(connection, true);
+        this.connection = connection;
+        DataSource dataSource = new SingleConnectionDataSource(connection, true);
         this.jdbc = new JdbcTemplate(dataSource);
         this.platform = PlatformFactory.createNewPlatformInstance(dataSource);
     }
@@ -135,11 +137,18 @@ public class DatabaseAdapter implements Adapter {
     public Version loadVersions() {
         Database db = createDatabaseWithSingleTable(VERSION_TABLE);
         Iterator<DynaBean> results;
+        Savepoint savepoint = null;
         try {
+            savepoint = connection.setSavepoint();
             results = (Iterator<DynaBean>) platform.query(db,
                 "SELECT release, migration FROM " + VERSION_TABLE_NAME,
                 new Table[] { VERSION_TABLE });
         } catch (Exception e) {
+            try {
+                if (savepoint != null) connection.rollback(savepoint);
+            } catch (SQLException rollbackE) {
+                throw new RuntimeException(VERSION_TABLE_NAME + " does not exist and an attempt to create it has failed", rollbackE);
+            }
             log.info("Creating " + VERSION_TABLE_NAME + " table");
             platform.createTables(db, false, false);
             return new Version();
@@ -178,6 +187,6 @@ public class DatabaseAdapter implements Adapter {
     }
 
     private Connection getTargetConnection() throws SQLException {
-        return ((ConnectionProxy) dataSource.getConnection()).getTargetConnection();
+        return ((ConnectionProxy) connection).getTargetConnection();
     }
 }
