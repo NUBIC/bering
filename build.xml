@@ -115,12 +115,12 @@
             </zipfileset>
         </zip>
 
-        <tar destfile="dist/${release-name}.tar.gz" compression="gzip">
+        <tar destfile="dist/${release-name}.tar.gz" compression="gzip" longfile="gnu">
             <tarfileset prefix="${release-name}" dir=".">
                 <patternset refid="release-pattern"/>
             </tarfileset>
         </tar>
-        <tar destfile="dist/${src-release-name}.tar.gz" compression="gzip">
+        <tar destfile="dist/${src-release-name}.tar.gz" compression="gzip" longfile="gnu">
             <tarfileset prefix="${release-name}" dir=".">
                 <patternset refid="release-pattern"/>
                 <patternset refid="src-release-pattern"/>
