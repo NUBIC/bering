@@ -15,8 +15,11 @@ import org.apache.ddlutils.model.Database;
 import org.apache.ddlutils.model.Table;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.datasource.ConnectionProxy;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.dao.DataAccessException;
 
 import javax.sql.DataSource;
@@ -24,8 +27,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.sql.Savepoint;
+import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import com.sun.java_cup.internal.version;
 
 /**
  * @author rsutphin
@@ -39,6 +45,7 @@ public class DatabaseAdapter implements Adapter {
 
     private static final Table VERSION_TABLE = createNamedTable(VERSION_TABLE_NAME);
     static {
+        // TODO: these columns should be non-null
         VERSION_TABLE.addColumn(createColumn(RELEASE_COLUMN_NAME, Types.INTEGER));
         VERSION_TABLE.addColumn(createColumn(MIGRATION_COLUMN_NAME, Types.INTEGER));
     }
@@ -47,18 +54,22 @@ public class DatabaseAdapter implements Adapter {
     private Connection connection;
     private boolean defaultAutocommit;
     private JdbcTemplate jdbc;
+    private SingleConnectionDataSource dataSource;
 
     public DatabaseAdapter(Connection connection) {
         this.connection = connection;
-        DataSource dataSource = new SingleConnectionDataSource(connection, true);
+        this.dataSource = new SingleConnectionDataSource(connection, true);
         this.jdbc = new JdbcTemplate(dataSource);
         this.platform = PlatformFactory.createNewPlatformInstance(dataSource);
     }
 
-    public void close() throws SQLException {
-        // use the connection directly because the data source used by JdbcTemplate
-        // is suppressing close (deliberately)
-        getTargetConnection().close();
+    public void close() {
+        try {
+            dataSource.destroy();
+        } catch (SQLException e) {
+            // TODO: make specific
+            throw new RuntimeException(e);
+        }
     }
 
     public void beginTransaction() {
@@ -136,13 +147,25 @@ public class DatabaseAdapter implements Adapter {
 
     public Version loadVersions() {
         Database db = createDatabaseWithSingleTable(VERSION_TABLE);
-        Iterator<DynaBean> results;
         Savepoint savepoint = null;
+        final Version version = new Version();
         try {
             savepoint = connection.setSavepoint();
-            results = (Iterator<DynaBean>) platform.query(db,
-                "SELECT release, migration FROM " + VERSION_TABLE_NAME,
-                new Table[] { VERSION_TABLE });
+            jdbc.query("SELECT " + RELEASE_COLUMN_NAME + ", " + MIGRATION_COLUMN_NAME + " FROM " + VERSION_TABLE_NAME,
+                (Object[]) null, new ResultSetExtractor() {
+                    public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
+                        log.debug(VERSION_TABLE_NAME + " table exists; reading current rows");
+                        while (rs.next()) {
+                            version.updateRelease(
+                                rs.getInt(RELEASE_COLUMN_NAME),
+                                rs.getInt(MIGRATION_COLUMN_NAME));
+                        }
+                        return null;
+                    }
+                }
+            );
+            connection.releaseSavepoint(savepoint);
+            return version;
         } catch (Exception e) {
             try {
                 if (savepoint != null) connection.rollback(savepoint);
@@ -153,16 +176,6 @@ public class DatabaseAdapter implements Adapter {
             platform.createTables(db, false, false);
             return new Version();
         }
-
-        Version version = new Version();
-        log.debug(VERSION_TABLE_NAME + " table exists; reading current rows");
-        while (results.hasNext()) {
-            DynaBean dynaBean = results.next();
-            version.updateRelease(
-                (Integer) dynaBean.get(RELEASE_COLUMN_NAME),
-                (Integer) dynaBean.get("migration"));
-        }
-        return version;
     }
 
     public void updateVersion(Integer release, Integer migration) {
@@ -182,11 +195,7 @@ public class DatabaseAdapter implements Adapter {
             throw new RuntimeException(e);
         }
         newVersion.set(RELEASE_COLUMN_NAME, release);
-        newVersion.set("migration", migration);
+        newVersion.set(MIGRATION_COLUMN_NAME, migration);
         platform.insert(db, newVersion);
-    }
-
-    private Connection getTargetConnection() throws SQLException {
-        return ((ConnectionProxy) connection).getTargetConnection();
     }
 }
