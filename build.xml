@@ -6,21 +6,27 @@
     <property name="release-version" value="SNAPSHOT"/> <!-- override on the command-line if necessary -->
     <property name="release-name" value="bering-${release-version}"/>
     <property name="src-release-name" value="${release-name}-src"/>
-    <property name="compiled-src" value="build/compiled-src"/>
-    <property name="compiled-test" value="build/compiled-test"/>
 
-    <path id="libs">
+    <property name="src-dir.main" value="src"/>
+    <property name="res-dir.main" value="resources"/>
+    <property name="build-dir.main" value="build/classes"/>
+
+    <property name="src-dir.test" value="test/src"/>
+    <property name="res-dir.test" value="test/src"/>
+    <property name="build-dir.test" value="build/test-classes"/>
+
+    <path id="cp.main">
         <fileset dir="lib">
             <include name="**/*.jar"/>
         </fileset>
     </path>
 
-    <path id="libs.test">
-        <pathelement location="${compiled-src}"/>
-        <fileset dir="lib-test">
+    <path id="cp.test">
+        <pathelement location="${build-dir.main}"/>
+        <fileset dir="test/lib">
             <include name="**/*.jar"/>
         </fileset>
-        <path refid="libs"/>
+        <path refid="cp.main"/>
     </path>
 
     <target name="clean">
@@ -29,41 +35,41 @@
     </target>
 
     <target name="init" description="create directories for compilation">
-        <mkdir dir="build/compiled-src"/>
-        <mkdir dir="build/compiled-test"/>
+        <mkdir dir="${build-dir.main}"/>
+        <mkdir dir="${build-dir.test}"/>
     </target>
 
     <target name="resources" depends="init" description="copy resources into classpath">
-        <copy todir="${compiled-src}">
-            <fileset dir="resources"/>
+        <copy todir="${build-dir.main}">
+            <fileset dir="${res-dir.main}"/>
         </copy>
     </target>
 
     <target name="resources-test" depends="init" description="copy test resources into test classpath">
-        <copy todir="${compiled-test}">
-            <fileset dir="test">
+        <copy todir="${build-dir.test}">
+            <fileset dir="${res-dir.test}">
                 <include name="**/test_db/**"/>
             </fileset>
         </copy>
     </target>
 
     <target name="compile" depends="resources" description="compile application code">
-        <javac source="${source-level}" srcdir="src" destdir="${compiled-src}" debug="true" classpathref="libs"/>
+        <javac source="${source-level}" srcdir="src" destdir="${build-dir.main}" debug="true" classpathref="cp.main"/>
     </target>
 
     <target name="compile-tests" depends="compile, resources-test" description="compile test code">
-        <javac source="${source-level}" srcdir="test" destdir="${compiled-test}" debug="true" classpathref="libs.test"/>
+        <javac source="${source-level}" srcdir="test" destdir="${build-dir.test}" debug="true" classpathref="cp.test"/>
     </target>
 
     <target name="test" depends="compile-tests" description="run unit tests">
         <junit haltonfailure="true" fork="true" forkmode="once">
             <classpath>
-                <pathelement location="${compiled-test}"/>
-                <path refid="libs.test"/>
+                <pathelement location="${build-dir.test}"/>
+                <path refid="cp.test"/>
             </classpath>
             <formatter type="plain" usefile="false"/>
             <batchtest>
-                <fileset dir="test">
+                <fileset dir="${src-dir.test}">
                     <include name="**/*Test.java"/>
                 </fileset>
             </batchtest>
@@ -72,7 +78,7 @@
 
     <target name="jar" depends="compile" description="build jar">
         <mkdir dir="dist"/>
-        <jar destfile="dist/${release-name}.jar" basedir="${compiled-src}">
+        <jar destfile="dist/${release-name}.jar" basedir="${build-dir.main}">
             <manifest>
                 <attribute name="Implementation-Title" value="Bering"/>
                 <attribute name="Implementation-Version" value="${release-version}"/>
@@ -91,7 +97,6 @@
         </patternset>
         <patternset id="src-release-pattern">
             <include name="build.xml"/>
-            <include name="lib-test/**"/>
             <include name="resources/**"/>
             <include name="src/**"/>
             <include name="test/**"/>
