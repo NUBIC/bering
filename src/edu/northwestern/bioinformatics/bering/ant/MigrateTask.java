@@ -7,6 +7,8 @@ import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * @author Moses Hohman
@@ -19,8 +21,10 @@ public class MigrateTask extends JDBCTask {
     public void execute() throws BuildException {
         Main command = new Main();
         command.setRootDir(createMigrationDirectory().getAbsolutePath());
-        command.setAdapter(new DatabaseAdapter(getConnection()));
+        DatabaseAdapter adapter = new DatabaseAdapter(getConnection());
+        command.setAdapter(adapter);
         command.migrate(getTargetRelease(), getTargetMigration());
+        adapter.close();
     }
 
     public String getMigrationsDir() {

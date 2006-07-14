@@ -3,6 +3,8 @@ package edu.northwestern.bioinformatics.bering;
 import org.apache.ddlutils.model.Column;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 
+import java.sql.SQLException;
+
 /**
  * @author Moses Hohman
  */
@@ -12,6 +14,8 @@ public interface Adapter {
     void commit();
 
     void rollback();
+
+    void close();
 
     void createTable(TableDefinition def);
 
