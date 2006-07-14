@@ -70,7 +70,7 @@
         </junit>
     </target>
 
-    <target name="jar" depends="test" description="build jar">
+    <target name="jar" depends="compile" description="build jar">
         <mkdir dir="dist"/>
         <jar destfile="dist/${release-name}.jar" basedir="${compiled-src}">
             <manifest>
@@ -81,7 +81,7 @@
         </jar>
     </target>
 
-    <target name="dist" depends="jar" description="build release .zip and .tar.gz files">
+    <target name="dist" depends="test, jar" description="build release .zip and .tar.gz files">
         <patternset id="release-pattern">
             <include name="LGPL.txt"/>
             <include name="LICENSE"/>
