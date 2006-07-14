@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import com.sun.java_cup.internal.version;
+
 /**
  * @author Moses Hohman
  */
@@ -18,6 +20,7 @@ public class MigrateTaskTest extends TestCase {
     private Project project = new Project();
 
     protected void setUp() throws Exception {
+        super.setUp();
         project.addBuildListener(new ConsoleLogger());
         task.setProject(project);
     }
@@ -38,6 +41,28 @@ public class MigrateTaskTest extends TestCase {
             assertTrue("exception message does not start with \"" + expectedMessage + "\": "  + expected.getMessage(),
                     expected.getMessage().startsWith(expectedMessage));
         }
+    }
+
+    public void testSetTargetVersion() throws Exception {
+        assertTargetVersionSet(5, 9, "5|9");
+        assertTargetVersionSet(null, 11, "11");
+        assertTargetVersionSet(null, null, "");
+    }
+
+    public void testSetInvalidTargetVersion() throws Exception {
+        try {
+            task.setTargetVersion("bad");
+            fail("Exception not thrown");
+        } catch (BuildException be) {
+            assertEquals("Invalid target version (bad).  Should have the form 'R|M' or 'M'.", be.getMessage());
+            assertNotNull(be.getCause());
+        }
+    }
+
+    private void assertTargetVersionSet(Integer expectedTargetRelease, Integer expectedTargetMigration, String targetVersionString) {
+        task.setTargetVersion(targetVersionString);
+        assertEquals("Target release wrong", expectedTargetRelease, task.getTargetRelease());
+        assertEquals("Target migration wrong", expectedTargetMigration, task.getTargetMigration());
     }
 
     private static class ConsoleLogger implements BuildLogger {

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.beans.PropertyEditor;
 
 /**
  * @author Moses Hohman
@@ -35,20 +36,25 @@ public class MigrateTask extends JDBCTask {
         this.migrationsDir = migrationsDir;
     }
 
+    public void setTargetVersion(String version) {
+        PropertyEditor editor = new TargetVersionEditor();
+        try {
+            editor.setAsText(version);
+        } catch (IllegalArgumentException e) {
+            throw new BuildException("Invalid target version (" + version
+                + ").  Should have the form 'R|M' or 'M'.", e);
+        }
+        Integer[] parsedVersion = (Integer[]) editor.getValue();
+        targetRelease   = parsedVersion[0];
+        targetMigration = parsedVersion[1];
+    }
+
     public Integer getTargetMigration() {
         return targetMigration;
     }
 
-    public void setTargetMigration(Integer targetMigration) {
-        this.targetMigration = targetMigration;
-    }
-
     public Integer getTargetRelease() {
         return targetRelease;
-    }
-
-    public void setTargetRelease(Integer targetRelease) {
-        this.targetRelease = targetRelease;
     }
 
     private File createMigrationDirectory() {
