@@ -150,7 +150,7 @@ public class DatabaseAdapter implements Adapter {
         Savepoint savepoint = null;
         final Version version = new Version();
         try {
-            savepoint = connection.setSavepoint();
+            savepoint = connection.setSavepoint("version-table-detect");
             jdbc.query("SELECT " + RELEASE_COLUMN_NAME + ", " + MIGRATION_COLUMN_NAME + " FROM " + VERSION_TABLE_NAME,
                 (Object[]) null, new ResultSetExtractor() {
                     public Object extractData(ResultSet rs) throws SQLException, DataAccessException {

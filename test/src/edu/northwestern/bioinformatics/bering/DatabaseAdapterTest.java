@@ -28,6 +28,7 @@ public class DatabaseAdapterTest extends TestCase {
         // in-memory databases apparently persist across connections within the same JVM
         // hence the random number added to the name
         conn = DriverManager.getConnection("jdbc:hsqldb:mem:test" + Math.random(), "sa", "");
+        conn.setAutoCommit(false);
         adapter = new DatabaseAdapter(conn);
         stmt = conn.createStatement();
 
@@ -91,7 +92,7 @@ public class DatabaseAdapterTest extends TestCase {
                 fail("No exception for missing column");
             } catch (Exception e) {
                 // expected
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
         assertEquals(1, count);
@@ -175,7 +176,7 @@ public class DatabaseAdapterTest extends TestCase {
             stmt.execute("SELECT * FROM " + tableName);
             fail("No exception for non-existent table");
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
