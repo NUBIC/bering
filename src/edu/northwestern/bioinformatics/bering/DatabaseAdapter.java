@@ -164,9 +164,9 @@ public class DatabaseAdapter implements Adapter {
                     }
                 }
             );
-            connection.releaseSavepoint(savepoint);
             return version;
         } catch (Exception e) {
+            log.debug("Assuming " + VERSION_TABLE_NAME + " does not exist due to exception", e);
             try {
                 if (savepoint != null) connection.rollback(savepoint);
             } catch (SQLException rollbackE) {
