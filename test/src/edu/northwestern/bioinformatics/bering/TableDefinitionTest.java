@@ -23,6 +23,7 @@ public class TableDefinitionTest extends TestCase {
         Column idCol = created.findColumn("id");
         assertNotNull("No id column", idCol);
         assertTrue("id column isn't the primary key", idCol.isPrimaryKey());
+        assertTrue("id column isn't autoincrement", idCol.isAutoIncrement());
     }
 
     public void testToTablePreservesTableName() throws Exception {

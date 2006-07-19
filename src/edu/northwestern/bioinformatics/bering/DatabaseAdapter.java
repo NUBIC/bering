@@ -6,6 +6,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
+import org.apache.ddlutils.platform.CreationParameters;
+import org.apache.ddlutils.platform.oracle.Oracle8Builder;
 import org.apache.ddlutils.alteration.AddColumnChange;
 import org.apache.ddlutils.alteration.RemoveColumnChange;
 import org.apache.ddlutils.alteration.TableChange;
@@ -104,22 +106,25 @@ public class DatabaseAdapter implements Adapter {
 
     public void createTable(TableDefinition def) {
         Database db = new Database();
-        db.addTable(def.toTable());
-        platform.createTables(db, false, false);
+        Table table = def.toTable();
+        db.addTable(table);
+        CreationParameters cp = new CreationParameters();
+        cp.addParameter(table, Oracle8Builder.PARAM_SUPPRESS_AUTOINCREMENT_TRIGGER, "true");
+        platform.createTables(db, cp, false, false);
     }
 
     public void dropTable(String name) {
-        platform.dropTables(createDatabaseWithSingleTable(createNamedTable(name)), false);
+        platform.dropTables(createDatabaseWithSingleTable(createIdedTable(name)), false);
     }
 
     public void addColumn(String tableName, Column column) {
-        Table table = createNamedTable(tableName);
+        Table table = createIdedTable(tableName);
         TableChange addColumn = new AddColumnChange(table, column, null, null);
         platform.changeDatabase(Arrays.asList(addColumn), false);
     }
 
     public void removeColumn(String tableName, String columnName) {
-        Table table = createNamedTable(tableName);
+        Table table = createIdedTable(tableName);
         Column column = new Column();
         column.setName(columnName);
         TableChange removeColumn = new RemoveColumnChange(table, column);
@@ -139,6 +144,15 @@ public class DatabaseAdapter implements Adapter {
         return table;
     }
 
+    private static Table createIdedTable(String name) {
+        Table table = createNamedTable(name);
+        Column id = createColumn("id", Types.INTEGER);
+        id.setPrimaryKey(true);
+        id.setAutoIncrement(true);
+        table.addColumn(id);
+        return table;
+    }
+
     private static Database createDatabaseWithSingleTable(Table table) {
         Database db = new Database();
         db.addTable(table);
@@ -150,7 +164,7 @@ public class DatabaseAdapter implements Adapter {
         Savepoint savepoint = null;
         final Version version = new Version();
         try {
-            savepoint = connection.setSavepoint("version-table-detect");
+            savepoint = connection.setSavepoint("versiontabledetect");
             jdbc.query("SELECT " + RELEASE_COLUMN_NAME + ", " + MIGRATION_COLUMN_NAME + " FROM " + VERSION_TABLE_NAME,
                 (Object[]) null, new ResultSetExtractor() {
                     public Object extractData(ResultSet rs) throws SQLException, DataAccessException {

@@ -26,6 +26,7 @@ public class TableDefinition {
     private Column createPrimaryKeyColumn() {
         Column col = context.createColumn(null, "id", "integer");
         col.setPrimaryKey(true);
+        col.setAutoIncrement(true);
         return col;
     }
 

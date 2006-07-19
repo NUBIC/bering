@@ -32,7 +32,7 @@ public class DatabaseAdapterTest extends TestCase {
         adapter = new DatabaseAdapter(conn);
         stmt = conn.createStatement();
 
-        stmt.execute("CREATE TABLE " + TABLE_NAME + " (id INTEGER PRIMARY KEY, title VARCHAR(50))");
+        stmt.execute("CREATE TABLE " + TABLE_NAME + " (id IDENTITY PRIMARY KEY, title VARCHAR(50))");
         stmt.execute("INSERT INTO " + TABLE_NAME + " (id, title) VALUES (1, 'Bering is Groovy')");
 
         assertTablePresent(TABLE_NAME);
@@ -53,7 +53,8 @@ public class DatabaseAdapterTest extends TestCase {
         adapter.createTable(def);
 
         assertTablePresent(tableName);
-        stmt.execute("INSERT INTO " + tableName + "(id, name, birthdate) VALUES (14, 'Dave', '2006-04-15')");
+        // in HSQL, the id should be automatically inserted
+        stmt.execute("INSERT INTO " + tableName + "(name, birthdate) VALUES ('Dave', '2006-04-15')");
         // expect no error
     }
 
