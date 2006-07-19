@@ -1,19 +1,19 @@
 package edu.northwestern.bioinformatics.bering;
 
-import static edu.northwestern.bioinformatics.bering.Migration.NULLABLE_KEY;
-import static edu.northwestern.bioinformatics.bering.Migration.LIMIT_KEY;
-import static edu.northwestern.bioinformatics.bering.Migration.PRECISION_KEY;
+import static edu.northwestern.bioinformatics.bering.Migration.*;
 import junit.framework.TestCase;
 import org.apache.ddlutils.model.Column;
 
 import java.sql.Types;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author rsutphin
  */
 public class MigrationTest extends TestCase {
     private Migration migration = new StubMigration();
+    private Map<String, Object> parameters = new HashMap<String, Object>();
 
     public void testCreateColumn() throws Exception {
         Column actual = migration.createColumn(null, "title", "string");
@@ -24,17 +24,38 @@ public class MigrationTest extends TestCase {
     }
 
     public void testCreateNotNullColumn() throws Exception {
-        Column actual = migration.createColumn(Collections.singletonMap(NULLABLE_KEY, (Object) Boolean.FALSE), "notnull", "string");
+        parameters.put(NULLABLE_KEY, false);
+        Column actual = migration.createColumn(parameters, "notnull", "string");
         assertTrue("required not set correctly", actual.isRequired());
     }
 
+    public void testCreateColumnWithIntegerDefaultValue() {
+        parameters.put("defaultValue", 0);
+        Column actual = migration.createColumn(parameters, "position", "integer");
+        assertEquals("0", actual.getDefaultValue());
+    }
+
+    public void testCreateColumnWithStringDefaultValue() {
+        parameters.put("defaultValue", "days");
+        Column actual = migration.createColumn(parameters, "duration_unit", "string");
+        assertEquals("days", actual.getDefaultValue());
+    }
+
+    public void testCreateColumnWithNullDefaultValueDoesntDoAnything() {
+        parameters.put("defaultValue", null);
+        Column actual = migration.createColumn(parameters, "duration_unit", "string");
+        assertNull("default value not null", actual.getDefaultValue());
+    }
+
     public void testCreateColumnWithLimit() throws Exception {
-        Column actual = migration.createColumn(Collections.singletonMap(LIMIT_KEY, (Object) 255), "notnull", "string");
+        parameters.put(LIMIT_KEY, 255);
+        Column actual = migration.createColumn(parameters, "notnull", "string");
         assertEquals(255, actual.getSizeAsInt());
     }
 
     public void testCreateColumnWithPrecision() throws Exception {
-        Column actual = migration.createColumn(Collections.singletonMap(PRECISION_KEY, (Object) 9), "notnull", "string");
+        parameters.put(PRECISION_KEY, 9);
+        Column actual = migration.createColumn(parameters, "notnull", "string");
         assertEquals(9, actual.getScale());
     }
 

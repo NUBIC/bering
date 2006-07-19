@@ -12,18 +12,20 @@ import java.util.Map;
  */
 public class TableDefinitionTest extends TestCase {
     private TableDefinition definition;
+    private Map<String, Object> params;
 
     protected void setUp() throws Exception {
         super.setUp();
         definition = new TableDefinition("frogs", new StubMigration());
+        params = new HashMap<String, Object>();
     }
 
     public void testNewTableContainsPrimaryKey() {
         Table created = definition.toTable();
-        Column idCol = created.findColumn("id");
-        assertNotNull("No id column", idCol);
-        assertTrue("id column isn't the primary key", idCol.isPrimaryKey());
-        assertTrue("id column isn't autoincrement", idCol.isAutoIncrement());
+        Column id = created.findColumn("id");
+        assertNotNull("No id column", id);
+        assertTrue("id column isn't the primary key", id.isPrimaryKey());
+        assertTrue("id column isn't autoincrement", id.isAutoIncrement());
     }
 
     public void testToTablePreservesTableName() throws Exception {
@@ -31,43 +33,46 @@ public class TableDefinitionTest extends TestCase {
     }
 
     public void testAddColumnWithLimit() throws Exception {
-        Map<String, Object> params = new HashMap<String, Object>();
         params.put("limit", 50);
         definition.addColumn(params, "name", "string");
 
-        Column col = definition.toTable().findColumn("name");
-        assertNotNull(col);
-        assertEquals("Wrong size", 50, col.getSizeAsInt());
+        Column name = definition.toTable().findColumn("name");
+        assertNotNull(name);
+        assertEquals("Wrong size", 50, name.getSizeAsInt());
     }
 
     public void testAddColumnWithPrecision() throws Exception {
-        Map<String, Object> params = new HashMap<String, Object>();
         params.put("precision", 50);
         definition.addColumn(params, "name", "string");
 
-        Column col = definition.toTable().findColumn("name");
-        assertNotNull(col);
-        assertEquals("Wrong scale", 50, col.getScale());
+        Column name = definition.toTable().findColumn("name");
+        assertNotNull(name);
+        assertEquals("Wrong scale", 50, name.getScale());
     }
 
     public void testAddNonNullableColumn() throws Exception {
-        Map<String, Object> params = new HashMap<String, Object>();
         params.put("nullable", false);
         definition.addColumn(params, "name", "string");
 
-        Column col = definition.toTable().findColumn("name");
-        assertNotNull(col);
-        assertTrue("Should be required", col.isRequired());
+        Column name = definition.toTable().findColumn("name");
+        assertNotNull(name);
+        assertTrue("Should be required", name.isRequired());
     }
 
     public void testAddNullableColumn() throws Exception {
-        Map<String, Object> params = new HashMap<String, Object>();
         params.put("nullable", true);
         definition.addColumn(params, "name", "string");
 
-        Column col = definition.toTable().findColumn("name");
-        assertNotNull(col);
-        assertFalse("Should not be required", col.isRequired());
+        Column name = definition.toTable().findColumn("name");
+        assertNotNull(name);
+        assertFalse("Should not be required", name.isRequired());
     }
 
+    public void testAddColumnWithIntegerDefaultValue() {
+        params.put("defaultValue", 0);
+        definition.addColumn(params, "position", "integer");
+
+        Column position = definition.toTable().findColumn("position");
+        assertEquals("0", position.getDefaultValue());
+    }
 }

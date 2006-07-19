@@ -14,6 +14,7 @@ public abstract class Migration {
     public static final String NULLABLE_KEY  = "nullable";
     public static final String LIMIT_KEY     = "limit";
     public static final String PRECISION_KEY = "precision";
+    private static final String DEFAULT_VALUE_KEY = "defaultValue";
 
     private static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
     static {
@@ -62,21 +63,24 @@ public abstract class Migration {
     // TODO: maybe this should be moved somewhere else
     // visible to collaborators (e.g., TableDefinition)
     Column createColumn(Map<String, Object> parameters, String columnName, String columnType) {
-        Column col = new Column();
-        col.setName(columnName);
-        col.setTypeCode(getTypeCode(columnType));
+        Column column = new Column();
+        column.setName(columnName);
+        column.setTypeCode(getTypeCode(columnType));
         if (parameters != null && !parameters.isEmpty()) {
             if (parameters.containsKey(NULLABLE_KEY)) {
-                col.setRequired(!((Boolean) parameters.get(NULLABLE_KEY)));
+                column.setRequired(!((Boolean) parameters.get(NULLABLE_KEY)));
+            }
+            if (parameters.containsKey(DEFAULT_VALUE_KEY) && parameters.get(DEFAULT_VALUE_KEY) != null) {
+                column.setDefaultValue(String.valueOf(parameters.get(DEFAULT_VALUE_KEY)));
             }
             if (parameters.containsKey(LIMIT_KEY)) {
-                col.setSize(String.valueOf(parameters.get(LIMIT_KEY)));
+                column.setSize(String.valueOf(parameters.get(LIMIT_KEY)));
             }
             if (parameters.containsKey(PRECISION_KEY)) {
-                col.setScale((Integer) parameters.get(PRECISION_KEY));
+                column.setScale((Integer) parameters.get(PRECISION_KEY));
             }
         }
-        return col;
+        return column;
     }
 
     private int getTypeCode(String typeName) {
