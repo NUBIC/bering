@@ -83,7 +83,7 @@ public class Migrator {
         }
 
         public void execute() {
-            System.out.println("Executing migration: " + script.getClassName());
+            System.out.println("Executing migration: " + script.getClassName() + '.' + direction());
             adapter.beginTransaction();
             try {
                 run();
@@ -105,6 +105,8 @@ public class Migrator {
         }
 
         protected abstract void run();
+
+        protected abstract String direction();
     }
 
     private class Up extends Executor {
@@ -115,6 +117,10 @@ public class Migrator {
         protected void run() {
             getScript().up(adapter);
         }
+
+        protected String direction() {
+            return "up";
+        }
     }
 
     private class Down extends Executor {
@@ -124,6 +130,10 @@ public class Migrator {
 
         protected void run() {
             getScript().down(adapter);
+        }
+
+        protected String direction() {
+            return "down";
         }
     }
 }
