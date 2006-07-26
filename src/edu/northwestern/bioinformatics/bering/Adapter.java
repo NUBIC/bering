@@ -4,6 +4,7 @@ import org.apache.ddlutils.model.Column;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 
 import java.sql.SQLException;
+import java.util.regex.Pattern;
 
 /**
  * @author Moses Hohman
@@ -24,6 +25,8 @@ public interface Adapter {
     void addColumn(String tableName, Column column);
 
     void removeColumn(String tableName, String columnName);
+
+    String getDatabaseName();
 
     Version loadVersions();
 

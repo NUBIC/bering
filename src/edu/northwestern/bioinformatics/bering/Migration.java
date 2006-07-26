@@ -6,6 +6,7 @@ import org.apache.ddlutils.model.Column;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Moses Hohman
@@ -56,6 +57,16 @@ public abstract class Migration {
 
     protected void removeColumn(String tableName, String columnName) {
         adapter.removeColumn(tableName, columnName);
+    }
+
+    protected boolean databaseMatches(String substring) {
+        return databaseMatches(
+            Pattern.compile(substring, Pattern.CASE_INSENSITIVE)
+        );
+    }
+
+    private boolean databaseMatches(Pattern regex) {
+        return regex.matcher(adapter.getDatabaseName()).find();
     }
 
     ////// IMPLEMENTATION METHODS

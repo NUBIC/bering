@@ -131,6 +131,10 @@ public class DatabaseAdapter implements Adapter {
         platform.changeDatabase(Arrays.asList(removeColumn), false);
     }
 
+    public String getDatabaseName() {
+        return platform.getName();
+    }
+
     private static Column createColumn(String name, int type) {
         Column column = new Column();
         column.setName(name);

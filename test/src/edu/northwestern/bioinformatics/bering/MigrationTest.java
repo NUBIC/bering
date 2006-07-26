@@ -12,8 +12,14 @@ import java.util.Map;
  * @author rsutphin
  */
 public class MigrationTest extends TestCase {
+    private StubAdapter adapter = new StubAdapter();
     private Migration migration = new StubMigration();
     private Map<String, Object> parameters = new HashMap<String, Object>();
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        migration.setAdapter(adapter);
+    }
 
     public void testCreateColumn() throws Exception {
         Column actual = migration.createColumn(null, "title", "string");
@@ -76,6 +82,23 @@ public class MigrationTest extends TestCase {
         } catch (IllegalArgumentException iae) {
             assertTrue(iae.getMessage().indexOf("fancytype") >= 0);
         }
+    }
+
+    public void testDatabaseMatchesExact() throws Exception {
+        adapter.setDatabaseName("SuperSQL");
+        assertTrue(migration.databaseMatches("SuperSQL"));
+    }
+
+    public void testDatabaseMatchesSubstring() throws Exception {
+        adapter.setDatabaseName("SuperSQL");
+        assertTrue(migration.databaseMatches("Super"));
+        assertTrue(migration.databaseMatches("uperSQ"));
+    }
+
+    public void testDatabaseMatchesCaseInsensitive() throws Exception {
+        adapter.setDatabaseName("SuperSQL");
+        assertTrue(migration.databaseMatches("supersql"));
+        assertTrue(migration.databaseMatches("super"));
     }
 
     private int getCreatedColumnType(String columnType) {
