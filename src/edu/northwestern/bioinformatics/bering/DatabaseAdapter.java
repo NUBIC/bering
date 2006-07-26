@@ -108,14 +108,28 @@ public class DatabaseAdapter implements Adapter {
         Database db = new Database();
         Table table = def.toTable();
         db.addTable(table);
-        // TODO: this doesn't work when dropping
-        CreationParameters cp = new CreationParameters();
-        cp.addParameter(table, Oracle8Builder.PARAM_SUPPRESS_AUTOINCREMENT_TRIGGER, "true");
-        platform.createTables(db, cp, false, false);
+        if (isOracle()) {
+            massageTableForPlatform(table);
+            execute("CREATE SEQUENCE " + createIdSequenceName(table));
+        }
+        platform.createTables(db, null, false, false);
     }
 
     public void dropTable(String name) {
-        platform.dropTables(createDatabaseWithSingleTable(createIdedTable(name)), false);
+        Table table = createIdedTable(name);
+        if (isOracle()) {
+            massageTableForPlatform(table);
+            execute("DROP SEQUENCE " + createIdSequenceName(table));
+        }
+        platform.dropTables(createDatabaseWithSingleTable(table), false);
+    }
+
+    private void massageTableForPlatform(Table table) {
+        table.getPrimaryKeyColumns()[0].setAutoIncrement(false);
+    }
+
+    private String createIdSequenceName(Table table) {
+        return "seq_" + table.getName() + "_id";
     }
 
     public void addColumn(String tableName, Column column) {
@@ -220,5 +234,9 @@ public class DatabaseAdapter implements Adapter {
         newVersion.set(RELEASE_COLUMN_NAME, release);
         newVersion.set(MIGRATION_COLUMN_NAME, migration);
         platform.insert(db, newVersion);
+    }
+
+    private boolean isOracle() {
+        return platform.getName().startsWith("Oracle");
     }
 }
