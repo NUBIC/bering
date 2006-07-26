@@ -41,6 +41,10 @@ public class StubAdapter implements Adapter {
         throw new UnsupportedOperationException("removeColumn not implemented");
     }
 
+    public void execute(String sql) {
+        throw new UnsupportedOperationException("execute not implemented");
+    }
+
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }

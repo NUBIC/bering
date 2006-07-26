@@ -26,6 +26,8 @@ public interface Adapter {
 
     void removeColumn(String tableName, String columnName);
 
+    void execute(String sql);
+
     String getDatabaseName();
 
     Version loadVersions();

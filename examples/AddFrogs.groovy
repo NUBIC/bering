@@ -10,7 +10,6 @@ class AddFrogsMigration extends Migration {
             t.addColumn('comments', 'string')
         }
 
-        // TODO: implement execute
         if (databaseMatches('oracle')) {
             execute("COMMENT ON TABLE frogs IS 'This is the frogs table in an Oracle DB'")
         } else if (databaseMatches('postgresql') {

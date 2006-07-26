@@ -108,6 +108,7 @@ public class DatabaseAdapter implements Adapter {
         Database db = new Database();
         Table table = def.toTable();
         db.addTable(table);
+        // TODO: this doesn't work when dropping
         CreationParameters cp = new CreationParameters();
         cp.addParameter(table, Oracle8Builder.PARAM_SUPPRESS_AUTOINCREMENT_TRIGGER, "true");
         platform.createTables(db, cp, false, false);
@@ -129,6 +130,10 @@ public class DatabaseAdapter implements Adapter {
         column.setName(columnName);
         TableChange removeColumn = new RemoveColumnChange(table, column);
         platform.changeDatabase(Arrays.asList(removeColumn), false);
+    }
+
+    public void execute(String sql) {
+        platform.evaluateBatch(sql, false);
     }
 
     public String getDatabaseName() {

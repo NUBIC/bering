@@ -167,6 +167,18 @@ public class DatabaseAdapterTest extends TestCase {
         assertFalse("Should be no results", any);
     }
 
+    public void testExecute() throws Exception {
+        adapter.execute("UPDATE " + TABLE_NAME + " SET title='New Title'");
+
+        ResultSet rs = stmt.executeQuery("SELECT title FROM " + TABLE_NAME);
+        boolean any = false;
+        while (rs.next()) {
+            assertEquals("New Title", rs.getString("title"));
+            any = true;
+        }
+        assertTrue("Malformed test -- expected rows in " + TABLE_NAME, any);
+    }
+
     private void assertTablePresent(String tableName) throws SQLException {
         stmt.execute("SELECT * FROM " + tableName);
         // expect no error

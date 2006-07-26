@@ -69,6 +69,14 @@ public abstract class Migration {
         return regex.matcher(adapter.getDatabaseName()).find();
     }
 
+    /**
+     * Execute one or more SQL statements, separated by semicolons.
+     * @param sql
+     */
+    protected void execute(String sql) {
+        adapter.execute(sql);
+    }
+
     ////// IMPLEMENTATION METHODS
 
     // TODO: maybe this should be moved somewhere else
