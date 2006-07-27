@@ -6,11 +6,16 @@ import java.util.List;
 import java.util.Collections;
 import java.util.ArrayList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author Rhett Sutphin
  * @author Moses Hohman
  */
 public class Migrator {
+    private Log log = LogFactory.getLog(getClass());
+
     private Adapter adapter;
     private Version current;
     private Target target;
@@ -83,7 +88,7 @@ public class Migrator {
         }
 
         public void execute() {
-            System.out.println("Executing migration: " + script.getClassName() + '.' + direction());
+            log.info("========= Executing migration: " + script.getClassName() + '.' + direction());
             adapter.beginTransaction();
             try {
                 run();

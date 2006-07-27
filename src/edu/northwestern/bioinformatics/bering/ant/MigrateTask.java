@@ -1,15 +1,13 @@
 package edu.northwestern.bioinformatics.bering.ant;
 
+import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
+import edu.northwestern.bioinformatics.bering.Main;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.JDBCTask;
-import edu.northwestern.bioinformatics.bering.Main;
-import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
 
+import java.beans.PropertyEditor;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.beans.PropertyEditor;
 
 /**
  * @author Moses Hohman
