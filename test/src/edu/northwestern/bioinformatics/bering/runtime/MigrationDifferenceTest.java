@@ -61,6 +61,29 @@ public class MigrationDifferenceTest extends BeringTestCase {
             false, 4);
     }
 
+    public void testDefaultCurrentIsZero() throws Exception {
+        assertMigrationsToRun(
+            createDifference(null, 4,   1, 2, 3, 4, 5, 6),
+            true,
+            1, 2, 3, 4
+        );
+    }
+
+    public void testDefaultTargetIsMax() throws Exception {
+        assertMigrationsToRun(
+            createDifference(0, null,   1, 2, 3, 4, 5, 6),
+            true,
+            1, 2, 3, 4, 5, 6
+        );
+    }
+    
+    public void testScriptsWithNullTargetWhenAtEnd() throws Exception {
+        assertMigrationsToRun(
+            createDifference(6, null,   1, 2, 3, 4, 5, 6),
+            true
+        );
+    }
+
     private void assertMigrationsToRun(MigrationDifference diff) {
         // the fact that isUp returns true when there are no migrations
         // is an unimportant implementation detail
@@ -79,7 +102,7 @@ public class MigrationDifferenceTest extends BeringTestCase {
         }
     }
 
-    private MigrationDifference createDifference(int current, int target, int... scriptNumbers) {
+    private MigrationDifference createDifference(Integer current, Integer target, int... scriptNumbers) {
         Release release = new Mock.Release(1, scriptNumbers);
         return new MigrationDifference(release, current, target);
     }

@@ -8,17 +8,25 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+
 /**
  * @author rsutphin
  */
 public class MigrationDifference {
+    private static final Log log = LogFactory.getLog(MigrationDifference.class);
+
     private Release release;
-    private Integer targetMigration, currentMigration;
+    private int targetMigration, currentMigration;
 
     public MigrationDifference(Release release, Integer currentMigration, Integer targetMigration) {
         this.release = release;
         this.currentMigration = currentMigration == null ? 0 : currentMigration;
         this.targetMigration = targetMigration == null ? release.getMaxScriptNumber() : targetMigration;
+        if (log.isDebugEnabled()) {
+            log.debug("Release " + release.getNumber() + " diffs from " + currentMigration + " to " + targetMigration);
+        }
     }
 
     public boolean isUp() {
