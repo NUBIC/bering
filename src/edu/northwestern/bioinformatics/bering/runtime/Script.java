@@ -79,11 +79,16 @@ public class Script extends MigrationFile {
         createMigrationInstance(adapter).down();
     }
 
+    public String getNumericDesignator() {
+        return new StringBuilder()
+            .append(getRelease().getNumber()).append('|').append(getNumber())
+            .toString();
+    }
+
     public String toString() {
         return new StringBuilder()
             .append(getClass().getSimpleName()).append('[')
-            .append(getRelease().getNumber()).append('-')
-            .append(getNumber()).append(' ')
+            .append(getNumericDesignator()).append(' ')
             .append(getName()).append(']')
             .toString();
     }

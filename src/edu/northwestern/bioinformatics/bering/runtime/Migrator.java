@@ -65,6 +65,7 @@ public class Migrator {
             finder.getRelease(releaseNumber), current.getMigrationNumber(releaseNumber),
             targetMigration
         );
+        log.debug("Scripts to run for " + releaseNumber + ": " + diff.getScriptsToRun());
         for (Script script : diff.getScriptsToRun()) {
             createExecutor(diff.isUp(), script).execute();
         }
@@ -88,7 +89,7 @@ public class Migrator {
         }
 
         public void execute() {
-            log.info("========= Executing migration: " + script.getClassName() + '.' + direction());
+            log.info("========= Executing migration: " + script.getClassName() + '.' + direction() + " [" + script.getNumericDesignator() + ']');
             adapter.beginTransaction();
             try {
                 run();
