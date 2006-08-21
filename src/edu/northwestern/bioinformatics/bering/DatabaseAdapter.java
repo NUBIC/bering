@@ -130,7 +130,12 @@ public class DatabaseAdapter implements Adapter {
 
     private String createIdSequenceName(Table table) {
         int maxlen = platform.getPlatformInfo().getMaxIdentifierLength();
-        return "seq_" + table.getName().substring(0, maxlen - 7) + "_id";
+        return "seq_" + truncate(table.getName(), maxlen - 7) + "_id";
+    }
+
+    private String truncate(String str, int maxlen) {
+        if (str.length() <= maxlen) return str;
+        return str.substring(0, maxlen);
     }
 
     public void addColumn(String tableName, Column column) {
