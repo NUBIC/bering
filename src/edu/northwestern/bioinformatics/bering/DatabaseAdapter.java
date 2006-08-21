@@ -129,7 +129,8 @@ public class DatabaseAdapter implements Adapter {
     }
 
     private String createIdSequenceName(Table table) {
-        return "seq_" + table.getName() + "_id";
+        int maxlen = platform.getPlatformInfo().getMaxIdentifierLength();
+        return "seq_" + table.getName().substring(0, maxlen - 7) + "_id";
     }
 
     public void addColumn(String tableName, Column column) {
