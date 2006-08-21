@@ -48,7 +48,7 @@
     <target name="resources-test" depends="init" description="copy test resources into test classpath">
         <copy todir="${build-dir.test}">
             <fileset dir="${res-dir.test}">
-                <include name="**/test_db/**"/>
+                <include name="**/test_db*/**"/>
             </fileset>
         </copy>
     </target>
