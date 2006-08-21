@@ -27,7 +27,11 @@ public class Release extends MigrationFile {
     }
 
     protected void addScript(Script script) {
-        scripts.put(script.getNumber(), script);
+        Integer key = script.getNumber();
+        if (scripts.containsKey(key)) {
+            throw new IllegalStateException("More than one script in release " + getNumber() + " with number '" + key + '\'');
+        }
+        scripts.put(key, script);
     }
 
     private File[] listScripts() {

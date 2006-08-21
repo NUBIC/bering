@@ -12,8 +12,7 @@ public class ReleaseTest extends BeringTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        existingRelease = new Release(
-            getClassRelativeFile(getClass(), "../test_db/001_out_the_door"));
+        existingRelease = createExistingRelease("../test_db/001_out_the_door");
     }
 
     public void testNameAndIndexWithName() throws Exception {
@@ -49,7 +48,20 @@ public class ReleaseTest extends BeringTestCase {
         assertEquals("add_ponds", out.getScript(2).getName());
     }
 
+    public void testDuplicateScriptNumberThrowsException() throws Exception {
+        try {
+            createExistingRelease("../test_db_malformed/003_duplicate_numbers").initialize();
+            fail("Exception not thrown");
+        } catch (IllegalStateException ise) {
+            assertEquals("More than one script in release 3 with number '2'", ise.getMessage());
+        }
+    }
+
     private Release createRelease(String dirname) {
         return new Release(new File(dirname));
+    }
+
+    private Release createExistingRelease(String dirname) {
+        return new Release(getClassRelativeFile(getClass(), dirname));
     }
 }
