@@ -6,6 +6,7 @@ import org.apache.ddlutils.model.Table;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.Types;
 
 /**
  * @author Moses Hohman
@@ -74,5 +75,16 @@ public class TableDefinitionTest extends TestCase {
 
         Column position = definition.toTable().findColumn("position");
         assertEquals("0", position.getDefaultValue());
+    }
+
+    public void testAddVersionColumn() throws Exception {
+        definition.addVersionColumn();
+
+        Column actual = definition.toTable().findColumn("version");
+        assertNotNull("Version column not added", actual);
+        assertEquals("Wrong name", "version", actual.getName());
+        assertEquals("Wrong type", Types.INTEGER, actual.getTypeCode());
+        assertTrue("Not NOT NULL", actual.isRequired());
+        assertEquals("Default not zero", "0", actual.getDefaultValue());
     }
 }

@@ -38,6 +38,13 @@ public class TableDefinition {
         columns.add(context.createColumn(parameters, columnName, type));
     }
 
+    public void addVersionColumn() {
+        Column v = context.createColumn(null, "version", "integer");
+        v.setRequired(true);
+        v.setDefaultValue("0");
+        columns.add(v);
+    }
+
     public Table toTable() {
         Table t =  new Table();
         t.setName(getName());
