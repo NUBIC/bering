@@ -124,8 +124,11 @@ public class DatabaseAdapter implements Adapter {
         platform.dropTables(createDatabaseWithSingleTable(table), false);
     }
 
-    private void massageTableForPlatform(Table table) {
-        table.getPrimaryKeyColumns()[0].setAutoIncrement(false);
+    private Table massageTableForPlatform(Table table) {
+        if (isOracle()) {
+            table.getPrimaryKeyColumns()[0].setAutoIncrement(false);
+        }
+        return table;
     }
 
     private String createIdSequenceName(Table table) {
@@ -139,8 +142,9 @@ public class DatabaseAdapter implements Adapter {
     }
 
     public void addColumn(String tableName, Column column) {
-        Table table = createIdedTable(tableName);
-        TableChange addColumn = new AddColumnChange(table, column, null, null);
+        Table table = createNamedTable(tableName);
+        AddColumnChange addColumn = new AddColumnChange(table, column, null, null);
+        addColumn.setAtEnd(true);
         platform.changeDatabase(Arrays.asList(addColumn), false);
     }
 
@@ -173,13 +177,13 @@ public class DatabaseAdapter implements Adapter {
         return table;
     }
 
-    private static Table createIdedTable(String name) {
+    private Table createIdedTable(String name) {
         Table table = createNamedTable(name);
         Column id = createColumn("id", Types.INTEGER);
         id.setPrimaryKey(true);
         id.setAutoIncrement(true);
         table.addColumn(id);
-        return table;
+        return massageTableForPlatform(table);
     }
 
     private static Database createDatabaseWithSingleTable(Table table) {
