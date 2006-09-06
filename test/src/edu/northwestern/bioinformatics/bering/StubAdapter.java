@@ -41,6 +41,10 @@ public class StubAdapter implements Adapter {
         throw new UnsupportedOperationException("removeColumn not implemented");
     }
 
+    public void setDefaultValue(String tableName, String columnName, String newDefault) {
+        throw new UnsupportedOperationException("setDefaultValue not implemented");
+    }
+
     public void execute(String sql) {
         throw new UnsupportedOperationException("execute not implemented");
     }

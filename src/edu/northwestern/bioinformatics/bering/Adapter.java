@@ -26,6 +26,8 @@ public interface Adapter {
 
     void removeColumn(String tableName, String columnName);
 
+    void setDefaultValue(String tableName, String columnName, String newDefault);
+
     void execute(String sql);
 
     String getDatabaseName();

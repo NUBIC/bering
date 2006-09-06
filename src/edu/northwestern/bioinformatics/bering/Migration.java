@@ -59,6 +59,10 @@ public abstract class Migration {
         adapter.removeColumn(tableName, columnName);
     }
 
+    protected void setDefaultValue(String tableName, String columnName, String newDefault) {
+        adapter.setDefaultValue(tableName, columnName, newDefault);
+    }
+
     protected boolean databaseMatches(String substring) {
         return databaseMatches(
             Pattern.compile(substring, Pattern.CASE_INSENSITIVE)

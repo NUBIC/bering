@@ -11,6 +11,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.sql.ResultSetMetaData;
+import java.util.Map;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
  * @author rsutphin
@@ -97,6 +103,28 @@ public class DatabaseAdapterTest extends TestCase {
             }
         }
         assertEquals(1, count);
+    }
+
+    public void testSetDefault() throws Exception {
+        {
+            String newDefault = "Foo";
+            adapter.setDefaultValue(TABLE_NAME, "title", newDefault);
+            stmt.execute("INSERT INTO " + TABLE_NAME + " (id) VALUES (2)");
+
+            List<Map<String, Object>> actual = results("SELECT * FROM " + TABLE_NAME + " where id=2");
+            assertEquals("Wrong number of results for query", 1, actual.size());
+            assertEquals("Default value not assigned to undefined column: " + actual.get(0),
+                newDefault, actual.get(0).get("TITLE"));
+        }
+
+        {
+            adapter.setDefaultValue(TABLE_NAME, "title", null);
+            stmt.execute("INSERT INTO " + TABLE_NAME + " (id) VALUES (3)");
+            List<Map<String, Object>> actual = results("SELECT * FROM " + TABLE_NAME + " where id=3");
+            assertEquals("Wrong number of results for query", 1, actual.size());
+            assertEquals("Default value not cleared: " + actual.get(0),
+                null, actual.get(0).get("TITLE"));
+        }
     }
 
     public void testLoadVersionTableWithNoTable() throws Exception {
@@ -191,6 +219,24 @@ public class DatabaseAdapterTest extends TestCase {
         } catch (Exception e) {
             // e.printStackTrace();
         }
+    }
+
+    private List<Map<String, Object>> results(String sql) throws SQLException {
+        return results(stmt.executeQuery(sql));
+    }
+
+    private List<Map<String, Object>> results(ResultSet rs) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int count = rsmd.getColumnCount();
+        List<Map<String, Object>> results = new LinkedList<Map<String, Object>>();
+        while (rs.next()) {
+            Map<String, Object> row = new LinkedHashMap<String, Object>();
+            for (int i = 1 ; i <= count ; i++) {
+                row.put(rsmd.getColumnName(i), rs.getObject(i));
+            }
+            results.add(row);
+        }
+        return results;
     }
 
     private Column createColumn(String name, int type) {

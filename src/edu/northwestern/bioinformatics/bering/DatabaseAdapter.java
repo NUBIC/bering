@@ -6,34 +6,28 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.platform.CreationParameters;
-import org.apache.ddlutils.platform.oracle.Oracle8Builder;
 import org.apache.ddlutils.alteration.AddColumnChange;
 import org.apache.ddlutils.alteration.RemoveColumnChange;
 import org.apache.ddlutils.alteration.TableChange;
+import org.apache.ddlutils.alteration.ColumnChange;
+import org.apache.ddlutils.alteration.ColumnDefaultValueChange;
+import org.apache.ddlutils.alteration.ModelChange;
 import org.apache.ddlutils.dynabean.SqlDynaClass;
 import org.apache.ddlutils.model.Column;
 import org.apache.ddlutils.model.Database;
 import org.apache.ddlutils.model.Table;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.datasource.ConnectionProxy;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.dao.DataAccessException;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.sql.Savepoint;
 import java.sql.ResultSet;
 import java.util.Arrays;
-import java.util.Iterator;
-
-import com.sun.java_cup.internal.version;
 
 /**
  * @author rsutphin
@@ -145,15 +139,30 @@ public class DatabaseAdapter implements Adapter {
         Table table = createNamedTable(tableName);
         AddColumnChange addColumn = new AddColumnChange(table, column, null, null);
         addColumn.setAtEnd(true);
-        platform.changeDatabase(Arrays.asList(addColumn), false);
+        applyChanges(addColumn);
     }
 
     public void removeColumn(String tableName, String columnName) {
         Table table = createIdedTable(tableName);
-        Column column = new Column();
-        column.setName(columnName);
+        Column column = createColumn(columnName);
         TableChange removeColumn = new RemoveColumnChange(table, column);
-        platform.changeDatabase(Arrays.asList(removeColumn), false);
+        applyChanges(removeColumn);
+    }
+
+    // TODO: if DDLUtils isn't going to be sufficient for abstracting this stuff,
+    // we need to factor it out into our own dialects
+    public void setDefaultValue(String tableName, String columnName, String newDefault) {
+        // DDLUtils insists on dropping and recreating the table.  So:
+        String defaultSql = newDefault == null ? "NULL" : '\'' + newDefault + '\'';
+        if (isOracle()) {
+            execute("ALTER TABLE " + tableName + " MODIFY (" + columnName + " DEFAULT " + defaultSql + ')');
+        } else {
+            execute("ALTER TABLE " + tableName + " ALTER COLUMN " + columnName + " SET DEFAULT " + defaultSql);
+        }
+    }
+
+    private void applyChanges(ModelChange... changes) {
+        platform.changeDatabase(Arrays.asList(changes), false);
     }
 
     public void execute(String sql) {
@@ -165,9 +174,14 @@ public class DatabaseAdapter implements Adapter {
     }
 
     private static Column createColumn(String name, int type) {
+        Column column = createColumn(name);
+        column.setTypeCode(type);
+        return column;
+    }
+
+    private static Column createColumn(String name) {
         Column column = new Column();
         column.setName(name);
-        column.setTypeCode(type);
         return column;
     }
 
