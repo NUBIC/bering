@@ -38,7 +38,7 @@ public abstract class Migration {
     ////// METHODS FOR MIGRATIONS TO CALL
 
     protected void createTable(String name, Closure addContents) {
-        TableDefinition definition = new TableDefinition(name, this);
+        TableDefinition definition = new TableDefinition(name);
         addContents.call(definition);
         adapter.createTable(definition);
     }
@@ -85,7 +85,7 @@ public abstract class Migration {
 
     // TODO: maybe this should be moved somewhere else
     // visible to collaborators (e.g., TableDefinition)
-    Column createColumn(Map<String, Object> parameters, String columnName, String columnType) {
+    static Column createColumn(Map<String, Object> parameters, String columnName, String columnType) {
         Column column = new Column();
         column.setName(columnName);
         column.setTypeCode(getTypeCode(columnType));
@@ -106,7 +106,7 @@ public abstract class Migration {
         return column;
     }
 
-    private int getTypeCode(String typeName) {
+    private static int getTypeCode(String typeName) {
         Integer code = NAMES_TO_JDBC_TYPES.get(typeName);
         if (code == null) {
             throw new IllegalArgumentException("Unknown type: " + typeName);

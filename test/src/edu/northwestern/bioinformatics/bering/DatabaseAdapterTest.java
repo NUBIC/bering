@@ -2,6 +2,7 @@ package edu.northwestern.bioinformatics.bering;
 
 import static edu.northwestern.bioinformatics.bering.DatabaseAdapter.VERSION_TABLE_NAME;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
+import edu.northwestern.bioinformatics.bering.dialect.Generic;
 import junit.framework.TestCase;
 import org.apache.ddlutils.model.Column;
 
@@ -16,7 +17,6 @@ import java.util.Map;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Arrays;
 
 /**
  * @author rsutphin
@@ -35,7 +35,7 @@ public class DatabaseAdapterTest extends TestCase {
         // hence the random number added to the name
         conn = DriverManager.getConnection("jdbc:hsqldb:mem:test" + Math.random(), "sa", "");
         conn.setAutoCommit(false);
-        adapter = new DatabaseAdapter(conn);
+        adapter = new DatabaseAdapter(conn, new Generic());
         stmt = conn.createStatement();
 
         stmt.execute("CREATE TABLE " + TABLE_NAME + " (id IDENTITY PRIMARY KEY, title VARCHAR(50))");
@@ -53,7 +53,7 @@ public class DatabaseAdapterTest extends TestCase {
         String tableName = "authors";
         assertTableNotPresent(tableName);
 
-        TableDefinition def = new TableDefinition(tableName, new StubMigration());
+        TableDefinition def = new TableDefinition(tableName);
         def.addColumn("name", "string");
         def.addColumn("birthdate", "timestamp");
         adapter.createTable(def);

@@ -1,33 +1,26 @@
 package edu.northwestern.bioinformatics.bering;
 
+import edu.northwestern.bioinformatics.bering.dialect.DdlUtilsBasedDialect;
+import edu.northwestern.bioinformatics.bering.dialect.Dialect;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
-import org.apache.commons.beanutils.DynaBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.alteration.AddColumnChange;
-import org.apache.ddlutils.alteration.RemoveColumnChange;
-import org.apache.ddlutils.alteration.TableChange;
-import org.apache.ddlutils.alteration.ColumnChange;
-import org.apache.ddlutils.alteration.ColumnDefaultValueChange;
-import org.apache.ddlutils.alteration.ModelChange;
-import org.apache.ddlutils.dynabean.SqlDynaClass;
 import org.apache.ddlutils.model.Column;
-import org.apache.ddlutils.model.Database;
-import org.apache.ddlutils.model.Table;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.StatementCallback;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.sql.Savepoint;
 import java.sql.ResultSet;
-import java.util.Arrays;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.util.List;
 
 /**
  * @author rsutphin
@@ -39,24 +32,29 @@ public class DatabaseAdapter implements Adapter {
     private static final String RELEASE_COLUMN_NAME = "release";
     private static final String MIGRATION_COLUMN_NAME = "migration";
 
-    private static final Table VERSION_TABLE = createNamedTable(VERSION_TABLE_NAME);
+    private static final TableDefinition VERSION_TABLE
+        = new TableDefinition(VERSION_TABLE_NAME, false);
     static {
         // TODO: these columns should be non-null
-        VERSION_TABLE.addColumn(createColumn(RELEASE_COLUMN_NAME, Types.INTEGER));
-        VERSION_TABLE.addColumn(createColumn(MIGRATION_COLUMN_NAME, Types.INTEGER));
+        VERSION_TABLE.addColumn(RELEASE_COLUMN_NAME, "integer");
+        VERSION_TABLE.addColumn(MIGRATION_COLUMN_NAME, "integer");
     }
 
-    private Platform platform;
     private Connection connection;
     private boolean defaultAutocommit;
     private JdbcTemplate jdbc;
     private SingleConnectionDataSource dataSource;
+    private Dialect dialect;
 
-    public DatabaseAdapter(Connection connection) {
+    public DatabaseAdapter(Connection connection, Dialect dialect) {
         this.connection = connection;
         this.dataSource = new SingleConnectionDataSource(connection, true);
         this.jdbc = new JdbcTemplate(dataSource);
-        this.platform = PlatformFactory.createNewPlatformInstance(dataSource);
+        this.dialect = dialect;
+        if (this.dialect instanceof DdlUtilsBasedDialect) {
+            Platform platform = PlatformFactory.createNewPlatformInstance(dataSource);
+            ((DdlUtilsBasedDialect) this.dialect).setPlatform(platform);
+        }
     }
 
     public void close() {
@@ -99,120 +97,53 @@ public class DatabaseAdapter implements Adapter {
     }
 
     public void createTable(TableDefinition def) {
-        Database db = new Database();
-        Table table = def.toTable();
-        db.addTable(table);
-        if (isOracle()) {
-            massageTableForPlatform(table);
-            execute("CREATE SEQUENCE " + createIdSequenceName(table));
-        }
-        platform.createTables(db, null, false, false);
+        execute(dialect.createTable(def));
     }
 
     public void dropTable(String name) {
-        Table table = createIdedTable(name);
-        if (isOracle()) {
-            massageTableForPlatform(table);
-            execute("DROP SEQUENCE " + createIdSequenceName(table));
-        }
-        platform.dropTables(createDatabaseWithSingleTable(table), false);
-    }
-
-    private Table massageTableForPlatform(Table table) {
-        if (isOracle()) {
-            table.getPrimaryKeyColumns()[0].setAutoIncrement(false);
-        }
-        return table;
-    }
-
-    private String createIdSequenceName(Table table) {
-        int maxlen = platform.getPlatformInfo().getMaxIdentifierLength();
-        return "seq_" + truncate(table.getName(), maxlen - 7) + "_id";
-    }
-
-    private String truncate(String str, int maxlen) {
-        if (str.length() <= maxlen) return str;
-        return str.substring(0, maxlen);
+        execute(dialect.dropTable(name));
     }
 
     public void addColumn(String tableName, Column column) {
-        Table table = createNamedTable(tableName);
-        AddColumnChange addColumn = new AddColumnChange(table, column, null, null);
-        addColumn.setAtEnd(true);
-        applyChanges(addColumn);
+        execute(dialect.addColumn(tableName, column));
     }
 
     public void removeColumn(String tableName, String columnName) {
-        Table table = createIdedTable(tableName);
-        Column column = createColumn(columnName);
-        TableChange removeColumn = new RemoveColumnChange(table, column);
-        applyChanges(removeColumn);
+        execute(dialect.removeColumn(tableName, columnName));
     }
 
-    // TODO: if DDLUtils isn't going to be sufficient for abstracting this stuff,
-    // we need to factor it out into our own dialects
     public void setDefaultValue(String tableName, String columnName, String newDefault) {
-        // DDLUtils insists on dropping and recreating the table.  So:
-        String defaultSql = newDefault == null ? "NULL" : '\'' + newDefault + '\'';
-        if (isOracle()) {
-            execute("ALTER TABLE " + tableName + " MODIFY (" + columnName + " DEFAULT " + defaultSql + ')');
-        } else {
-            execute("ALTER TABLE " + tableName + " ALTER COLUMN " + columnName + " SET DEFAULT " + defaultSql);
-        }
-    }
-
-    private void applyChanges(ModelChange... changes) {
-        platform.changeDatabase(Arrays.asList(changes), false);
+        execute(dialect.setDefaultValue(tableName, columnName, newDefault));
     }
 
     public void execute(String sql) {
-        platform.evaluateBatch(sql, false);
+        execute(SqlUtils.separateStatements(sql));
+    }
+
+    private void execute(final List<String> statements) {
+        jdbc.execute(new StatementCallback() {
+            public Object doInStatement(Statement stmt) throws SQLException, DataAccessException {
+                for (String sql : statements) {
+                    if (sql.trim().length() == 0) continue;
+                    log.info("SQL: " + sql.replaceAll("\n", "\n     ") + ';');
+                    stmt.execute(sql);
+                }
+                return null;
+            }
+        });
     }
 
     public String getDatabaseName() {
-        return platform.getName();
-    }
-
-    private static Column createColumn(String name, int type) {
-        Column column = createColumn(name);
-        column.setTypeCode(type);
-        return column;
-    }
-
-    private static Column createColumn(String name) {
-        Column column = new Column();
-        column.setName(name);
-        return column;
-    }
-
-    private static Table createNamedTable(String name) {
-        Table table = new Table();
-        table.setName(name);
-        return table;
-    }
-
-    private Table createIdedTable(String name) {
-        Table table = createNamedTable(name);
-        Column id = createColumn("id", Types.INTEGER);
-        id.setPrimaryKey(true);
-        id.setAutoIncrement(true);
-        table.addColumn(id);
-        return massageTableForPlatform(table);
-    }
-
-    private static Database createDatabaseWithSingleTable(Table table) {
-        Database db = new Database();
-        db.addTable(table);
-        return db;
+        return dialect.getDialectName();
     }
 
     public Version loadVersions() {
-        Database db = createDatabaseWithSingleTable(VERSION_TABLE);
         Savepoint savepoint = null;
         final Version version = new Version();
         try {
             savepoint = connection.setSavepoint("versiontabledetect");
-            jdbc.query("SELECT " + RELEASE_COLUMN_NAME + ", " + MIGRATION_COLUMN_NAME + " FROM " + VERSION_TABLE_NAME,
+            jdbc.query(String.format(
+                "SELECT %s, %s FROM %s", RELEASE_COLUMN_NAME, MIGRATION_COLUMN_NAME, VERSION_TABLE_NAME),
                 (Object[]) null, new ResultSetExtractor() {
                     public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
                         log.debug(VERSION_TABLE_NAME + " table exists; reading current rows");
@@ -234,33 +165,18 @@ public class DatabaseAdapter implements Adapter {
                 throw new RuntimeException(VERSION_TABLE_NAME + " does not exist and an attempt to create it has failed", rollbackE);
             }
             log.info("Creating " + VERSION_TABLE_NAME + " table");
-            platform.createTables(db, false, false);
+            createTable(VERSION_TABLE);
             return new Version();
         }
     }
 
     public void updateVersion(Integer release, Integer migration) {
-        Database db = createDatabaseWithSingleTable(VERSION_TABLE);
-        platform.evaluateBatch("DELETE FROM " + VERSION_TABLE_NAME + " WHERE " + RELEASE_COLUMN_NAME + " = " + release, false);
+        execute(String.format("DELETE FROM %s WHERE %s = %d",
+            VERSION_TABLE_NAME, RELEASE_COLUMN_NAME, release));
 
         if (migration < 1) return;
 
-        DynaBean newVersion;
-        try {
-            newVersion = SqlDynaClass.newInstance(VERSION_TABLE).newInstance();
-        } catch (IllegalAccessException e) {
-            // TODO: make specific
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            // TODO: make specific
-            throw new RuntimeException(e);
-        }
-        newVersion.set(RELEASE_COLUMN_NAME, release);
-        newVersion.set(MIGRATION_COLUMN_NAME, migration);
-        platform.insert(db, newVersion);
-    }
-
-    private boolean isOracle() {
-        return platform.getName().startsWith("Oracle");
+        execute(String.format("INSERT INTO %s (%s, %s) VALUES (%d, %d)",
+            VERSION_TABLE_NAME, RELEASE_COLUMN_NAME, MIGRATION_COLUMN_NAME, release, migration));
     }
 }

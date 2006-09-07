@@ -13,18 +13,19 @@ import java.util.Map;
 public class TableDefinition {
     private String name;
     private List<Column> columns;
-    private Migration context;
 
-    public TableDefinition(String name, Migration context) {
+    public TableDefinition(String name) {
+        this(name, true);
+    }
+
+    public TableDefinition(String name, boolean includeId) {
         this.name = name;
-        this.context = context;
-
         columns = new LinkedList<Column>();
-        columns.add(createPrimaryKeyColumn());
+        if (includeId) columns.add(createPrimaryKeyColumn());
     }
 
     private Column createPrimaryKeyColumn() {
-        Column col = context.createColumn(null, "id", "integer");
+        Column col = Migration.createColumn(null, "id", "integer");
         col.setPrimaryKey(true);
         col.setAutoIncrement(true);
         return col;
@@ -35,11 +36,11 @@ public class TableDefinition {
     }
 
     public void addColumn(Map<String, Object> parameters, String columnName, String type) {
-        columns.add(context.createColumn(parameters, columnName, type));
+        columns.add(Migration.createColumn(parameters, columnName, type));
     }
 
     public void addVersionColumn() {
-        Column v = context.createColumn(null, "version", "integer");
+        Column v = Migration.createColumn(null, "version", "integer");
         v.setRequired(true);
         v.setDefaultValue("0");
         columns.add(v);

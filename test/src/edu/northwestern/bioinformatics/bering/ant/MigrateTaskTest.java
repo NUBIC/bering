@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import com.sun.java_cup.internal.version;
+import edu.northwestern.bioinformatics.bering.dialect.Generic;
+import edu.northwestern.bioinformatics.bering.dialect.Dialect;
 
 /**
  * @author Moses Hohman
@@ -27,6 +29,10 @@ public class MigrateTaskTest extends TestCase {
 
     public void testDefaultMigrationsDir() {
         assertEquals("db/migrate", task.getMigrationsDir());
+    }
+
+    public void testDefaultDialect() throws Exception {
+        assertEquals(Generic.class.getName(), task.getDialect());
     }
 
     public void testBuildExceptionThrownIfMigrationsDirIsNotADirectory() throws IOException {
@@ -56,6 +62,26 @@ public class MigrateTaskTest extends TestCase {
         } catch (BuildException be) {
             assertEquals("Invalid target version (bad).  Should have the form 'R|M' or 'M'.", be.getMessage());
             assertNotNull(be.getCause());
+        }
+    }
+
+    public void testInvalidDialect() throws Exception {
+        task.setDialect("this is not a class");
+        try {
+            task.createDialect();
+            fail("Exception not thrown");
+        } catch (BuildException e) {
+            assertEquals("Could not find dialect class this is not a class", e.getMessage());
+        }
+    }
+
+    public void testNonDialectDialect() throws Exception {
+        task.setDialect(String.class.getName());
+        try {
+            task.createDialect();
+            fail("Exception not thrown");
+        } catch (BuildException e) {
+            assertEquals("Class java.lang.String does not implement " + Dialect.class.getName(), e.getMessage());
         }
     }
 

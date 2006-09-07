@@ -17,7 +17,7 @@ public class TableDefinitionTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        definition = new TableDefinition("frogs", new StubMigration());
+        definition = new TableDefinition("frogs");
         params = new HashMap<String, Object>();
     }
 
@@ -27,6 +27,11 @@ public class TableDefinitionTest extends TestCase {
         assertNotNull("No id column", id);
         assertTrue("id column isn't the primary key", id.isPrimaryKey());
         assertTrue("id column isn't autoincrement", id.isAutoIncrement());
+    }
+    
+    public void testIdCanBeDisabled() throws Exception {
+        TableDefinition noId = new TableDefinition("anonymous", false);
+        assertEquals(0, noId.toTable().getColumnCount());
     }
 
     public void testToTablePreservesTableName() throws Exception {
