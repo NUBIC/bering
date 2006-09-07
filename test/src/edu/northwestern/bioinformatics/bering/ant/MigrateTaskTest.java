@@ -34,6 +34,11 @@ public class MigrateTaskTest extends TestCase {
     public void testDefaultDialect() throws Exception {
         assertEquals(Generic.class.getName(), task.getDialect());
     }
+    
+    public void testSetDialectBlankDoesNotChangeIt() throws Exception {
+        task.setDialect("");
+        assertEquals(Generic.class.getName(), task.getDialect());
+    }
 
     public void testBuildExceptionThrownIfMigrationsDirIsNotADirectory() throws IOException {
         File tempFile = File.createTempFile("MigrateTaskTest", ".tmp");

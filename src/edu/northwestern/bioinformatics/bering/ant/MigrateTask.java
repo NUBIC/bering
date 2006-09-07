@@ -79,6 +79,7 @@ public class MigrateTask extends JDBCTask {
     }
 
     public void setDialect(String dialect) {
+        if (dialect == null || dialect.trim().length() == 0) return;
         this.dialect = dialect;
     }
 
