@@ -63,6 +63,10 @@ public abstract class Migration {
         adapter.setDefaultValue(tableName, columnName, newDefault);
     }
 
+    protected void setNullable(String tableName, String columnName, boolean nullable) {
+        adapter.setNullable(tableName, columnName, nullable);
+    }
+
     protected boolean databaseMatches(String substring) {
         return databaseMatches(
             Pattern.compile(substring, Pattern.CASE_INSENSITIVE)

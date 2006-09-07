@@ -116,6 +116,10 @@ public class DatabaseAdapter implements Adapter {
         execute(dialect.setDefaultValue(tableName, columnName, newDefault));
     }
 
+    public void setNullable(String tableName, String columnName, boolean nullable) {
+        execute(dialect.setNullable(tableName, columnName, nullable));
+    }
+
     public void execute(String sql) {
         execute(SqlUtils.separateStatements(sql));
     }

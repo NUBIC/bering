@@ -127,6 +127,27 @@ public class DatabaseAdapterTest extends TestCase {
         }
     }
 
+    public void testSetNullable() throws Exception {
+        stmt.execute(String.format("ALTER TABLE %s ALTER COLUMN %s VARCHAR NOT NULL", TABLE_NAME, "title"));
+
+        adapter.setNullable(TABLE_NAME, "title", true);
+
+        stmt.execute(String.format("INSERT INTO %s (title) VALUES (NULL)", TABLE_NAME));
+        // expect no exception
+    }
+
+    public void testSetNotNullable() throws Exception {
+        adapter.setNullable(TABLE_NAME, "title", false);
+
+        try {
+            stmt.execute(String.format("INSERT INTO %s (title) VALUES (NULL)", TABLE_NAME));
+            fail("Exception not thrown");
+        } catch (SQLException e) {
+            // expected
+            e.printStackTrace();
+        }
+    }
+
     public void testLoadVersionTableWithNoTable() throws Exception {
         Version actual = adapter.loadVersions();
         assertEquals(0, actual.getReleaseNumbers().size());

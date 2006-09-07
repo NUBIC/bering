@@ -19,4 +19,5 @@ public interface Dialect {
     List<String> removeColumn(String table, String column);
 
     List<String> setDefaultValue(String table, String column, String defaultValue);
+    List<String> setNullable(String table, String column, boolean nullable);
 }

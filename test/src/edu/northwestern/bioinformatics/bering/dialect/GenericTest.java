@@ -1,9 +1,7 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
-import edu.northwestern.bioinformatics.bering.BeringTestCase;
 import edu.northwestern.bioinformatics.bering.TableDefinition;
 import static edu.northwestern.bioinformatics.bering.dialect.DdlUtilsTools.*;
-import org.apache.ddlutils.Platform;
 import static org.easymock.classextension.EasyMock.expect;
 
 import java.util.List;
@@ -11,26 +9,18 @@ import java.util.List;
 /**
  * @author Rhett Sutphin
  */
-public class GenericTest extends BeringTestCase {
-    private Platform platform;
-    private Generic dialect;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        dialect = new Generic();
-        platform = registerMockFor(Platform.class);
-        dialect.setPlatform(platform);
-    }
+public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
+    protected Generic createDialect() { return new Generic(); }
 
     public void testCreateTable() throws Exception {
         TableDefinition def = createTestTable();
         String expectedSql = "CREATE TABLE etc";
 
-        expect(platform.getCreateTablesSql(createDatabase(def.toTable()), false, false))
+        expect(getPlatform().getCreateTablesSql(createDatabase(def.toTable()), false, false))
             .andReturn(expectedSql);
         replayMocks();
 
-        List<String> statements = dialect.createTable(def);
+        List<String> statements = getDialect().createTable(def);
         verifyMocks();
 
         assertStatements(statements, expectedSql);
@@ -40,31 +30,34 @@ public class GenericTest extends BeringTestCase {
         String tableName = "test";
         String expectedSql = "DROP TABLE";
 
-        expect(platform.getDropTablesSql(createDatabase(createIdedTable(tableName)), false))
+        expect(getPlatform().getDropTablesSql(createDatabase(createIdedTable(tableName)), false))
             .andReturn(expectedSql);
         replayMocks();
 
-        List<String> statements = dialect.dropTable(tableName);
+        List<String> statements = getDialect().dropTable(tableName);
         verifyMocks();
 
         assertStatements(statements, expectedSql);
     }
 
     public void testSetDefaultValue() throws Exception {
-        List<String> statements = dialect.setDefaultValue("feast", "length", "8");
+        List<String> statements = getDialect().setDefaultValue("feast", "length", "8");
         assertStatements(statements, "ALTER TABLE feast ALTER COLUMN length SET DEFAULT '8'");
     }
 
     public void testUnsetDefaultValue() throws Exception {
-        List<String> statements = dialect.setDefaultValue("feast", "length", null);
+        List<String> statements = getDialect().setDefaultValue("feast", "length", null);
         assertStatements(statements, "ALTER TABLE feast ALTER COLUMN length SET DEFAULT NULL");
     }
 
-    private static void assertStatements(List<String> actual, String... expected) {
-        assertEquals("Wrong number of statements: " + actual, expected.length, actual.size());
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals("Wrong statment " + i, expected[0], actual.get(0));
-        }
+    public void testSetNullable() throws Exception {
+        List<String> statements = getDialect().setNullable("feast", "length", true);
+        assertStatements(statements, "ALTER TABLE feast ALTER COLUMN length SET NULL");
+    }
+
+    public void testSetNotNullable() throws Exception {
+        List<String> statements = getDialect().setNullable("feast", "length", false);
+        assertStatements(statements, "ALTER TABLE feast ALTER COLUMN length SET NOT NULL");
     }
 
     private static TableDefinition createTestTable() {

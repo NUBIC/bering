@@ -26,9 +26,15 @@ public class Oracle extends Generic {
     }
 
     public List<String> setDefaultValue(String table, String column, String newDefault) {
-        return Arrays.asList(
-            "ALTER TABLE " + table + " MODIFY (" + column + " DEFAULT " + sqlLiteral(newDefault) + ')'
-        );
+        return Arrays.asList(String.format(
+            "ALTER TABLE %s MODIFY (%s DEFAULT %s)", table, column, sqlLiteral(newDefault)
+        ));
+    }
+
+    public List<String> setNullable(String table, String column, boolean nullable) {
+        return Arrays.asList(String.format(
+            "ALTER TABLE %s MODIFY (%s %sNULL)", table, column, nullable ? "" : "NOT "
+        ));
     }
 
     private String createIdSequenceName(Table table) {

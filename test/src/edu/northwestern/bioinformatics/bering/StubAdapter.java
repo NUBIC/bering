@@ -45,6 +45,10 @@ public class StubAdapter implements Adapter {
         throw new UnsupportedOperationException("setDefaultValue not implemented");
     }
 
+    public void setNullable(String tableName, String columnName, boolean nullable) {
+        throw new UnsupportedOperationException("setNullable not implemented");
+    }
+
     public void execute(String sql) {
         throw new UnsupportedOperationException("execute not implemented");
     }

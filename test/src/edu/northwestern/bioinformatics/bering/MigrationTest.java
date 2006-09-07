@@ -1,5 +1,6 @@
 package edu.northwestern.bioinformatics.bering;
 
+import static edu.northwestern.bioinformatics.bering.Migration.createColumn;
 import static edu.northwestern.bioinformatics.bering.Migration.*;
 import junit.framework.TestCase;
 import org.apache.ddlutils.model.Column;
@@ -22,7 +23,7 @@ public class MigrationTest extends TestCase {
     }
 
     public void testCreateColumn() throws Exception {
-        Column actual = migration.createColumn(null, "title", "string");
+        Column actual = Migration.createColumn(null, "title", "string");
         assertEquals("Wrong name", "title", actual.getName());
         assertEquals("Wrong type", Types.VARCHAR, actual.getTypeCode());
         assertFalse("Should be nullable by default", actual.isRequired());
@@ -31,37 +32,37 @@ public class MigrationTest extends TestCase {
 
     public void testCreateNotNullColumn() throws Exception {
         parameters.put(NULLABLE_KEY, false);
-        Column actual = migration.createColumn(parameters, "notnull", "string");
+        Column actual = Migration.createColumn(parameters, "notnull", "string");
         assertTrue("required not set correctly", actual.isRequired());
     }
 
     public void testCreateColumnWithIntegerDefaultValue() {
         parameters.put("defaultValue", 0);
-        Column actual = migration.createColumn(parameters, "position", "integer");
+        Column actual = Migration.createColumn(parameters, "position", "integer");
         assertEquals("0", actual.getDefaultValue());
     }
 
     public void testCreateColumnWithStringDefaultValue() {
         parameters.put("defaultValue", "days");
-        Column actual = migration.createColumn(parameters, "duration_unit", "string");
+        Column actual = Migration.createColumn(parameters, "duration_unit", "string");
         assertEquals("days", actual.getDefaultValue());
     }
 
     public void testCreateColumnWithNullDefaultValueDoesntDoAnything() {
         parameters.put("defaultValue", null);
-        Column actual = migration.createColumn(parameters, "duration_unit", "string");
+        Column actual = Migration.createColumn(parameters, "duration_unit", "string");
         assertNull("default value not null", actual.getDefaultValue());
     }
 
     public void testCreateColumnWithLimit() throws Exception {
         parameters.put(LIMIT_KEY, 255);
-        Column actual = migration.createColumn(parameters, "notnull", "string");
+        Column actual = Migration.createColumn(parameters, "notnull", "string");
         assertEquals(255, actual.getSizeAsInt());
     }
 
     public void testCreateColumnWithPrecision() throws Exception {
         parameters.put(PRECISION_KEY, 9);
-        Column actual = migration.createColumn(parameters, "notnull", "string");
+        Column actual = Migration.createColumn(parameters, "notnull", "string");
         assertEquals(9, actual.getScale());
     }
 
@@ -102,6 +103,6 @@ public class MigrationTest extends TestCase {
     }
 
     private int getCreatedColumnType(String columnType) {
-        return migration.createColumn(null, "", columnType).getTypeCode();
+        return Migration.createColumn(null, "", columnType).getTypeCode();
     }
 }

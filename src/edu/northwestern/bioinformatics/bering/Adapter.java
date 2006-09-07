@@ -28,6 +28,8 @@ public interface Adapter {
 
     void setDefaultValue(String tableName, String columnName, String newDefault);
 
+    void setNullable(String tableName, String columnName, boolean nullable);
+
     void execute(String sql);
 
     String getDatabaseName();
