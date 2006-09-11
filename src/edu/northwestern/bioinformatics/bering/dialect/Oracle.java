@@ -13,8 +13,8 @@ import java.util.List;
 public class Oracle extends Generic {
     public List<String> createTable(Table table) {
         List<String> statments = new ArrayList<String>(2);
-        statments.add("CREATE SEQUENCE " + createIdSequenceName(table));
-        if (hasPrimaryKey(table)) statments.addAll(super.createTable(massageTableForOracle(table)));
+        if (hasPrimaryKey(table)) statments.add("CREATE SEQUENCE " + createIdSequenceName(table));
+        statments.addAll(super.createTable(massageTableForOracle(table)));
         return statments;
     }
 
