@@ -56,7 +56,6 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
 
     public void testCreateTableWithoutPK() throws Exception {
         String expectedCreateTable = "CREATE TABLE etc";
-        expect(getPlatformInfo().getMaxIdentifierLength()).andReturn(15);
         expect(getPlatform().getCreateTablesSql((Database) notNull(), eq(false), eq(false)))
             .andReturn(expectedCreateTable);
         replayMocks();
