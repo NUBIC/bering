@@ -60,6 +60,19 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
         assertStatements(statements, "ALTER TABLE feast ALTER COLUMN length SET NOT NULL");
     }
 
+    public void testSeparateStatements() throws Exception {
+        String script =
+            "CREATE TABLE etc;\n" +
+            "CREATE SEQUENCE etc;\n" +
+            "INSERT INTO etc (alia) VALUES ('foo');";
+        assertStatements(
+            getDialect().separateStatements(script),
+            "CREATE TABLE etc",
+            "CREATE SEQUENCE etc",
+            "INSERT INTO etc (alia) VALUES ('foo')"
+        );
+    }
+
     private static TableDefinition createTestTable() {
         TableDefinition def = new TableDefinition("feast");
         def.addColumn("name", "string");

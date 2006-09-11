@@ -6,6 +6,7 @@ import org.apache.ddlutils.model.Table;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * @author Rhett Sutphin
@@ -56,5 +57,42 @@ public class Oracle extends Generic {
 
     private boolean hasPrimaryKey(Table table) {
         return table.getPrimaryKeyColumns().length > 0;
+    }
+
+    // Attempts to be SQLPLUS-compatible for scripts that mix PL/SQL and plain SQL
+    public List<String> separateStatements(String script) {
+        List<String> statments = new LinkedList<String>();
+
+        // First, split by '/' on a line by itself
+        String[] blocks = script.split("[\\r\\n]+/[\\r\\n]+");
+
+        // For each resulting block (except the last),
+        for (int i = 0 ; i < blocks.length - 1 ; i++) {
+            String block = blocks[i];
+            // Walk back to the previous CREATE -- it is the beginning of the last statement in the block.
+            int lastCreate = block.toUpperCase().lastIndexOf("CREATE");
+            if (lastCreate < 0) {
+                throw new IllegalArgumentException("Block ends with '/' but does not include a CREATE");
+            }
+            String last = block.substring(lastCreate);
+            String balance = block.substring(0, lastCreate);
+
+            // Split the remainder on semi-colons
+            splitBySemiColons(balance, statments);
+
+            statments.add(last.trim());
+        }
+
+        // The last block doesn't end with a '/', so include all its statements
+        splitBySemiColons(blocks[blocks.length - 1], statments);
+
+        return statments;
+    }
+
+    private void splitBySemiColons(String block, List<String> addTo) {
+        String[] bStatements = block.split("\\s*;\\s*");
+        for (String bStatement : bStatements) {
+            if (bStatement.length() > 0) addTo.add(bStatement);
+        }
     }
 }

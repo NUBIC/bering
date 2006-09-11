@@ -1,17 +1,19 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
-import static edu.northwestern.bioinformatics.bering.SqlUtils.*;
+import edu.northwestern.bioinformatics.bering.SqlUtils;
 import edu.northwestern.bioinformatics.bering.TableDefinition;
 import static edu.northwestern.bioinformatics.bering.dialect.DdlUtilsTools.*;
-import org.apache.ddlutils.model.Table;
-import org.apache.ddlutils.model.Column;
-import org.apache.ddlutils.alteration.ModelChange;
 import org.apache.ddlutils.alteration.AddColumnChange;
-import org.apache.ddlutils.alteration.TableChange;
+import org.apache.ddlutils.alteration.ModelChange;
 import org.apache.ddlutils.alteration.RemoveColumnChange;
+import org.apache.ddlutils.alteration.TableChange;
+import org.apache.ddlutils.model.Column;
+import org.apache.ddlutils.model.Table;
+import org.apache.ddlutils.util.SqlTokenizer;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * @author Rhett Sutphin
@@ -19,6 +21,16 @@ import java.util.Arrays;
 public class Generic extends DdlUtilsBasedDialect {
     public List<String> createTable(TableDefinition def) {
         return createTable(def.toTable());
+    }
+
+    // Uses DdlUtils' tokenizer, which just splits on ;
+    public List<String> separateStatements(String script) {
+        SqlTokenizer tok = new SqlTokenizer(script);
+        List<String> stmts = new LinkedList<String>();
+        while (tok.hasMoreStatements()) {
+            stmts.add(tok.getNextStatement());
+        }
+        return stmts;
     }
 
     protected List<String> createTable(Table table) {
@@ -54,7 +66,7 @@ public class Generic extends DdlUtilsBasedDialect {
     public List<String> setDefaultValue(String table, String column, String newDefault) {
         // DDLUtils insists on dropping and recreating the table.  So:
         return Arrays.asList(String.format(
-            "ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s", table, column, sqlLiteral(newDefault)
+            "ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s", table, column, SqlUtils.sqlLiteral(newDefault)
         ));
     }
 

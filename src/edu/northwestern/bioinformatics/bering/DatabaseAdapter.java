@@ -121,7 +121,7 @@ public class DatabaseAdapter implements Adapter {
     }
 
     public void execute(String sql) {
-        execute(SqlUtils.separateStatements(sql));
+        execute(dialect.separateStatements(sql));
     }
 
     private void execute(final List<String> statements) {

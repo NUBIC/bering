@@ -12,6 +12,8 @@ import org.apache.ddlutils.model.Column;
 public interface Dialect {
     String getDialectName();
 
+    List<String> separateStatements(String script);
+
     List<String> createTable(TableDefinition table);
     List<String> dropTable(String table);
 

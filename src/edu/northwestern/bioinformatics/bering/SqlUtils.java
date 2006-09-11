@@ -10,15 +10,6 @@ import java.util.LinkedList;
  */
 public class SqlUtils {
 
-    public static List<String> separateStatements(String multistatmentSql) {
-        SqlTokenizer tok = new SqlTokenizer(multistatmentSql);
-        List<String> stmts = new LinkedList<String>();
-        while (tok.hasMoreStatements()) {
-            stmts.add(tok.getNextStatement());
-        }
-        return stmts;
-    }
-
     public static String sqlLiteral(String value) {
         return value == null ? "NULL" : '\'' + value + '\'';
     }
