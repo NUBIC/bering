@@ -14,14 +14,14 @@ public class Oracle extends Generic {
     public List<String> createTable(Table table) {
         List<String> statments = new ArrayList<String>(2);
         statments.add("CREATE SEQUENCE " + createIdSequenceName(table));
-        statments.addAll(super.createTable(massageTableForOracle(table)));
+        if (hasPrimaryKey(table)) statments.addAll(super.createTable(massageTableForOracle(table)));
         return statments;
     }
 
     public List<String> dropTable(Table table) {
         List<String> statments = new ArrayList<String>(2);
         statments.addAll(super.dropTable(massageTableForOracle(table)));
-        statments.add("DROP SEQUENCE " + createIdSequenceName(table));
+        if (hasPrimaryKey(table)) statments.add("DROP SEQUENCE " + createIdSequenceName(table));
         return statments;
     }
 
@@ -48,7 +48,13 @@ public class Oracle extends Generic {
     }
 
     private Table massageTableForOracle(Table table) {
-        table.getPrimaryKeyColumns()[0].setAutoIncrement(false);
+        if (hasPrimaryKey(table)) {
+            table.getPrimaryKeyColumns()[0].setAutoIncrement(false);
+        }
         return table;
+    }
+
+    private boolean hasPrimaryKey(Table table) {
+        return table.getPrimaryKeyColumns().length > 0;
     }
 }
