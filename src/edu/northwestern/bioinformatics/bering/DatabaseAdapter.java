@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * @author rsutphin
@@ -32,12 +33,12 @@ public class DatabaseAdapter implements Adapter {
     private static final String RELEASE_COLUMN_NAME = "release";
     private static final String MIGRATION_COLUMN_NAME = "migration";
 
-    private static final TableDefinition VERSION_TABLE
-        = new TableDefinition(VERSION_TABLE_NAME, false);
+    private static final TableDefinition VERSION_TABLE = new TableDefinition(VERSION_TABLE_NAME);
     static {
         // TODO: these columns should be non-null
         VERSION_TABLE.addColumn(RELEASE_COLUMN_NAME, "integer");
         VERSION_TABLE.addColumn(MIGRATION_COLUMN_NAME, "integer");
+        VERSION_TABLE.setIncludePrimaryKey(false);
     }
 
     private Connection connection;

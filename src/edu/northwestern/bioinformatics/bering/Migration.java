@@ -16,6 +16,7 @@ public abstract class Migration {
     public static final String LIMIT_KEY     = "limit";
     public static final String PRECISION_KEY = "precision";
     private static final String DEFAULT_VALUE_KEY = "defaultValue";
+    public static final String PRIMARY_KEY_KEY = "primaryKey";
 
     private static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
     static {
@@ -105,6 +106,9 @@ public abstract class Migration {
             }
             if (parameters.containsKey(PRECISION_KEY)) {
                 column.setScale((Integer) parameters.get(PRECISION_KEY));
+            }
+            if (parameters.containsKey(PRIMARY_KEY_KEY)) {
+                column.setPrimaryKey((Boolean) parameters.get(PRIMARY_KEY_KEY));
             }
         }
         return column;

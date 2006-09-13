@@ -63,7 +63,8 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
             .andReturn(expectedCreateTable);
         replayMocks();
 
-        TableDefinition def = new TableDefinition("bering_version", false);
+        TableDefinition def = new TableDefinition("bering_version");
+        def.setIncludePrimaryKey(false);
         def.addColumn("release", "integer");
         assertStatements(
             getDialect().createTable(def.toTable()),

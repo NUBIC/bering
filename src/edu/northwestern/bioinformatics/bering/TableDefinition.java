@@ -13,15 +13,12 @@ import java.util.Map;
 public class TableDefinition {
     private String name;
     private List<Column> columns;
+    private boolean includeDefaultPrimaryKey;
 
     public TableDefinition(String name) {
-        this(name, true);
-    }
-
-    public TableDefinition(String name, boolean includeId) {
         this.name = name;
         columns = new LinkedList<Column>();
-        if (includeId) columns.add(createPrimaryKeyColumn());
+        includeDefaultPrimaryKey = true;
     }
 
     private Column createPrimaryKeyColumn() {
@@ -46,9 +43,14 @@ public class TableDefinition {
         columns.add(v);
     }
 
+    public void setIncludePrimaryKey(boolean set) {
+        includeDefaultPrimaryKey = set;
+    }
+
     public Table toTable() {
         Table t =  new Table();
         t.setName(getName());
+        if (includeDefaultPrimaryKey) t.addColumn(createPrimaryKeyColumn());
         for (Column column : columns) {
             t.addColumn(column);
         }

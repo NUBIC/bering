@@ -65,6 +65,12 @@ public class MigrationTest extends TestCase {
         Column actual = Migration.createColumn(parameters, "notnull", "string");
         assertEquals(9, actual.getScale());
     }
+    
+    public void testCreateManualPrimaryKeyColumn() throws Exception {
+        parameters.put(PRIMARY_KEY_KEY, true);
+        Column actual = Migration.createColumn(parameters, "name", "string");
+        assertTrue(actual.isPrimaryKey());
+    }
 
     public void testCreatedColumnTypes() throws Exception {
         assertEquals(Types.BOOLEAN,   getCreatedColumnType("boolean"));

@@ -29,8 +29,10 @@ public class TableDefinitionTest extends TestCase {
         assertTrue("id column isn't autoincrement", id.isAutoIncrement());
     }
     
-    public void testIdCanBeDisabled() throws Exception {
-        TableDefinition noId = new TableDefinition("anonymous", false);
+    public void testIdCanBeDisabledAfterCreation() throws Exception {
+        TableDefinition noId = new TableDefinition("anonymous");
+        assertEquals(1, noId.toTable().getColumnCount());
+        noId.setIncludePrimaryKey(false);
         assertEquals(0, noId.toTable().getColumnCount());
     }
 
