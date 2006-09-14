@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
  * @author rsutphin
@@ -146,6 +147,13 @@ public class DatabaseAdapterTest extends TestCase {
             // expected
             e.printStackTrace();
         }
+    }
+
+    public void testInsert() throws Exception {
+        String newTitle = "Bering is Groovy 2nd Ed";
+        adapter.insert(TABLE_NAME, Arrays.asList("title"), Arrays.asList((Object) newTitle));
+
+        assertEquals(1, results("SELECT * FROM " + TABLE_NAME + " WHERE title='" + newTitle + '\'').size());
     }
 
     public void testLoadVersionTableWithNoTable() throws Exception {

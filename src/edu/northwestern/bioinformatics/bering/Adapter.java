@@ -5,6 +5,7 @@ import edu.northwestern.bioinformatics.bering.runtime.Version;
 
 import java.sql.SQLException;
 import java.util.regex.Pattern;
+import java.util.List;
 
 /**
  * @author Moses Hohman
@@ -31,6 +32,8 @@ public interface Adapter {
     void setNullable(String tableName, String columnName, boolean nullable);
 
     void execute(String sql);
+
+    void insert(String tableName, List<String> columnNames, List<Object> values);
 
     String getDatabaseName();
 

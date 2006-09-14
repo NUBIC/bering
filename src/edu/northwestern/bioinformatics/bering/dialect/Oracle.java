@@ -2,6 +2,7 @@ package edu.northwestern.bioinformatics.bering.dialect;
 
 import static edu.northwestern.bioinformatics.bering.SqlUtils.sqlLiteral;
 import org.apache.ddlutils.model.Table;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,8 +40,12 @@ public class Oracle extends Generic {
     }
 
     private String createIdSequenceName(Table table) {
+        return createIdSequenceName(table.getName());
+    }
+
+    private String createIdSequenceName(String tableName) {
         int maxlen = getPlatform().getPlatformInfo().getMaxIdentifierLength();
-        return "seq_" + truncate(table.getName(), maxlen - 7) + "_id";
+        return "seq_" + truncate(tableName, maxlen - 7) + "_id";
     }
 
     private String truncate(String str, int maxlen) {
@@ -93,6 +98,22 @@ public class Oracle extends Generic {
         String[] bStatements = block.split("\\s*;\\s*");
         for (String bStatement : bStatements) {
             if (bStatement.length() > 0) addTo.add(bStatement);
+        }
+    }
+
+    public List<String> insert(String table, List<String> columns, List<Object> values) {
+        if (columns.size() == 0) {
+            return Arrays.asList(String.format(
+                "INSERT INTO %s (id) VALUES (%s.nextval)", table, createIdSequenceName(table)
+            ));
+        } else {
+            return Arrays.asList(String.format(
+                "INSERT INTO %s (id, %s) VALUES (%s.nextval, %s)",
+                    table,
+                    StringUtils.join(columns.iterator(), INSERT_DELIMITER),
+                    createIdSequenceName(table),
+                    createInsertValueString(values)
+            ));
         }
     }
 }

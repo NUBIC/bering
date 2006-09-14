@@ -8,11 +8,13 @@ import org.apache.ddlutils.model.Column;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Arrays;
 
 /**
  * @author rsutphin
  */
-public class MigrationTest extends TestCase {
+public class MigrationTest extends BeringTestCase {
     private StubAdapter adapter = new StubAdapter();
     private Migration migration = new StubMigration();
     private Map<String, Object> parameters = new HashMap<String, Object>();
@@ -65,7 +67,7 @@ public class MigrationTest extends TestCase {
         Column actual = Migration.createColumn(parameters, "notnull", "string");
         assertEquals(9, actual.getScale());
     }
-    
+
     public void testCreateManualPrimaryKeyColumn() throws Exception {
         parameters.put(PRIMARY_KEY_KEY, true);
         Column actual = Migration.createColumn(parameters, "name", "string");
@@ -110,5 +112,22 @@ public class MigrationTest extends TestCase {
 
     private int getCreatedColumnType(String columnType) {
         return Migration.createColumn(null, "", columnType).getTypeCode();
+    }
+
+    public void testInsert() {
+        String tableName = "table";
+        Map<String,  Object> expectedValues = new LinkedHashMap<String, Object>();
+        expectedValues.put("1", 1);
+        expectedValues.put("2", "two");
+        expectedValues.put("3", "eighteen");
+
+        Adapter mockAdapter = registerMockFor(Adapter.class);
+        migration.setAdapter(mockAdapter);
+
+        mockAdapter.insert(tableName, Arrays.asList("1", "2", "3"), Arrays.asList(1, (Object) "two", "eighteen"));
+        replayMocks();
+
+        migration.insert(tableName, expectedValues);
+        verifyMocks();
     }
 }

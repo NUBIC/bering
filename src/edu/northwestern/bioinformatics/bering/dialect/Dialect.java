@@ -22,4 +22,6 @@ public interface Dialect {
 
     List<String> setDefaultValue(String table, String column, String defaultValue);
     List<String> setNullable(String table, String column, boolean nullable);
+
+    List<String> insert(String table, List<String> columns, List<Object> values);
 }

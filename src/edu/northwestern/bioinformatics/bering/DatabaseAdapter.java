@@ -125,6 +125,10 @@ public class DatabaseAdapter implements Adapter {
         execute(dialect.separateStatements(sql));
     }
 
+    public void insert(String tableName, List<String> columnNames, List<Object> values) {
+        execute(dialect.insert(tableName, columnNames, values));
+    }
+
     private void execute(final List<String> statements) {
         jdbc.execute(new StatementCallback() {
             public Object doInStatement(Statement stmt) throws SQLException, DataAccessException {

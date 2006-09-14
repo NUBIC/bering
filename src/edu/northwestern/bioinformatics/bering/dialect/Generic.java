@@ -10,15 +10,19 @@ import org.apache.ddlutils.alteration.TableChange;
 import org.apache.ddlutils.model.Column;
 import org.apache.ddlutils.model.Table;
 import org.apache.ddlutils.util.SqlTokenizer;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.ArrayList;
 
 /**
  * @author Rhett Sutphin
  */
 public class Generic extends DdlUtilsBasedDialect {
+    protected static final String INSERT_DELIMITER = ", ";
+
     public List<String> createTable(TableDefinition def) {
         return createTable(def.toTable());
     }
@@ -74,6 +78,23 @@ public class Generic extends DdlUtilsBasedDialect {
         return Arrays.asList(String.format(
             "ALTER TABLE %s ALTER COLUMN %s SET %sNULL", table, column, nullable ? "" : "NOT "
         ));
+    }
+
+    public List<String> insert(String table, List<String> columns, List<Object> values) {
+        return Arrays.asList(String.format(
+            "INSERT INTO %s (%s) VALUES (%s)",
+                table,
+                StringUtils.join(columns.iterator(), INSERT_DELIMITER),
+                createInsertValueString(values)
+        ));
+    }
+
+    protected String createInsertValueString(List<Object> values) {
+        List<String> valueLiterals = new ArrayList<String>();
+        for (Object o : values) {
+            valueLiterals.add(SqlUtils.sqlLiteral(o));
+        }
+        return StringUtils.join(valueLiterals.iterator(), INSERT_DELIMITER);
     }
 
     ////// UTILITIES

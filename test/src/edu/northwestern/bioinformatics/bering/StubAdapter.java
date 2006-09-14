@@ -3,6 +3,8 @@ package edu.northwestern.bioinformatics.bering;
 import org.apache.ddlutils.model.Column;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 
+import java.util.List;
+
 /**
  * @author Rhett Sutphin
  */
@@ -67,5 +69,9 @@ public class StubAdapter implements Adapter {
 
     public void updateVersion(Integer release, Integer migration) {
         throw new UnsupportedOperationException("updateVersion not implemented");
+    }
+
+    public void insert(String tableName, List<String> columnNames, List<Object> values) {
+        throw new UnsupportedOperationException("insert not implemented");
     }
 }

@@ -5,6 +5,7 @@ import static edu.northwestern.bioinformatics.bering.dialect.DdlUtilsTools.*;
 import static org.easymock.classextension.EasyMock.expect;
 
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * @author Rhett Sutphin
@@ -70,6 +71,13 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
             "CREATE TABLE etc",
             "CREATE SEQUENCE etc",
             "INSERT INTO etc (alia) VALUES ('foo')"
+        );
+    }
+
+    public void testInsert() throws Exception {
+        assertStatements(
+            getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100)),
+            "INSERT INTO feast (length, cost) VALUES ('An hour', 100)"
         );
     }
 

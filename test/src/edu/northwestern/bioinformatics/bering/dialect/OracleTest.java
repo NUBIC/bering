@@ -42,7 +42,7 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
 
     public void testCreateTableIncludesSequence() throws Exception {
         String expectedCreateTable = "CREATE TABLE etc";
-        expect(getPlatformInfo().getMaxIdentifierLength()).andReturn(15);
+        expectGetMaxIdentLength(15);
         expect(getPlatform().getCreateTablesSql((Database) notNull(), eq(false), eq(false)))
             .andReturn(expectedCreateTable);
         replayMocks();
@@ -75,7 +75,7 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
 
     public void testCreateTableWithLongName() throws Exception {
         String expectedCreateTable = "CREATE TABLE etc";
-        expect(getPlatformInfo().getMaxIdentifierLength()).andReturn(15);
+        expectGetMaxIdentLength(15);
         expect(getPlatform().getCreateTablesSql((Database) notNull(), eq(false), eq(false)))
             .andReturn(expectedCreateTable);
         replayMocks();
@@ -90,9 +90,13 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
         verifyMocks();
     }
 
+    private void expectGetMaxIdentLength(int maxlen) {
+        expect(getPlatformInfo().getMaxIdentifierLength()).andReturn(maxlen);
+    }
+
     public void testDropTable() throws Exception {
         String expectedDropTable = "CREATE TABLE etc";
-        expect(getPlatformInfo().getMaxIdentifierLength()).andReturn(15);
+        expectGetMaxIdentLength(15);
         expect(getPlatform().getDropTablesSql((Database) notNull(), eq(false)))
             .andReturn(expectedDropTable);
         replayMocks();
@@ -194,5 +198,15 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
             "ABC/DEF",
             "GHI"
         );
+    }
+
+    public void testInsert() throws Exception {
+        expectGetMaxIdentLength(30);
+        replayMocks();
+        assertStatements(
+            getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100)),
+            "INSERT INTO feast (id, length, cost) VALUES (seq_feast_id.nextval, 'An hour', 100)"
+        );
+        verifyMocks();
     }
 }

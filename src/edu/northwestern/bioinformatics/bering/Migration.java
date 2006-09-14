@@ -6,6 +6,8 @@ import org.apache.ddlutils.model.Column;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 /**
@@ -66,6 +68,16 @@ public abstract class Migration {
 
     protected void setNullable(String tableName, String columnName, boolean nullable) {
         adapter.setNullable(tableName, columnName, nullable);
+    }
+
+    protected void insert(String tableName, Map<String, Object> values) {
+        List<String> columns = new LinkedList<String>();
+        List<Object> toInsert = new LinkedList<Object>();
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            columns.add(entry.getKey());
+            toInsert.add(entry.getValue());
+        }
+        adapter.insert(tableName, columns, toInsert);
     }
 
     protected boolean databaseMatches(String substring) {
