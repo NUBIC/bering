@@ -27,6 +27,8 @@ public interface Adapter {
 
     void removeColumn(String tableName, String columnName);
 
+    void renameColumn(String tableName, String columnName, String newColumnName);
+
     void setDefaultValue(String tableName, String columnName, String newDefault);
 
     void setNullable(String tableName, String columnName, boolean nullable);

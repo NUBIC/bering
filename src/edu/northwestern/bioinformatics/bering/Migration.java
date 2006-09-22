@@ -62,6 +62,10 @@ public abstract class Migration {
         adapter.removeColumn(tableName, columnName);
     }
 
+    protected void renameColumn(String tableName, String columnName, String newColumnName) {
+        adapter.renameColumn(tableName, columnName, newColumnName);
+    }
+
     protected void setDefaultValue(String tableName, String columnName, String newDefault) {
         adapter.setDefaultValue(tableName, columnName, newDefault);
     }

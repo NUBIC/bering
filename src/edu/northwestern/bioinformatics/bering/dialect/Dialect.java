@@ -19,6 +19,7 @@ public interface Dialect {
 
     List<String> addColumn(String table, Column column);
     List<String> removeColumn(String table, String column);
+    List<String> renameColumn(String tableName, String columnName, String newColumnName);
 
     List<String> setDefaultValue(String table, String column, String defaultValue);
     List<String> setNullable(String table, String column, boolean nullable);

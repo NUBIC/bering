@@ -67,6 +67,12 @@ public class Generic extends DdlUtilsBasedDialect {
         return getSqlForChanges(removeColumn);
     }
 
+    public List<String> renameColumn(String tableName, String columnName, String newColumnName) {
+        return Arrays.asList(String.format(
+            "ALTER TABLE %s RENAME COLUMN %s TO %s", tableName, columnName, newColumnName
+        ));
+    }
+
     public List<String> setDefaultValue(String table, String column, String newDefault) {
         // DDLUtils insists on dropping and recreating the table.  So:
         return Arrays.asList(String.format(
@@ -101,6 +107,10 @@ public class Generic extends DdlUtilsBasedDialect {
 
     private List<String> getSqlForChanges(ModelChange... changes) {
         return separateStatements(getPlatform().getChangeDatabaseSql(Arrays.asList(changes)));
+    }
+
+    protected List<String> singleStatement(String sql, Object... formatArguments) {
+        return Arrays.asList(String.format(sql, formatArguments));
     }
 
 }

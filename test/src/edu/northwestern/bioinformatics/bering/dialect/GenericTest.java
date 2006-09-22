@@ -61,6 +61,11 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
         assertStatements(statements, "ALTER TABLE feast ALTER COLUMN length SET NOT NULL");
     }
 
+    public void testRenameColumn() throws Exception {
+        List<String> statements = getDialect().renameColumn("feast", "length", "duration");
+        assertStatements(statements, "ALTER TABLE feast RENAME COLUMN length TO duration");
+    }
+
     public void testSeparateStatements() throws Exception {
         String script =
             "CREATE TABLE etc;\n" +
