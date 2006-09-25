@@ -43,8 +43,8 @@ public class Generic extends DdlUtilsBasedDialect {
         );
     }
 
-    public List<String> dropTable(String tableName) {
-        return dropTable(createIdedTable(tableName));
+    public List<String> dropTable(String tableName, boolean hasPrimaryKey) {
+        return dropTable(hasPrimaryKey ? createIdedTable(tableName) : DdlUtilsTools.createTable(tableName));
     }
 
     protected List<String> dropTable(Table table) {

@@ -35,7 +35,21 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
             .andReturn(expectedSql);
         replayMocks();
 
-        List<String> statements = getDialect().dropTable(tableName);
+        List<String> statements = getDialect().dropTable(tableName, true);
+        verifyMocks();
+
+        assertStatements(statements, expectedSql);
+    }
+
+    public void testDropNoPkTable() throws Exception {
+        String tableName = "test";
+        String expectedSql = "DROP TABLE";
+
+        expect(getPlatform().getDropTablesSql(createDatabase(createTable(tableName)), false))
+            .andReturn(expectedSql);
+        replayMocks();
+
+        List<String> statements = getDialect().dropTable(tableName, false);
         verifyMocks();
 
         assertStatements(statements, expectedSql);

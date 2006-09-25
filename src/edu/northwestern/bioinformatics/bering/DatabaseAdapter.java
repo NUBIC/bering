@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Collections;
 
 /**
  * @author rsutphin
@@ -101,8 +100,8 @@ public class DatabaseAdapter implements Adapter {
         execute(dialect.createTable(def));
     }
 
-    public void dropTable(String name) {
-        execute(dialect.dropTable(name));
+    public void dropTable(String name, boolean hasPrimaryKey) {
+        execute(dialect.dropTable(name, hasPrimaryKey));
     }
 
     public void addColumn(String tableName, Column column) {

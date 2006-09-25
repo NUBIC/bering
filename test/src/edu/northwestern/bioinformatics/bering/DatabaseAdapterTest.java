@@ -68,7 +68,7 @@ public class DatabaseAdapterTest extends TestCase {
     public void testDropTable() throws Exception {
         assertTablePresent(TABLE_NAME);
 
-        adapter.dropTable(TABLE_NAME);
+        adapter.dropTable(TABLE_NAME, true);
         assertTableNotPresent(TABLE_NAME);
     }
 

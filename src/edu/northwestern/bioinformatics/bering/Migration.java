@@ -47,7 +47,17 @@ public abstract class Migration {
     }
 
     protected void dropTable(String name) {
-        adapter.dropTable(name);
+        dropTable(null, name);
+    }
+
+    protected void dropTable(Map<String, Object> parameters, String name) {
+        boolean hasPrimaryKey = true;
+        if (parameters != null) {
+            if (parameters.containsKey(PRIMARY_KEY_KEY)) {
+                hasPrimaryKey = (Boolean) parameters.get(PRIMARY_KEY_KEY);
+            }
+        }
+        adapter.dropTable(name, hasPrimaryKey);
     }
 
     protected void addColumn(String tableName, String columnName, String columnType) {

@@ -1,26 +1,29 @@
 package edu.northwestern.bioinformatics.bering;
 
-import static edu.northwestern.bioinformatics.bering.Migration.createColumn;
+import static java.util.Collections.singletonMap;
+
 import static edu.northwestern.bioinformatics.bering.Migration.*;
-import junit.framework.TestCase;
 import org.apache.ddlutils.model.Column;
+import org.easymock.classextension.EasyMock;
 
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author rsutphin
  */
 public class MigrationTest extends BeringTestCase {
-    private StubAdapter adapter = new StubAdapter();
+    private Adapter adapter;
     private Migration migration = new StubMigration();
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
     protected void setUp() throws Exception {
         super.setUp();
+        adapter = registerMockFor(Adapter.class);
         migration.setAdapter(adapter);
     }
 
@@ -94,24 +97,65 @@ public class MigrationTest extends BeringTestCase {
     }
 
     public void testDatabaseMatchesExact() throws Exception {
-        adapter.setDatabaseName("SuperSQL");
+        expectDbName("SuperSQL");
+        replayMocks();
         assertTrue(migration.databaseMatches("SuperSQL"));
+        verifyMocks();
     }
 
     public void testDatabaseMatchesSubstring() throws Exception {
-        adapter.setDatabaseName("SuperSQL");
+        expectDbName("SuperSQL");
+        replayMocks();
         assertTrue(migration.databaseMatches("Super"));
         assertTrue(migration.databaseMatches("uperSQ"));
+        verifyMocks();
     }
 
     public void testDatabaseMatchesCaseInsensitive() throws Exception {
-        adapter.setDatabaseName("SuperSQL");
+        expectDbName("SuperSQL");
+        replayMocks();
         assertTrue(migration.databaseMatches("supersql"));
         assertTrue(migration.databaseMatches("super"));
+        verifyMocks();
     }
 
-    private int getCreatedColumnType(String columnType) {
-        return Migration.createColumn(null, "", columnType).getTypeCode();
+    public void testDropTableNoParameters() throws Exception {
+        String tableName = "table";
+        adapter.dropTable(tableName, true);
+        replayMocks();
+
+        migration.dropTable(tableName);
+        verifyMocks();
+    }
+
+    public void testDropTablePkTrue() throws Exception {
+        String tableName = "table";
+        adapter.dropTable(tableName, true);
+        replayMocks();
+
+        migration.dropTable(
+            singletonMap(Migration.PRIMARY_KEY_KEY, (Object) Boolean.TRUE), tableName);
+        verifyMocks();
+    }
+
+    public void testDropTablePkFalse() throws Exception {
+        String tableName = "table";
+        adapter.dropTable(tableName, false);
+        replayMocks();
+
+        migration.dropTable(
+            singletonMap(Migration.PRIMARY_KEY_KEY, (Object) Boolean.FALSE), tableName);
+        verifyMocks();
+    }
+
+    public void testDropTablePkNotPresent() throws Exception {
+        String tableName = "table";
+        adapter.dropTable(tableName, true);
+        replayMocks();
+
+        migration.dropTable(
+            singletonMap("foo", (Object) "bar"), tableName);
+        verifyMocks();
     }
 
     public void testInsert() {
@@ -121,13 +165,18 @@ public class MigrationTest extends BeringTestCase {
         expectedValues.put("2", "two");
         expectedValues.put("3", "eighteen");
 
-        Adapter mockAdapter = registerMockFor(Adapter.class);
-        migration.setAdapter(mockAdapter);
-
-        mockAdapter.insert(tableName, Arrays.asList("1", "2", "3"), Arrays.asList(1, (Object) "two", "eighteen"));
+        adapter.insert(tableName, Arrays.asList("1", "2", "3"), Arrays.asList(1, (Object) "two", "eighteen"));
         replayMocks();
 
         migration.insert(tableName, expectedValues);
         verifyMocks();
+    }
+
+    private void expectDbName(String dbName) {
+        EasyMock.expect(adapter.getDatabaseName()).andReturn(dbName).anyTimes();
+    }
+
+    private int getCreatedColumnType(String columnType) {
+        return Migration.createColumn(null, "", columnType).getTypeCode();
     }
 }

@@ -15,7 +15,7 @@ public interface Dialect {
     List<String> separateStatements(String script);
 
     List<String> createTable(TableDefinition table);
-    List<String> dropTable(String table);
+    List<String> dropTable(String table, boolean hasPrimaryKey);
 
     List<String> addColumn(String table, Column column);
     List<String> removeColumn(String table, String column);

@@ -31,7 +31,7 @@ public class StubAdapter implements Adapter {
         throw new UnsupportedOperationException("createTable not implemented");
     }
 
-    public void dropTable(String name) {
+    public void dropTable(String name, boolean hasPrimaryKey) {
         throw new UnsupportedOperationException("dropTable not implemented");
     }
 

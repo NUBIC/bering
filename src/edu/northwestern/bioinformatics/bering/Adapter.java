@@ -21,7 +21,7 @@ public interface Adapter {
 
     void createTable(TableDefinition def);
 
-    void dropTable(String name);
+    void dropTable(String name, boolean hasPrimaryKey);
 
     void addColumn(String tableName, Column column);
 
