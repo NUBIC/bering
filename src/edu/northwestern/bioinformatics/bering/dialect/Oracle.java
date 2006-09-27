@@ -54,14 +54,33 @@ public class Oracle extends Generic {
         return str.substring(0, maxlen);
     }
 
-    private Table massageTableForOracle(Table table) {
-        if (hasAutomaticPrimaryKey(table)) {
-            table.getPrimaryKeyColumns()[0].setAutoIncrement(false);
+    private static Table massageTableForOracle(Table table) {
+        Table massaged = cloneTable(table);
+
+        if (hasAutomaticPrimaryKey(massaged)) {
+            massaged.getPrimaryKeyColumns()[0].setAutoIncrement(false);
         }
         return table;
     }
 
-    private boolean hasAutomaticPrimaryKey(Table table) {
+    // Table#clone doesn't clone the individual columns, so:
+    private static Table cloneTable(Table table) {
+        Table massaged;
+        try {
+            massaged = (Table) table.clone();
+            while (massaged.getColumnCount() > 0) {
+                massaged.removeColumn(0);
+            }
+            for (Column column : table.getColumns()) {
+                massaged.addColumn((Column) column.clone());
+            }
+        } catch (CloneNotSupportedException e) {
+            throw new Error("This shouldn't be possible", e);
+        }
+        return massaged;
+    }
+
+    private static boolean hasAutomaticPrimaryKey(Table table) {
         if (table.getPrimaryKeyColumns().length == 1) {
             Column pk = table.getPrimaryKeyColumns()[0];
             return pk.isAutoIncrement();
