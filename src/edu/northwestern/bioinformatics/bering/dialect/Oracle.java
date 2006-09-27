@@ -2,6 +2,7 @@ package edu.northwestern.bioinformatics.bering.dialect;
 
 import static edu.northwestern.bioinformatics.bering.SqlUtils.sqlLiteral;
 import org.apache.ddlutils.model.Table;
+import org.apache.ddlutils.model.Column;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.LinkedList;
 public class Oracle extends Generic {
     public List<String> createTable(Table table) {
         List<String> statments = new ArrayList<String>(2);
-        if (hasPrimaryKey(table)) statments.add("CREATE SEQUENCE " + createIdSequenceName(table));
+        if (hasAutomaticPrimaryKey(table)) statments.add("CREATE SEQUENCE " + createIdSequenceName(table));
         statments.addAll(super.createTable(massageTableForOracle(table)));
         return statments;
     }
@@ -23,7 +24,7 @@ public class Oracle extends Generic {
     public List<String> dropTable(Table table) {
         List<String> statments = new ArrayList<String>(2);
         statments.addAll(super.dropTable(massageTableForOracle(table)));
-        if (hasPrimaryKey(table)) statments.add("DROP SEQUENCE " + createIdSequenceName(table));
+        if (hasAutomaticPrimaryKey(table)) statments.add("DROP SEQUENCE " + createIdSequenceName(table));
         return statments;
     }
 
@@ -54,14 +55,19 @@ public class Oracle extends Generic {
     }
 
     private Table massageTableForOracle(Table table) {
-        if (hasPrimaryKey(table)) {
+        if (hasAutomaticPrimaryKey(table)) {
             table.getPrimaryKeyColumns()[0].setAutoIncrement(false);
         }
         return table;
     }
 
-    private boolean hasPrimaryKey(Table table) {
-        return table.getPrimaryKeyColumns().length > 0;
+    private boolean hasAutomaticPrimaryKey(Table table) {
+        if (table.getPrimaryKeyColumns().length == 1) {
+            Column pk = table.getPrimaryKeyColumns()[0];
+            return pk.isAutoIncrement();
+        } else {
+            return false;
+        }
     }
 
     // Attempts to be SQLPLUS-compatible for scripts that mix PL/SQL and plain SQL
@@ -101,12 +107,12 @@ public class Oracle extends Generic {
         }
     }
 
-    public List<String> insert(String table, List<String> columns, List<Object> values) {
+    public List<String> insert(String table, List<String> columns, List<Object> values, boolean automaticPrimaryKey) {
         if (columns.size() == 0) {
             return Arrays.asList(String.format(
                 "INSERT INTO %s (id) VALUES (%s.nextval)", table, createIdSequenceName(table)
             ));
-        } else {
+        } else if (automaticPrimaryKey) {
             return Arrays.asList(String.format(
                 "INSERT INTO %s (id, %s) VALUES (%s.nextval, %s)",
                     table,
@@ -114,6 +120,8 @@ public class Oracle extends Generic {
                     createIdSequenceName(table),
                     createInsertValueString(values)
             ));
+        } else {
+            return super.insert(table, columns, values, automaticPrimaryKey);
         }
     }
 }

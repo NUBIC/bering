@@ -35,7 +35,7 @@ public interface Adapter {
 
     void execute(String sql);
 
-    void insert(String tableName, List<String> columnNames, List<Object> values);
+    void insert(String tableName, List<String> columnNames, List<Object> values, boolean automaticPrimaryKey);
 
     String getDatabaseName();
 

@@ -86,7 +86,7 @@ public class Generic extends DdlUtilsBasedDialect {
         ));
     }
 
-    public List<String> insert(String table, List<String> columns, List<Object> values) {
+    public List<String> insert(String table, List<String> columns, List<Object> values, boolean hasPrimaryKey) {
         return Arrays.asList(String.format(
             "INSERT INTO %s (%s) VALUES (%s)",
                 table,

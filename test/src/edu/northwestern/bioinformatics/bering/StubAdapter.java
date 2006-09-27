@@ -75,7 +75,7 @@ public class StubAdapter implements Adapter {
         throw new UnsupportedOperationException("updateVersion not implemented");
     }
 
-    public void insert(String tableName, List<String> columnNames, List<Object> values) {
+    public void insert(String tableName, List<String> columnNames, List<Object> values, boolean hasPrimaryKey) {
         throw new UnsupportedOperationException("insert not implemented");
     }
 }

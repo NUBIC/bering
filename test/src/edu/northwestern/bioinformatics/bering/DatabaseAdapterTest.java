@@ -151,7 +151,7 @@ public class DatabaseAdapterTest extends TestCase {
 
     public void testInsert() throws Exception {
         String newTitle = "Bering is Groovy 2nd Ed";
-        adapter.insert(TABLE_NAME, Arrays.asList("title"), Arrays.asList((Object) newTitle));
+        adapter.insert(TABLE_NAME, Arrays.asList("title"), Arrays.asList((Object) newTitle), true);
 
         assertEquals(1, results("SELECT * FROM " + TABLE_NAME + " WHERE title='" + newTitle + '\'').size());
     }

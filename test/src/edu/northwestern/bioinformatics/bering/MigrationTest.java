@@ -73,8 +73,14 @@ public class MigrationTest extends BeringTestCase {
 
     public void testCreateManualPrimaryKeyColumn() throws Exception {
         parameters.put(PRIMARY_KEY_KEY, true);
-        Column actual = Migration.createColumn(parameters, "name", "string");
+        Column actual = Migration.createColumn(parameters, "id", "integer");
         assertTrue(actual.isPrimaryKey());
+    }
+
+    public void testCreateColumnDefaultsToNotPk() throws Exception {
+        parameters.put("someParam", "someValue");
+        Column actual = Migration.createColumn(parameters, "id", "integer");
+        assertFalse(actual.isPrimaryKey());
     }
 
     public void testCreatedColumnTypes() throws Exception {
@@ -165,10 +171,32 @@ public class MigrationTest extends BeringTestCase {
         expectedValues.put("2", "two");
         expectedValues.put("3", "eighteen");
 
-        adapter.insert(tableName, Arrays.asList("1", "2", "3"), Arrays.asList(1, (Object) "two", "eighteen"));
+        adapter.insert(tableName, Arrays.asList("1", "2", "3"), Arrays.asList(1, (Object) "two", "eighteen"), true);
         replayMocks();
 
         migration.insert(tableName, expectedValues);
+        verifyMocks();
+    }
+
+    public void testInsertNoPk() throws Exception {
+        String tableName = "table";
+
+        adapter.insert(tableName, Arrays.asList("1"), Arrays.asList((Object) "one"), false);
+        replayMocks();
+
+        migration.insert(Collections.singletonMap(PRIMARY_KEY_KEY, (Object) Boolean.FALSE),
+            tableName, Collections.singletonMap("1", (Object) "one"));
+        verifyMocks();
+    }
+
+    public void testInsertExplicitPk() throws Exception {
+        String tableName = "table";
+
+        adapter.insert(tableName, Arrays.asList("1"), Arrays.asList((Object) "one"), true);
+        replayMocks();
+
+        migration.insert(Collections.singletonMap(PRIMARY_KEY_KEY, (Object) Boolean.TRUE),
+            tableName, Collections.singletonMap("1", (Object) "one"));
         verifyMocks();
     }
 

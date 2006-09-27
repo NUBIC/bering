@@ -128,8 +128,8 @@ public class DatabaseAdapter implements Adapter {
         execute(dialect.separateStatements(sql));
     }
 
-    public void insert(String tableName, List<String> columnNames, List<Object> values) {
-        execute(dialect.insert(tableName, columnNames, values));
+    public void insert(String tableName, List<String> columnNames, List<Object> values, boolean hasPrimaryKey) {
+        execute(dialect.insert(tableName, columnNames, values, hasPrimaryKey));
     }
 
     private void execute(final List<String> statements) {

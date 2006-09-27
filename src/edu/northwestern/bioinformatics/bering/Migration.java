@@ -51,12 +51,7 @@ public abstract class Migration {
     }
 
     protected void dropTable(Map<String, Object> parameters, String name) {
-        boolean hasPrimaryKey = true;
-        if (parameters != null) {
-            if (parameters.containsKey(PRIMARY_KEY_KEY)) {
-                hasPrimaryKey = (Boolean) parameters.get(PRIMARY_KEY_KEY);
-            }
-        }
+        boolean hasPrimaryKey = hasPrimaryKey(parameters, true);
         adapter.dropTable(name, hasPrimaryKey);
     }
 
@@ -85,13 +80,17 @@ public abstract class Migration {
     }
 
     protected void insert(String tableName, Map<String, Object> values) {
+        this.insert(null, tableName, values);
+    }
+
+    protected void insert(Map<String, Object> parameters, String tableName, Map<String, Object> values) {
         List<String> columns = new LinkedList<String>();
         List<Object> toInsert = new LinkedList<Object>();
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             columns.add(entry.getKey());
             toInsert.add(entry.getValue());
         }
-        adapter.insert(tableName, columns, toInsert);
+        adapter.insert(tableName, columns, toInsert, hasPrimaryKey(parameters, true));
     }
 
     protected boolean databaseMatches(String substring) {
@@ -133,11 +132,19 @@ public abstract class Migration {
             if (parameters.containsKey(PRECISION_KEY)) {
                 column.setScale((Integer) parameters.get(PRECISION_KEY));
             }
-            if (parameters.containsKey(PRIMARY_KEY_KEY)) {
-                column.setPrimaryKey((Boolean) parameters.get(PRIMARY_KEY_KEY));
-            }
+            column.setPrimaryKey(hasPrimaryKey(parameters, false));
         }
         return column;
+    }
+
+    private static boolean hasPrimaryKey(Map<String, Object> parameters, boolean def) {
+        boolean hasPrimaryKey = def;
+        if (parameters != null) {
+            if (parameters.containsKey(PRIMARY_KEY_KEY)) {
+                hasPrimaryKey = (Boolean) parameters.get(PRIMARY_KEY_KEY);
+            }
+        }
+        return hasPrimaryKey;
     }
 
     private static int getTypeCode(String typeName) {

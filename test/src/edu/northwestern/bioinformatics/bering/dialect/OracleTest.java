@@ -1,12 +1,14 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
 import edu.northwestern.bioinformatics.bering.TableDefinition;
+import edu.northwestern.bioinformatics.bering.Migration;
 import org.apache.ddlutils.model.Database;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * @author Rhett Sutphin
@@ -66,6 +68,23 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
         TableDefinition def = new TableDefinition("bering_version");
         def.setIncludePrimaryKey(false);
         def.addColumn("release", "integer");
+        assertStatements(
+            getDialect().createTable(def.toTable()),
+            expectedCreateTable
+        );
+        verifyMocks();
+    }
+
+    public void testCreateTableWithManualPKDoesNotCreateSequence() throws Exception {
+        String expectedCreateTable = "CREATE TABLE etc";
+        expect(getPlatform().getCreateTablesSql((Database) notNull(), eq(false), eq(false)))
+            .andReturn(expectedCreateTable);
+        replayMocks();
+
+        TableDefinition def = new TableDefinition("feast");
+        def.setIncludePrimaryKey(false);
+        def.addColumn(Collections.singletonMap(Migration.PRIMARY_KEY_KEY, (Object) Boolean.TRUE), "id", "integer");
+        def.addColumn("length", "integer");
         assertStatements(
             getDialect().createTable(def.toTable()),
             expectedCreateTable
@@ -204,8 +223,17 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
         expectGetMaxIdentLength(30);
         replayMocks();
         assertStatements(
-            getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100)),
+            getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100), true),
             "INSERT INTO feast (id, length, cost) VALUES (seq_feast_id.nextval, 'An hour', 100)"
+        );
+        verifyMocks();
+    }
+
+    public void testInsertNoPrimaryKey() throws Exception {
+        replayMocks();
+        assertStatements(
+            getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100), false),
+            "INSERT INTO feast (length, cost) VALUES ('An hour', 100)"
         );
         verifyMocks();
     }

@@ -95,7 +95,7 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
 
     public void testInsert() throws Exception {
         assertStatements(
-            getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100)),
+            getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100), true),
             "INSERT INTO feast (length, cost) VALUES ('An hour', 100)"
         );
     }
