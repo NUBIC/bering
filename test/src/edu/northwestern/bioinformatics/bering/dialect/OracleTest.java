@@ -3,6 +3,7 @@ package edu.northwestern.bioinformatics.bering.dialect;
 import edu.northwestern.bioinformatics.bering.TableDefinition;
 import edu.northwestern.bioinformatics.bering.Migration;
 import org.apache.ddlutils.model.Database;
+import org.apache.ddlutils.model.Table;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.*;
 
@@ -236,5 +237,12 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
             "INSERT INTO feast (length, cost) VALUES ('An hour', 100)"
         );
         verifyMocks();
+    }
+
+    public void testMassageTableRemovesAutoIncrement() throws Exception {
+        TableDefinition def = new TableDefinition("feast");
+        def.addColumn("length", "integer");
+        Table massaged = Oracle.massageTableForOracle(def.toTable());
+        assertFalse("PK still autoincrement", massaged.getPrimaryKeyColumns()[0].isAutoIncrement());
     }
 }
