@@ -36,6 +36,7 @@ public class MigrateTask extends JDBCTask {
     // package-level for testing
     Dialect createDialect() {
         String d = getDialect();
+        if (d != null) d = d.trim();
         try {
             return (Dialect) Class.forName(d).newInstance();
         } catch (InstantiationException e) {

@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import com.sun.java_cup.internal.version;
 import edu.northwestern.bioinformatics.bering.dialect.Generic;
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
+import edu.northwestern.bioinformatics.bering.dialect.Oracle;
 
 /**
  * @author Moses Hohman
@@ -88,6 +89,12 @@ public class MigrateTaskTest extends TestCase {
         } catch (BuildException e) {
             assertEquals("Class java.lang.String does not implement " + Dialect.class.getName(), e.getMessage());
         }
+    }
+    
+    public void testWhitespaceStrippedFromDialect() throws Exception {
+        task.setDialect(Oracle.class.getName() + '\t');
+        Dialect d = task.createDialect();
+        assertTrue(d instanceof Oracle);
     }
 
     private void assertTargetVersionSet(Integer expectedTargetRelease, Integer expectedTargetMigration, String targetVersionString) {
