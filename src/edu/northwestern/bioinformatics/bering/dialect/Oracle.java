@@ -21,6 +21,17 @@ public class Oracle extends Generic {
         return statments;
     }
 
+
+    public List<String> renameTable(String table, String newName, boolean hasPrimaryKey) {
+        List<String> statements = new ArrayList<String>(2);
+        statements.addAll(super.renameTable(table, newName, hasPrimaryKey));
+        if (hasPrimaryKey) {
+            statements.add(String.format(
+                "RENAME %s TO %s", createIdSequenceName(table), createIdSequenceName(newName)));
+        }
+        return statements;
+    }
+
     public List<String> dropTable(Table table) {
         List<String> statments = new ArrayList<String>(2);
         statments.addAll(super.dropTable(massageTableForOracle(table)));

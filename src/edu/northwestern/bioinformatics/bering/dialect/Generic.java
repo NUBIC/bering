@@ -32,7 +32,7 @@ public class Generic extends DdlUtilsBasedDialect {
         SqlTokenizer tok = new SqlTokenizer(script);
         List<String> stmts = new LinkedList<String>();
         while (tok.hasMoreStatements()) {
-            stmts.add(tok.getNextStatement());
+            stmts.add(tok.getNextStatement().trim());
         }
         return stmts;
     }
@@ -43,8 +43,16 @@ public class Generic extends DdlUtilsBasedDialect {
         );
     }
 
+    public List<String> renameTable(String table, String newName, boolean hasPrimaryKey) {
+        return singleStatement("ALTER TABLE %s RENAME TO %s", table, newName);
+    }
+
     public List<String> dropTable(String tableName, boolean hasPrimaryKey) {
-        return dropTable(hasPrimaryKey ? createIdedTable(tableName) : DdlUtilsTools.createTable(tableName));
+        return dropTable(createTable(tableName, hasPrimaryKey));
+    }
+
+    private static Table createTable(String tableName, boolean hasPrimaryKey) {
+        return hasPrimaryKey ? createIdedTable(tableName) : DdlUtilsTools.createTable(tableName);
     }
 
     protected List<String> dropTable(Table table) {

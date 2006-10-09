@@ -21,10 +21,13 @@ public interface Adapter {
 
     void createTable(TableDefinition def);
 
+    void renameTable(String tableName, String newName, boolean hasPrimaryKey);
+
     void dropTable(String name, boolean hasPrimaryKey);
 
     void addColumn(String tableName, Column column);
 
+    // TODO: rename this to dropColumn
     void removeColumn(String tableName, String columnName);
 
     void renameColumn(String tableName, String columnName, String newColumnName);

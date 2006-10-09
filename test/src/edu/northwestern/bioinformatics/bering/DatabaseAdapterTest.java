@@ -5,6 +5,7 @@ import edu.northwestern.bioinformatics.bering.runtime.Version;
 import edu.northwestern.bioinformatics.bering.dialect.Generic;
 import junit.framework.TestCase;
 import org.apache.ddlutils.model.Column;
+import org.codehaus.groovy.ant.Groovy;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -70,6 +71,19 @@ public class DatabaseAdapterTest extends TestCase {
 
         adapter.dropTable(TABLE_NAME, true);
         assertTableNotPresent(TABLE_NAME);
+    }
+
+    public void testRenameTable() throws Exception {
+        String newName = "tomes";
+        assertTablePresent(TABLE_NAME);
+
+        adapter.renameTable(TABLE_NAME, newName, true);
+        assertTableNotPresent(TABLE_NAME);
+
+        List<Map<String, Object>> results = results("SELECT * FROM " + newName);
+        assertEquals("Data not retained after rename: " + results, 1, results.size());
+        assertEquals("Data not retained after rename: " + results, 1, results.get(0).get("ID"));
+        assertEquals("Data not retained after rename: " + results, "Bering is Groovy", results.get(0).get("TITLE"));
     }
 
     public void testAddColumn() throws Exception {

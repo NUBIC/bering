@@ -100,6 +100,10 @@ public class DatabaseAdapter implements Adapter {
         execute(dialect.createTable(def));
     }
 
+    public void renameTable(String tableName, String newName, boolean hasPrimaryKey) {
+        execute(dialect.renameTable(tableName, newName, hasPrimaryKey));
+    }
+
     public void dropTable(String name, boolean hasPrimaryKey) {
         execute(dialect.dropTable(name, hasPrimaryKey));
     }

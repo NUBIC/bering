@@ -126,9 +126,33 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
         assertStatements(
             getDialect().dropTable(def.toTable()),
             expectedDropTable,
-            "DROP SEQUENCE feast_id_seq"
+            "DROP SEQUENCE seq_feast_id"
         );
         verifyMocks();
+    }
+
+    public void testRenameTableWithPk() throws Exception {
+        String tableName = "test";
+        String newTableName = "t_test";
+        expectGetMaxIdentLength(15);
+        expectGetMaxIdentLength(15);
+        replayMocks();
+
+        assertStatements(
+            getDialect().renameTable(tableName, newTableName, true),
+            "ALTER TABLE test RENAME TO t_test",
+            "RENAME seq_test_id TO seq_t_test_id"
+        );
+    }
+
+    public void testRenameTableWithoutPk() throws Exception {
+        String tableName = "test";
+        String newTableName = "t_test";
+
+        assertStatements(
+            getDialect().renameTable(tableName, newTableName, false),
+            "ALTER TABLE test RENAME TO t_test"
+        );
     }
 
     public void testSeparateStatementsNoPlSql() throws Exception {

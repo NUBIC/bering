@@ -33,7 +33,7 @@ public abstract class DdlUtilsDialectTestCase<D extends DdlUtilsBasedDialect> ex
     protected static void assertStatements(List<String> actual, String... expected) {
         assertEquals("Wrong number of statements: " + actual, expected.length, actual.size());
         for (int i = 0; i < expected.length; i++) {
-            assertEquals("Wrong statment " + i, expected[0], actual.get(0));
+            assertEquals("Wrong statment " + i, expected[i], actual.get(i));
         }
     }
 }

@@ -46,6 +46,15 @@ public abstract class Migration {
         adapter.createTable(definition);
     }
 
+    protected void renameTable(String tableName, String newName) {
+        renameTable(null, tableName, newName);
+    }
+
+    protected void renameTable(Map<String, Object> parameters, String name, String newName) {
+        boolean hasPrimaryKey = hasPrimaryKey(parameters, true);
+        adapter.renameTable(name, newName, hasPrimaryKey);
+    }
+
     protected void dropTable(String name) {
         dropTable(null, name);
     }

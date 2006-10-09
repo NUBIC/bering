@@ -26,6 +26,14 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
 
         assertStatements(statements, expectedSql);
     }
+    
+    public void testRenameTable() throws Exception {
+        String tableName = "test";
+        String newTableName = "t_test";
+        assertStatements(
+            getDialect().renameTable(tableName, newTableName, true),
+            "ALTER TABLE " + tableName + " RENAME TO " + newTableName);
+    }
 
     public void testDropTable() throws Exception {
         String tableName = "test";

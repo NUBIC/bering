@@ -164,6 +164,39 @@ public class MigrationTest extends BeringTestCase {
         verifyMocks();
     }
 
+    public void testRenameTablePkTrue() throws Exception {
+        String tableName = "table";
+        String newName = "newName";
+        adapter.renameTable(tableName, newName, true);
+        replayMocks();
+
+        migration.renameTable(
+            singletonMap(Migration.PRIMARY_KEY_KEY, (Object) Boolean.TRUE), tableName, newName);
+        verifyMocks();
+    }
+
+    public void testRenameTablePkFalse() throws Exception {
+        String tableName = "table";
+        String newName = "newName";
+        adapter.renameTable(tableName, newName, false);
+        replayMocks();
+
+        migration.renameTable(
+            singletonMap(Migration.PRIMARY_KEY_KEY, (Object) Boolean.FALSE), tableName, newName);
+        verifyMocks();
+    }
+
+    public void testRenameTablePkNotPresent() throws Exception {
+        String tableName = "table";
+        String newName = "newName";
+        adapter.renameTable(tableName, newName, true);
+        replayMocks();
+
+        migration.renameTable(
+            singletonMap("foo", (Object) "bar"), tableName, newName);
+        verifyMocks();
+    }
+
     public void testInsert() {
         String tableName = "table";
         Map<String,  Object> expectedValues = new LinkedHashMap<String, Object>();

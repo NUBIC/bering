@@ -31,6 +31,10 @@ public class StubAdapter implements Adapter {
         throw new UnsupportedOperationException("createTable not implemented");
     }
 
+    public void renameTable(String tableName, String newName, boolean hasPrimaryKey) {
+        throw new UnsupportedOperationException("renameTable not implemented");
+    }
+
     public void dropTable(String name, boolean hasPrimaryKey) {
         throw new UnsupportedOperationException("dropTable not implemented");
     }
