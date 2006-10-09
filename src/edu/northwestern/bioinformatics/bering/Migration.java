@@ -72,8 +72,16 @@ public abstract class Migration {
         adapter.addColumn(tableName, createColumn(parameters, columnName, columnType));
     }
 
+    /**
+     * Use {@link #dropColumn} instead.
+     */
+    @Deprecated
     protected void removeColumn(String tableName, String columnName) {
-        adapter.removeColumn(tableName, columnName);
+        dropColumn(tableName, columnName);
+    }
+
+    protected void dropColumn(String tableName, String columnName) {
+        adapter.dropColumn(tableName, columnName);
     }
 
     protected void renameColumn(String tableName, String columnName, String newColumnName) {

@@ -27,8 +27,7 @@ public interface Adapter {
 
     void addColumn(String tableName, Column column);
 
-    // TODO: rename this to dropColumn
-    void removeColumn(String tableName, String columnName);
+    void dropColumn(String tableName, String columnName);
 
     void renameColumn(String tableName, String columnName, String newColumnName);
 

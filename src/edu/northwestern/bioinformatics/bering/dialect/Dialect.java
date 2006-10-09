@@ -19,7 +19,7 @@ public interface Dialect {
     List<String> dropTable(String table, boolean hasPrimaryKey);
 
     List<String> addColumn(String table, Column column);
-    List<String> removeColumn(String table, String column);
+    List<String> dropColumn(String table, String column);
     List<String> renameColumn(String tableName, String columnName, String newColumnName);
 
     List<String> setDefaultValue(String table, String column, String defaultValue);

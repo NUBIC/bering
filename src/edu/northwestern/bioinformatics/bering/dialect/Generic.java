@@ -68,7 +68,7 @@ public class Generic extends DdlUtilsBasedDialect {
         return getSqlForChanges(addColumn);
     }
 
-    public List<String> removeColumn(String tableName, String columnName) {
+    public List<String> dropColumn(String tableName, String columnName) {
         Table table = createIdedTable(tableName);
         Column column = createColumn(columnName);
         TableChange removeColumn = new RemoveColumnChange(table, column);

@@ -43,8 +43,8 @@ public class StubAdapter implements Adapter {
         throw new UnsupportedOperationException("addColumn not implemented");
     }
 
-    public void removeColumn(String tableName, String columnName) {
-        throw new UnsupportedOperationException("removeColumn not implemented");
+    public void dropColumn(String tableName, String columnName) {
+        throw new UnsupportedOperationException("dropColumn not implemented");
     }
 
     public void renameColumn(String tableName, String columnName, String newColumnName) {

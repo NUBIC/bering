@@ -5,7 +5,6 @@ import edu.northwestern.bioinformatics.bering.runtime.Version;
 import edu.northwestern.bioinformatics.bering.dialect.Generic;
 import junit.framework.TestCase;
 import org.apache.ddlutils.model.Column;
-import org.codehaus.groovy.ant.Groovy;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -102,7 +101,7 @@ public class DatabaseAdapterTest extends TestCase {
     }
 
     public void testRemoveColumn() throws Exception {
-        adapter.removeColumn(TABLE_NAME, "title");
+        adapter.dropColumn(TABLE_NAME, "title");
 
         ResultSet rs = stmt.executeQuery("SELECT * FROM " + TABLE_NAME);
         int count = 0;

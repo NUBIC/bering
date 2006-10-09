@@ -112,8 +112,8 @@ public class DatabaseAdapter implements Adapter {
         execute(dialect.addColumn(tableName, column));
     }
 
-    public void removeColumn(String tableName, String columnName) {
-        execute(dialect.removeColumn(tableName, columnName));
+    public void dropColumn(String tableName, String columnName) {
+        execute(dialect.dropColumn(tableName, columnName));
     }
 
     public void renameColumn(String tableName, String columnName, String newColumnName) {
