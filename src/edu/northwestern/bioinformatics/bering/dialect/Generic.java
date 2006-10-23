@@ -23,56 +23,8 @@ import java.util.ArrayList;
 public class Generic extends DdlUtilsBasedDialect {
     protected static final String INSERT_DELIMITER = ", ";
 
-    public List<String> createTable(TableDefinition def) {
-        return createTable(def.toTable());
-    }
-
-    // Uses DdlUtils' tokenizer, which just splits on ;
-    public List<String> separateStatements(String script) {
-        SqlTokenizer tok = new SqlTokenizer(script);
-        List<String> stmts = new LinkedList<String>();
-        while (tok.hasMoreStatements()) {
-            stmts.add(tok.getNextStatement().trim());
-        }
-        return stmts;
-    }
-
-    protected List<String> createTable(Table table) {
-        return separateStatements(
-            getPlatform().getCreateTablesSql(createDatabase(table), false, false)
-        );
-    }
-
     public List<String> renameTable(String table, String newName, boolean hasPrimaryKey) {
         return singleStatement("ALTER TABLE %s RENAME TO %s", table, newName);
-    }
-
-    public List<String> dropTable(String tableName, boolean hasPrimaryKey) {
-        return dropTable(createTable(tableName, hasPrimaryKey));
-    }
-
-    private static Table createTable(String tableName, boolean hasPrimaryKey) {
-        return hasPrimaryKey ? createIdedTable(tableName) : DdlUtilsTools.createTable(tableName);
-    }
-
-    protected List<String> dropTable(Table table) {
-        return separateStatements(
-            getPlatform().getDropTablesSql(createDatabase(table), false)
-        );
-    }
-
-    public List<String> addColumn(String tableName, Column column) {
-        Table table = DdlUtilsTools.createTable(tableName);
-        AddColumnChange addColumn = new AddColumnChange(table, column, null, null);
-        addColumn.setAtEnd(true);
-        return getSqlForChanges(addColumn);
-    }
-
-    public List<String> dropColumn(String tableName, String columnName) {
-        Table table = createIdedTable(tableName);
-        Column column = createColumn(columnName);
-        TableChange removeColumn = new RemoveColumnChange(table, column);
-        return getSqlForChanges(removeColumn);
     }
 
     public List<String> renameColumn(String tableName, String columnName, String newColumnName) {
@@ -112,10 +64,6 @@ public class Generic extends DdlUtilsBasedDialect {
     }
 
     ////// UTILITIES
-
-    private List<String> getSqlForChanges(ModelChange... changes) {
-        return separateStatements(getPlatform().getChangeDatabaseSql(Arrays.asList(changes)));
-    }
 
     protected List<String> singleStatement(String sql, Object... formatArguments) {
         return Arrays.asList(String.format(sql, formatArguments));

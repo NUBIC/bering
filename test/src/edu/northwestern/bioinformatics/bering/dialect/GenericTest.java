@@ -3,6 +3,10 @@ package edu.northwestern.bioinformatics.bering.dialect;
 import edu.northwestern.bioinformatics.bering.TableDefinition;
 import static edu.northwestern.bioinformatics.bering.dialect.DdlUtilsTools.*;
 import static org.easymock.classextension.EasyMock.expect;
+import org.easymock.IArgumentMatcher;
+import static org.easymock.EasyMock.reportMatcher;
+import org.apache.ddlutils.model.Column;
+import org.apache.ddlutils.alteration.AddColumnChange;
 
 import java.util.List;
 import java.util.Arrays;

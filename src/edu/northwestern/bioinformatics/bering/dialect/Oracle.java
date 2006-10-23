@@ -14,6 +14,7 @@ import java.util.LinkedList;
  * @author Rhett Sutphin
  */
 public class Oracle extends Generic {
+    @Override
     public List<String> createTable(Table table) {
         List<String> statments = new ArrayList<String>(2);
         if (hasAutomaticPrimaryKey(table)) statments.add("CREATE SEQUENCE " + createIdSequenceName(table));
@@ -21,7 +22,7 @@ public class Oracle extends Generic {
         return statments;
     }
 
-
+    @Override
     public List<String> renameTable(String table, String newName, boolean hasPrimaryKey) {
         List<String> statements = new ArrayList<String>(2);
         statements.addAll(super.renameTable(table, newName, hasPrimaryKey));
@@ -32,6 +33,7 @@ public class Oracle extends Generic {
         return statements;
     }
 
+    @Override
     public List<String> dropTable(Table table) {
         List<String> statments = new ArrayList<String>(2);
         statments.addAll(super.dropTable(massageTableForOracle(table)));
@@ -39,12 +41,14 @@ public class Oracle extends Generic {
         return statments;
     }
 
+    @Override
     public List<String> setDefaultValue(String table, String column, String newDefault) {
         return Arrays.asList(String.format(
             "ALTER TABLE %s MODIFY (%s DEFAULT %s)", table, column, sqlLiteral(newDefault)
         ));
     }
 
+    @Override
     public List<String> setNullable(String table, String column, boolean nullable) {
         return Arrays.asList(String.format(
             "ALTER TABLE %s MODIFY (%s %sNULL)", table, column, nullable ? "" : "NOT "
@@ -102,6 +106,7 @@ public class Oracle extends Generic {
     }
 
     // Attempts to be SQLPLUS-compatible for scripts that mix PL/SQL and plain SQL
+    @Override
     public List<String> separateStatements(String script) {
         List<String> statments = new LinkedList<String>();
 
@@ -138,6 +143,7 @@ public class Oracle extends Generic {
         }
     }
 
+    @Override
     public List<String> insert(String table, List<String> columns, List<Object> values, boolean automaticPrimaryKey) {
         if (columns.size() == 0) {
             return Arrays.asList(String.format(
