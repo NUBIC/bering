@@ -7,23 +7,23 @@
     <property name="release-name" value="bering-${release-version}"/>
     <property name="src-release-name" value="${release-name}-src"/>
 
-    <property name="src-dir.main" value="src-new/main/java"/>
-    <property name="res-dir.main" value="src-new/main/resources"/>
+    <property name="src-dir.main" value="src/main/java"/>
+    <property name="res-dir.main" value="src/main/resources"/>
     <property name="build-dir.main" value="build/classes"/>
 
-    <property name="src-dir.test" value="src-new/test/java"/>
-    <property name="res-dir.test" value="src-new/test/java"/>
+    <property name="src-dir.test" value="src/test/java"/>
+    <property name="res-dir.test" value="src/test/java"/>
     <property name="build-dir.test" value="build/test-classes"/>
 
     <path id="cp.main">
-        <fileset dir="lib-new/main">
+        <fileset dir="lib/main">
             <include name="**/*.jar"/>
         </fileset>
     </path>
 
     <path id="cp.test">
         <pathelement location="${build-dir.main}"/>
-        <fileset dir="lib-new/test">
+        <fileset dir="lib/test">
             <include name="**/*.jar"/>
         </fileset>
         <path refid="cp.main"/>
@@ -95,13 +95,11 @@
             <include name="LICENSE"/>
             <include name="dist/bering*.jar"/>
             <include name="doc/**"/>
-            <include name="lib-new/**"/>
+            <include name="lib/main/**"/>
         </patternset>
         <patternset id="src-release-pattern">
             <include name="build.xml"/>
-            <include name="resources/**"/>
             <include name="src/**"/>
-            <include name="test/**"/>
         </patternset>
         <fileset id="release-fileset" dir=".">
             <patternset refid="release-pattern"/>
