@@ -7,23 +7,23 @@
     <property name="release-name" value="bering-${release-version}"/>
     <property name="src-release-name" value="${release-name}-src"/>
 
-    <property name="src-dir.main" value="src"/>
-    <property name="res-dir.main" value="resources"/>
+    <property name="src-dir.main" value="src-new/main/java"/>
+    <property name="res-dir.main" value="src-new/main/resources"/>
     <property name="build-dir.main" value="build/classes"/>
 
-    <property name="src-dir.test" value="test/src"/>
-    <property name="res-dir.test" value="test/src"/>
+    <property name="src-dir.test" value="src-new/test/java"/>
+    <property name="res-dir.test" value="src-new/test/java"/>
     <property name="build-dir.test" value="build/test-classes"/>
 
     <path id="cp.main">
-        <fileset dir="lib">
+        <fileset dir="lib-new/main">
             <include name="**/*.jar"/>
         </fileset>
     </path>
 
     <path id="cp.test">
         <pathelement location="${build-dir.main}"/>
-        <fileset dir="test/lib">
+        <fileset dir="lib-new/test">
             <include name="**/*.jar"/>
         </fileset>
         <path refid="cp.main"/>
@@ -54,11 +54,11 @@
     </target>
 
     <target name="compile" depends="resources" description="compile application code">
-        <javac source="${source-level}" srcdir="src" destdir="${build-dir.main}" debug="true" classpathref="cp.main"/>
+        <javac source="${source-level}" srcdir="${src-dir.main}" destdir="${build-dir.main}" debug="true" classpathref="cp.main"/>
     </target>
 
     <target name="compile-tests" depends="compile, resources-test" description="compile test code">
-        <javac source="${source-level}" srcdir="test" destdir="${build-dir.test}" debug="true" classpathref="cp.test"/>
+        <javac source="${source-level}" srcdir="${src-dir.test}" destdir="${build-dir.test}" debug="true" classpathref="cp.test"/>
     </target>
 
     <target name="test" depends="compile-tests" description="run unit tests">
@@ -95,7 +95,7 @@
             <include name="LICENSE"/>
             <include name="dist/bering*.jar"/>
             <include name="doc/**"/>
-            <include name="lib/**"/>
+            <include name="lib-new/**"/>
         </patternset>
         <patternset id="src-release-pattern">
             <include name="build.xml"/>
