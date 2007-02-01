@@ -1,7 +1,6 @@
 package edu.northwestern.bioinformatics.bering;
 
 import groovy.lang.Closure;
-import org.apache.ddlutils.model.Column;
 
 import java.sql.Types;
 import java.util.HashMap;
@@ -12,20 +11,22 @@ import java.util.regex.Pattern;
 
 /**
  * @author Moses Hohman
+ * @author Rhett Sutphin
  */
 public abstract class Migration {
-    public static final String NULLABLE_KEY  = "nullable";
-    public static final String LIMIT_KEY     = "limit";
-    public static final String PRECISION_KEY = "precision";
-    private static final String DEFAULT_VALUE_KEY = "defaultValue";
-    public static final String PRIMARY_KEY_KEY = "primaryKey";
+    public static final String NULLABLE_KEY      = "nullable";
+    public static final String LIMIT_KEY         = "limit";
+    public static final String PRECISION_KEY     = "precision";
+    public static final String SCALE_KEY         = "scale";
+    public static final String DEFAULT_VALUE_KEY = "defaultValue";
+    public static final String PRIMARY_KEY_KEY   = "primaryKey";
 
-    private static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
+    public static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
     static {
         NAMES_TO_JDBC_TYPES.put("string",    Types.VARCHAR);
         NAMES_TO_JDBC_TYPES.put("integer",   Types.INTEGER);
-        NAMES_TO_JDBC_TYPES.put("float",     Types.NUMERIC);
-        NAMES_TO_JDBC_TYPES.put("boolean",   Types.BOOLEAN);
+        NAMES_TO_JDBC_TYPES.put("float",     Types.FLOAT);
+        NAMES_TO_JDBC_TYPES.put("boolean",   Types.BIT);
         NAMES_TO_JDBC_TYPES.put("date",      Types.DATE);
         NAMES_TO_JDBC_TYPES.put("time",      Types.TIME);
         NAMES_TO_JDBC_TYPES.put("timestamp", Types.TIMESTAMP);
@@ -69,7 +70,17 @@ public abstract class Migration {
     }
 
     protected void addColumn(Map<String, Object> parameters, String tableName, String columnName, String columnType) {
-        adapter.addColumn(tableName, createColumn(parameters, columnName, columnType));
+        adapter.addColumn(tableName, Column.createColumn(parameters, columnName, columnType));
+    }
+
+    static boolean hasPrimaryKey(Map<String, Object> parameters, boolean def) {
+        boolean hasPrimaryKey = def;
+        if (parameters != null) {
+            if (parameters.containsKey(PRIMARY_KEY_KEY)) {
+                hasPrimaryKey = (Boolean) parameters.get(PRIMARY_KEY_KEY);
+            }
+        }
+        return hasPrimaryKey;
     }
 
     /**
@@ -132,46 +143,6 @@ public abstract class Migration {
 
     // TODO: maybe this should be moved somewhere else
     // visible to collaborators (e.g., TableDefinition)
-    static Column createColumn(Map<String, Object> parameters, String columnName, String columnType) {
-        Column column = new Column();
-        column.setName(columnName);
-        column.setTypeCode(getTypeCode(columnType));
-        if (parameters != null && !parameters.isEmpty()) {
-            if (parameters.containsKey(NULLABLE_KEY)) {
-                column.setRequired(!((Boolean) parameters.get(NULLABLE_KEY)));
-            }
-            if (parameters.containsKey(DEFAULT_VALUE_KEY) && parameters.get(DEFAULT_VALUE_KEY) != null) {
-                column.setDefaultValue(String.valueOf(parameters.get(DEFAULT_VALUE_KEY)));
-            }
-            if (parameters.containsKey(LIMIT_KEY)) {
-                column.setSize(String.valueOf(parameters.get(LIMIT_KEY)));
-            }
-            if (parameters.containsKey(PRECISION_KEY)) {
-                column.setScale((Integer) parameters.get(PRECISION_KEY));
-            }
-            column.setPrimaryKey(hasPrimaryKey(parameters, false));
-        }
-        return column;
-    }
-
-    private static boolean hasPrimaryKey(Map<String, Object> parameters, boolean def) {
-        boolean hasPrimaryKey = def;
-        if (parameters != null) {
-            if (parameters.containsKey(PRIMARY_KEY_KEY)) {
-                hasPrimaryKey = (Boolean) parameters.get(PRIMARY_KEY_KEY);
-            }
-        }
-        return hasPrimaryKey;
-    }
-
-    private static int getTypeCode(String typeName) {
-        Integer code = NAMES_TO_JDBC_TYPES.get(typeName);
-        if (code == null) {
-            throw new IllegalArgumentException("Unknown type: " + typeName);
-        }
-        return code;
-    }
-
     public final void setAdapter(Adapter adapter) {
         this.adapter = adapter;
     }

@@ -1,21 +1,25 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
-import edu.northwestern.bioinformatics.bering.TableDefinition;
 import edu.northwestern.bioinformatics.bering.Migration;
-import org.apache.ddlutils.model.Database;
-import org.apache.ddlutils.model.Table;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.*;
+import edu.northwestern.bioinformatics.bering.TableDefinition;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Rhett Sutphin
  */
-public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
-    protected Oracle createDialect() { return new Oracle(); }
+public class OracleTest extends HibernateBasedDialectTestCase<Oracle> {
+
+    @Override
+    protected Class<Oracle> getDialectClass() {
+        return Oracle.class;
+    }
+
+    public void testName() throws Exception {
+        assertEquals("oracle", getDialect().getDialectName());
+    }
 
     public void testSetDefault() throws Exception {
         assertStatements(getDialect().setDefaultValue("feast", "length", "8"),
@@ -44,100 +48,67 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
     }
 
     public void testCreateTableIncludesSequence() throws Exception {
-        String expectedCreateTable = "CREATE TABLE etc";
-        expectGetMaxIdentLength(15);
-        expect(getPlatform().getCreateTablesSql((Database) notNull(), eq(false), eq(false)))
-            .andReturn(expectedCreateTable);
-        replayMocks();
+        String expectedCreateTable
+            = "CREATE TABLE feast (\n  id NUMBER(10,0),\n  name VARCHAR2(2000 CHAR),\n  length NUMBER(10,0),\n  PRIMARY KEY(id)\n)";
 
-        TableDefinition def = new TableDefinition("feast");
-        def.addColumn("length", "integer");
         assertStatements(
-            getDialect().createTable(def.toTable()),
+            getDialect().createTable(createTestTable()),
             "CREATE SEQUENCE seq_feast_id",
             expectedCreateTable
         );
-        verifyMocks();
     }
 
     public void testCreateTableWithoutPK() throws Exception {
-        String expectedCreateTable = "CREATE TABLE etc";
-        expect(getPlatform().getCreateTablesSql((Database) notNull(), eq(false), eq(false)))
-            .andReturn(expectedCreateTable);
-        replayMocks();
+        String expectedCreateTable = "CREATE TABLE feast (\n  name VARCHAR2(2000 CHAR),\n  length NUMBER(10,0)\n)";
 
-        TableDefinition def = new TableDefinition("bering_version");
+        TableDefinition def = createTestTable();
         def.setIncludePrimaryKey(false);
-        def.addColumn("release", "integer");
         assertStatements(
-            getDialect().createTable(def.toTable()),
+            getDialect().createTable(def),
             expectedCreateTable
         );
-        verifyMocks();
     }
 
     public void testCreateTableWithManualPKDoesNotCreateSequence() throws Exception {
-        String expectedCreateTable = "CREATE TABLE etc";
-        expect(getPlatform().getCreateTablesSql((Database) notNull(), eq(false), eq(false)))
-            .andReturn(expectedCreateTable);
-        replayMocks();
-
-        TableDefinition def = new TableDefinition("feast");
+        String expectedCreateTable = "CREATE TABLE feast (\n  name VARCHAR2(2000 CHAR),\n  length NUMBER(10,0),\n  id NUMBER(10,0) PRIMARY KEY\n)";
+        TableDefinition def = createTestTable();
         def.setIncludePrimaryKey(false);
         def.addColumn(Collections.singletonMap(Migration.PRIMARY_KEY_KEY, (Object) Boolean.TRUE), "id", "integer");
-        def.addColumn("length", "integer");
         assertStatements(
-            getDialect().createTable(def.toTable()),
+            getDialect().createTable(def),
             expectedCreateTable
         );
-        verifyMocks();
     }
 
     public void testCreateTableWithLongName() throws Exception {
-        String expectedCreateTable = "CREATE TABLE etc";
-        expectGetMaxIdentLength(15);
-        expect(getPlatform().getCreateTablesSql((Database) notNull(), eq(false), eq(false)))
-            .andReturn(expectedCreateTable);
-        replayMocks();
+        String expectedCreateTable
+            = "CREATE TABLE superfeast01234567890123456789 (\n  id NUMBER(10,0),\n  length NUMBER(10,0),\n  PRIMARY KEY(id)\n)";
 
-        TableDefinition def = new TableDefinition("superfeast2000");
+        TableDefinition def = new TableDefinition("superfeast01234567890123456789");
         def.addColumn("length", "integer");
         assertStatements(
-            getDialect().createTable(def.toTable()),
-            "CREATE SEQUENCE seq_superfea_id",
+            getDialect().createTable(def),
+            "CREATE SEQUENCE seq_superfeast0123456789012_id",
             expectedCreateTable
         );
         verifyMocks();
     }
 
-    private void expectGetMaxIdentLength(int maxlen) {
-        expect(getPlatformInfo().getMaxIdentifierLength()).andReturn(maxlen);
-    }
-
     public void testDropTable() throws Exception {
-        String expectedDropTable = "CREATE TABLE etc";
-        expectGetMaxIdentLength(15);
-        expect(getPlatform().getDropTablesSql((Database) notNull(), eq(false)))
-            .andReturn(expectedDropTable);
-        replayMocks();
+        String expectedDropTable = "DROP TABLE feast";
+        String tableName = "feast";
 
-        TableDefinition def = new TableDefinition("feast");
-        def.addColumn("length", "integer");
         assertStatements(
-            getDialect().dropTable(def.toTable()),
+            getDialect().dropTable(tableName, true),
             expectedDropTable,
             "DROP SEQUENCE seq_feast_id"
         );
-        verifyMocks();
     }
+
 
     public void testRenameTableWithPk() throws Exception {
         String tableName = "test";
         String newTableName = "t_test";
-        expectGetMaxIdentLength(15);
-        expectGetMaxIdentLength(15);
-        replayMocks();
-
         assertStatements(
             getDialect().renameTable(tableName, newTableName, true),
             "ALTER TABLE test RENAME TO t_test",
@@ -245,28 +216,51 @@ public class OracleTest extends DdlUtilsDialectTestCase<Oracle> {
     }
 
     public void testInsert() throws Exception {
-        expectGetMaxIdentLength(30);
-        replayMocks();
         assertStatements(
             getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100), true),
             "INSERT INTO feast (id, length, cost) VALUES (seq_feast_id.nextval, 'An hour', 100)"
         );
-        verifyMocks();
     }
 
     public void testInsertNoPrimaryKey() throws Exception {
-        replayMocks();
         assertStatements(
             getDialect().insert("feast", Arrays.asList("length", "cost"), Arrays.asList((Object) "An hour", 100), false),
             "INSERT INTO feast (length, cost) VALUES ('An hour', 100)"
         );
-        verifyMocks();
     }
 
-    public void testMassageTableRemovesAutoIncrement() throws Exception {
-        TableDefinition def = new TableDefinition("feast");
-        def.addColumn("length", "integer");
-        Table massaged = Oracle.massageTableForOracle(def.toTable());
-        assertFalse("PK still autoincrement", massaged.getPrimaryKeyColumns()[0].isAutoIncrement());
+    @Override
+    protected String expectedAddStringStatement() {
+        return "ALTER TABLE t ADD (c VARCHAR2(2000 CHAR))";
+    }
+
+    @Override
+    protected String expectedAddIntegerStatement() {
+        return "ALTER TABLE t ADD (c NUMBER(10,0))";
+    }
+
+    @Override
+    protected String expectedAddFloatStatement() {
+        return "ALTER TABLE t ADD (c FLOAT)";
+    }
+
+    @Override
+    protected String expectedAddBooleanStatement() {
+        return "ALTER TABLE t ADD (c NUMBER(1,0))";
+    }
+
+    @Override
+    protected String expectedAddDateStatement() {
+        return "ALTER TABLE t ADD (c DATE)";
+    }
+
+    @Override
+    protected String expectedAddTimeStatement() {
+        return "ALTER TABLE t ADD (c DATE)";
+    }
+
+    @Override
+    protected String expectedAddTimestampStatement() {
+        return "ALTER TABLE t ADD (c TIMESTAMP)";
     }
 }

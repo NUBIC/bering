@@ -1,36 +1,22 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
+import edu.northwestern.bioinformatics.bering.Column;
 import edu.northwestern.bioinformatics.bering.TableDefinition;
-import static edu.northwestern.bioinformatics.bering.dialect.DdlUtilsTools.*;
-import static org.easymock.classextension.EasyMock.expect;
-import org.easymock.IArgumentMatcher;
-import static org.easymock.EasyMock.reportMatcher;
-import org.apache.ddlutils.model.Column;
-import org.apache.ddlutils.alteration.AddColumnChange;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
+ * This test covers shared behaviors in AbstractDialect.
+ *
  * @author Rhett Sutphin
  */
-public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
-    protected Generic createDialect() { return new Generic(); }
-
-    public void testCreateTable() throws Exception {
-        TableDefinition def = createTestTable();
-        String expectedSql = "CREATE TABLE etc";
-
-        expect(getPlatform().getCreateTablesSql(createDatabase(def.toTable()), false, false))
-            .andReturn(expectedSql);
-        replayMocks();
-
-        List<String> statements = getDialect().createTable(def);
-        verifyMocks();
-
-        assertStatements(statements, expectedSql);
+public class DefaultDialectTest extends DialectTestCase<DefaultDialectTest.TestDialect> {
+    @Override
+    protected Class<TestDialect> getDialectClass() {
+        return TestDialect.class;
     }
-    
+
     public void testRenameTable() throws Exception {
         String tableName = "test";
         String newTableName = "t_test";
@@ -41,29 +27,17 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
 
     public void testDropTable() throws Exception {
         String tableName = "test";
-        String expectedSql = "DROP TABLE";
-
-        expect(getPlatform().getDropTablesSql(createDatabase(createIdedTable(tableName)), false))
-            .andReturn(expectedSql);
-        replayMocks();
+        String expectedSql = "DROP TABLE test";
 
         List<String> statements = getDialect().dropTable(tableName, true);
-        verifyMocks();
-
         assertStatements(statements, expectedSql);
     }
 
     public void testDropNoPkTable() throws Exception {
         String tableName = "test";
-        String expectedSql = "DROP TABLE";
-
-        expect(getPlatform().getDropTablesSql(createDatabase(createTable(tableName)), false))
-            .andReturn(expectedSql);
-        replayMocks();
+        String expectedSql = "DROP TABLE test";
 
         List<String> statements = getDialect().dropTable(tableName, false);
-        verifyMocks();
-
         assertStatements(statements, expectedSql);
     }
 
@@ -92,6 +66,11 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
         assertStatements(statements, "ALTER TABLE feast RENAME COLUMN length TO duration");
     }
 
+    public void testDropColumn() throws Exception {
+        List<String> statements = getDialect().dropColumn("feast", "length");
+        assertStatements(statements, "ALTER TABLE feast DROP COLUMN length");
+    }
+
     public void testSeparateStatements() throws Exception {
         String script =
             "CREATE TABLE etc;\n" +
@@ -112,10 +91,17 @@ public class GenericTest extends DdlUtilsDialectTestCase<Generic> {
         );
     }
 
-    private static TableDefinition createTestTable() {
-        TableDefinition def = new TableDefinition("feast");
-        def.addColumn("name", "string");
-        def.addColumn("length", "integer");
-        return def;
+    public static class TestDialect extends AbstractDialect {
+        public String getDialectName() {
+            return "test";
+        }
+
+        public List<String> createTable(TableDefinition table) {
+            throw new UnsupportedOperationException("createTable not implemented");
+        }
+
+        public List<String> addColumn(String tableName, Column column) {
+            throw new UnsupportedOperationException("addColumn not implemented");
+        }
     }
 }

@@ -10,8 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import com.sun.java_cup.internal.version;
-import edu.northwestern.bioinformatics.bering.dialect.Generic;
+import edu.northwestern.bioinformatics.bering.dialect.AbstractDialect;
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
 import edu.northwestern.bioinformatics.bering.dialect.Oracle;
 
@@ -33,12 +32,12 @@ public class MigrateTaskTest extends TestCase {
     }
 
     public void testDefaultDialect() throws Exception {
-        assertEquals(Generic.class.getName(), task.getDialect());
+        assertEquals(AbstractDialect.class.getName(), task.getDialect());
     }
     
     public void testSetDialectBlankDoesNotChangeIt() throws Exception {
         task.setDialect("");
-        assertEquals(Generic.class.getName(), task.getDialect());
+        assertEquals(AbstractDialect.class.getName(), task.getDialect());
     }
 
     public void testBuildExceptionThrownIfMigrationsDirIsNotADirectory() throws IOException {

@@ -1,6 +1,5 @@
 package edu.northwestern.bioinformatics.bering;
 
-import org.apache.ddlutils.model.Column;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 
 import java.util.List;

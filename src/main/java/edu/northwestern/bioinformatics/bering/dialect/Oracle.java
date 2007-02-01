@@ -1,25 +1,44 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
+import edu.northwestern.bioinformatics.bering.Column;
 import static edu.northwestern.bioinformatics.bering.SqlUtils.sqlLiteral;
-import org.apache.ddlutils.model.Table;
-import org.apache.ddlutils.model.Column;
+import edu.northwestern.bioinformatics.bering.TableDefinition;
+import edu.northwestern.bioinformatics.bering.TypeQualifiers;
+import edu.northwestern.bioinformatics.bering.dialect.hibernate.ImprovedOracleDialect;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.dialect.Dialect;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Rhett Sutphin
  */
-public class Oracle extends Generic {
+public class Oracle extends HibernateBasedDialect {
+    private static final int MAX_IDENTIFIER_LENGTH = 30;
+    private static final int VARCHAR2_CHAR_LIMIT = 2000;
+
     @Override
-    public List<String> createTable(Table table) {
-        List<String> statments = new ArrayList<String>(2);
-        if (hasAutomaticPrimaryKey(table)) statments.add("CREATE SEQUENCE " + createIdSequenceName(table));
-        statments.addAll(super.createTable(massageTableForOracle(table)));
-        return statments;
+    protected Dialect createHibernateDialect() {
+        return new ImprovedOracleDialect();
+    }
+
+    @Override
+    public String getDialectName() {
+        return "oracle";
+    }
+
+    @Override
+    public List<String> createTable(TableDefinition def) {
+        List<String> statements = new ArrayList<String>(2);
+        if (def.getIncludePrimaryKey()) {
+            statements.add(String.format("CREATE SEQUENCE %s", createIdSequenceName(def.getName())));
+        }
+        statements.addAll(super.createTable(def));
+        return statements;
     }
 
     @Override
@@ -34,10 +53,10 @@ public class Oracle extends Generic {
     }
 
     @Override
-    public List<String> dropTable(Table table) {
+    public List<String> dropTable(String tableName, boolean primaryKey) {
         List<String> statments = new ArrayList<String>(2);
-        statments.addAll(super.dropTable(massageTableForOracle(table)));
-        if (hasAutomaticPrimaryKey(table)) statments.add("DROP SEQUENCE " + createIdSequenceName(table));
+        statments.addAll(super.dropTable(tableName, primaryKey));
+        if (primaryKey) statments.add("DROP SEQUENCE " + createIdSequenceName(tableName));
         return statments;
     }
 
@@ -55,54 +74,45 @@ public class Oracle extends Generic {
         ));
     }
 
-    private String createIdSequenceName(Table table) {
-        return createIdSequenceName(table.getName());
+    @Override
+    public List<String> addColumn(String table, Column column) {
+        return Arrays.asList(String.format(
+            "ALTER TABLE %s ADD (%s)",
+            table,
+            new ColumnDeclaration(column).toSql()
+        ));
+    }
+
+    @Override
+    protected TypeQualifiers getDefaultTypeQualifiers(int typeCode) {
+        switch (typeCode) {
+            case Types.VARCHAR: return new TypeQualifiers(VARCHAR2_CHAR_LIMIT, null, null);
+            default: return super.getDefaultTypeQualifiers(typeCode);
+        }
     }
 
     private String createIdSequenceName(String tableName) {
-        int maxlen = getPlatform().getPlatformInfo().getMaxIdentifierLength();
-        return "seq_" + truncate(tableName, maxlen - 7) + "_id";
+        return createIdentifier("seq_", tableName, "_id");
+    }
+
+    private String createPkConstraintName(String tableName) {
+        return createIdentifier("pk_", tableName, null);
+    }
+
+    private String createIdentifier(String prefix, String basename, String suffix) {
+        int truncateBy = (prefix == null ? 0 : prefix.length()) + (suffix == null ? 0 : suffix.length());
+
+        StringBuilder ident = new StringBuilder(MAX_IDENTIFIER_LENGTH);
+        if (prefix != null) ident.append(prefix);
+        ident.append(truncate(basename, MAX_IDENTIFIER_LENGTH - truncateBy));
+        if (suffix != null) ident.append(suffix);
+
+        return ident.toString();
     }
 
     private String truncate(String str, int maxlen) {
         if (str.length() <= maxlen) return str;
         return str.substring(0, maxlen);
-    }
-
-    // package-level for testing
-    static Table massageTableForOracle(Table table) {
-        Table massaged = cloneTable(table);
-
-        if (hasAutomaticPrimaryKey(massaged)) {
-            massaged.getPrimaryKeyColumns()[0].setAutoIncrement(false);
-        }
-        return massaged;
-    }
-
-    // Table#clone doesn't clone the individual columns, so:
-    private static Table cloneTable(Table table) {
-        Table clone;
-        try {
-            clone = (Table) table.clone();
-            while (clone.getColumnCount() > 0) {
-                clone.removeColumn(0);
-            }
-            for (Column column : table.getColumns()) {
-                clone.addColumn((Column) column.clone());
-            }
-        } catch (CloneNotSupportedException e) {
-            throw new Error("This shouldn't be possible", e);
-        }
-        return clone;
-    }
-
-    private static boolean hasAutomaticPrimaryKey(Table table) {
-        if (table.getPrimaryKeyColumns().length == 1) {
-            Column pk = table.getPrimaryKeyColumns()[0];
-            return pk.isAutoIncrement();
-        } else {
-            return false;
-        }
     }
 
     // Attempts to be SQLPLUS-compatible for scripts that mix PL/SQL and plain SQL

@@ -1,9 +1,11 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
+import edu.northwestern.bioinformatics.bering.BeringException;
+
 /**
  * @author rsutphin
  */
-public class MigrationLoadingException extends RuntimeException {
+public class MigrationLoadingException extends BeringException {
     public MigrationLoadingException(String message) {
         super(message);
     }

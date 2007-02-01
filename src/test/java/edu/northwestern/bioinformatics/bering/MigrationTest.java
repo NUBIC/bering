@@ -1,17 +1,14 @@
 package edu.northwestern.bioinformatics.bering;
 
-import static java.util.Collections.singletonMap;
-
-import static edu.northwestern.bioinformatics.bering.Migration.*;
-import org.apache.ddlutils.model.Column;
+import static edu.northwestern.bioinformatics.bering.Migration.PRIMARY_KEY_KEY;
 import org.easymock.classextension.EasyMock;
 
 import java.sql.Types;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.Arrays;
 import java.util.Collections;
+import static java.util.Collections.singletonMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author rsutphin
@@ -19,7 +16,6 @@ import java.util.Collections;
 public class MigrationTest extends BeringTestCase {
     private Adapter adapter;
     private Migration migration = new StubMigration();
-    private Map<String, Object> parameters = new HashMap<String, Object>();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -27,69 +23,13 @@ public class MigrationTest extends BeringTestCase {
         migration.setAdapter(adapter);
     }
 
-    public void testCreateColumn() throws Exception {
-        Column actual = Migration.createColumn(null, "title", "string");
-        assertEquals("Wrong name", "title", actual.getName());
-        assertEquals("Wrong type", Types.VARCHAR, actual.getTypeCode());
-        assertFalse("Should be nullable by default", actual.isRequired());
-        assertNull("Should have no size by default", actual.getSize());
-    }
-
-    public void testCreateNotNullColumn() throws Exception {
-        parameters.put(NULLABLE_KEY, false);
-        Column actual = Migration.createColumn(parameters, "notnull", "string");
-        assertTrue("required not set correctly", actual.isRequired());
-    }
-
-    public void testCreateColumnWithIntegerDefaultValue() {
-        parameters.put("defaultValue", 0);
-        Column actual = Migration.createColumn(parameters, "position", "integer");
-        assertEquals("0", actual.getDefaultValue());
-    }
-
-    public void testCreateColumnWithStringDefaultValue() {
-        parameters.put("defaultValue", "days");
-        Column actual = Migration.createColumn(parameters, "duration_unit", "string");
-        assertEquals("days", actual.getDefaultValue());
-    }
-
-    public void testCreateColumnWithNullDefaultValueDoesntDoAnything() {
-        parameters.put("defaultValue", null);
-        Column actual = Migration.createColumn(parameters, "duration_unit", "string");
-        assertNull("default value not null", actual.getDefaultValue());
-    }
-
-    public void testCreateColumnWithLimit() throws Exception {
-        parameters.put(LIMIT_KEY, 255);
-        Column actual = Migration.createColumn(parameters, "notnull", "string");
-        assertEquals(255, actual.getSizeAsInt());
-    }
-
-    public void testCreateColumnWithPrecision() throws Exception {
-        parameters.put(PRECISION_KEY, 9);
-        Column actual = Migration.createColumn(parameters, "notnull", "string");
-        assertEquals(9, actual.getScale());
-    }
-
-    public void testCreateManualPrimaryKeyColumn() throws Exception {
-        parameters.put(PRIMARY_KEY_KEY, true);
-        Column actual = Migration.createColumn(parameters, "id", "integer");
-        assertTrue(actual.isPrimaryKey());
-    }
-
-    public void testCreateColumnDefaultsToNotPk() throws Exception {
-        parameters.put("someParam", "someValue");
-        Column actual = Migration.createColumn(parameters, "id", "integer");
-        assertFalse(actual.isPrimaryKey());
-    }
-
     public void testCreatedColumnTypes() throws Exception {
-        assertEquals(Types.BOOLEAN,   getCreatedColumnType("boolean"));
+        assertEquals(Types.BIT,       getCreatedColumnType("boolean"));
         assertEquals(Types.DATE,      getCreatedColumnType("date"));
         assertEquals(Types.TIME,      getCreatedColumnType("time"));
         assertEquals(Types.TIMESTAMP, getCreatedColumnType("timestamp"));
         assertEquals(Types.VARCHAR,   getCreatedColumnType("string"));
-        assertEquals(Types.NUMERIC,   getCreatedColumnType("float"));
+        assertEquals(Types.FLOAT,     getCreatedColumnType("float"));
         assertEquals(Types.INTEGER,   getCreatedColumnType("integer"));
     }
 
@@ -238,6 +178,6 @@ public class MigrationTest extends BeringTestCase {
     }
 
     private int getCreatedColumnType(String columnType) {
-        return Migration.createColumn(null, "", columnType).getTypeCode();
+        return Column.createColumn(null, "", columnType).getTypeCode();
     }
 }

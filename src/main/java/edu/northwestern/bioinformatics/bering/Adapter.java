@@ -1,14 +1,12 @@
 package edu.northwestern.bioinformatics.bering;
 
-import org.apache.ddlutils.model.Column;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 
-import java.sql.SQLException;
-import java.util.regex.Pattern;
 import java.util.List;
 
 /**
  * @author Moses Hohman
+ * @author Rhett Sutphin
  */
 public interface Adapter {
     void beginTransaction();

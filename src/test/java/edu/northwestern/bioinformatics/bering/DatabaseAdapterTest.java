@@ -1,23 +1,22 @@
 package edu.northwestern.bioinformatics.bering;
 
 import static edu.northwestern.bioinformatics.bering.DatabaseAdapter.VERSION_TABLE_NAME;
+import edu.northwestern.bioinformatics.bering.dialect.Hsqldb;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
-import edu.northwestern.bioinformatics.bering.dialect.Generic;
 import junit.framework.TestCase;
-import org.apache.ddlutils.model.Column;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.sql.ResultSetMetaData;
-import java.util.Map;
-import java.util.List;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author rsutphin
@@ -29,6 +28,7 @@ public class DatabaseAdapterTest extends TestCase {
     private Connection conn;
     private Statement stmt;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         Class.forName("org.hsqldb.jdbcDriver");
@@ -36,7 +36,7 @@ public class DatabaseAdapterTest extends TestCase {
         // hence the random number added to the name
         conn = DriverManager.getConnection("jdbc:hsqldb:mem:test" + Math.random(), "sa", "");
         conn.setAutoCommit(false);
-        adapter = new DatabaseAdapter(conn, new Generic());
+        adapter = new DatabaseAdapter(conn, new Hsqldb());
         stmt = conn.createStatement();
 
         stmt.execute("CREATE TABLE " + TABLE_NAME + " (id IDENTITY PRIMARY KEY, title VARCHAR(50))");
@@ -45,6 +45,7 @@ public class DatabaseAdapterTest extends TestCase {
         assertTablePresent(TABLE_NAME);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         conn.close();
         super.tearDown();

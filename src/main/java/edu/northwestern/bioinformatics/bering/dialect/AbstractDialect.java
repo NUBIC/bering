@@ -1,30 +1,28 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
 import edu.northwestern.bioinformatics.bering.SqlUtils;
-import edu.northwestern.bioinformatics.bering.TableDefinition;
-import static edu.northwestern.bioinformatics.bering.dialect.DdlUtilsTools.*;
-import org.apache.ddlutils.alteration.AddColumnChange;
-import org.apache.ddlutils.alteration.ModelChange;
-import org.apache.ddlutils.alteration.RemoveColumnChange;
-import org.apache.ddlutils.alteration.TableChange;
-import org.apache.ddlutils.model.Column;
-import org.apache.ddlutils.model.Table;
-import org.apache.ddlutils.util.SqlTokenizer;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.LinkedList;
-import java.util.ArrayList;
 
 /**
  * @author Rhett Sutphin
  */
-public class Generic extends DdlUtilsBasedDialect {
+public abstract class AbstractDialect implements Dialect {
     protected static final String INSERT_DELIMITER = ", ";
+
+    public List<String> separateStatements(String script) {
+        return Arrays.asList(script.split("\\s*;\\s*"));
+    }
 
     public List<String> renameTable(String table, String newName, boolean hasPrimaryKey) {
         return singleStatement("ALTER TABLE %s RENAME TO %s", table, newName);
+    }
+
+    public List<String> dropTable(String table, boolean hasPrimaryKey) {
+        return singleStatement("DROP TABLE %s", table);
     }
 
     public List<String> renameColumn(String tableName, String columnName, String newColumnName) {
@@ -33,8 +31,11 @@ public class Generic extends DdlUtilsBasedDialect {
         ));
     }
 
+    public List<String> dropColumn(String table, String column) {
+        return singleStatement("ALTER TABLE %s DROP COLUMN %s", table, column);
+    }
+
     public List<String> setDefaultValue(String table, String column, String newDefault) {
-        // DDLUtils insists on dropping and recreating the table.  So:
         return Arrays.asList(String.format(
             "ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s", table, column, SqlUtils.sqlLiteral(newDefault)
         ));

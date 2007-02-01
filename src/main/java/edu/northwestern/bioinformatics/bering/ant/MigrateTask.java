@@ -3,7 +3,7 @@ package edu.northwestern.bioinformatics.bering.ant;
 import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
 import edu.northwestern.bioinformatics.bering.Main;
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
-import edu.northwestern.bioinformatics.bering.dialect.Generic;
+import edu.northwestern.bioinformatics.bering.dialect.AbstractDialect;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.JDBCTask;
 
@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class MigrateTask extends JDBCTask {
     private String migrationsDir = "db/migrate";
-    private String dialect = Generic.class.getName();
+    private String dialect = AbstractDialect.class.getName();
     private Integer targetMigration;
     private Integer targetRelease;
 

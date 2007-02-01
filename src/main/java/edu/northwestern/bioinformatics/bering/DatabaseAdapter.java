@@ -1,13 +1,9 @@
 package edu.northwestern.bioinformatics.bering;
 
-import edu.northwestern.bioinformatics.bering.dialect.DdlUtilsBasedDialect;
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ddlutils.Platform;
-import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.model.Column;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -51,10 +47,6 @@ public class DatabaseAdapter implements Adapter {
         this.dataSource = new SingleConnectionDataSource(connection, true);
         this.jdbc = new JdbcTemplate(dataSource);
         this.dialect = dialect;
-        if (this.dialect instanceof DdlUtilsBasedDialect) {
-            Platform platform = PlatformFactory.createNewPlatformInstance(dataSource);
-            ((DdlUtilsBasedDialect) this.dialect).setPlatform(platform);
-        }
     }
 
     public void close() {

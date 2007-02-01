@@ -1,19 +1,30 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
-import org.apache.ddlutils.model.Column;
-import org.apache.ddlutils.alteration.AddColumnChange;
-import org.apache.ddlutils.alteration.ColumnChange;
-import org.easymock.classextension.EasyMock;
-import static org.easymock.classextension.EasyMock.*;
-import org.easymock.IArgumentMatcher;
+import edu.northwestern.bioinformatics.bering.TableDefinition;
 
 import java.util.List;
 
 /**
  * @author Rhett Sutphin
  */
-public class PostgreSQLTest extends DdlUtilsDialectTestCase<PostgreSQL> {
-    protected PostgreSQL createDialect() { return new PostgreSQL(); }
+public class PostgreSQLTest extends HibernateBasedDialectTestCase<PostgreSQL> {
+
+    @Override
+    protected Class<PostgreSQL> getDialectClass() {
+        return PostgreSQL.class;
+    }
+
+    public void testName() throws Exception {
+        assertEquals("postgresql", getDialect().getDialectName());
+    }
+
+    public void testCreateTable() throws Exception {
+        TableDefinition def = createTestTable();
+        String expectedSql = "CREATE TABLE feast (\n  id SERIAL NOT NULL,\n  name TEXT,\n  length INT4,\n  PRIMARY KEY(id)\n)";
+
+        List<String> statements = getDialect().createTable(def);
+        assertStatements(statements, expectedSql);
+    }
 
     public void testSetNullable() throws Exception {
         assertStatements(
@@ -50,7 +61,7 @@ public class PostgreSQLTest extends DdlUtilsDialectTestCase<PostgreSQL> {
         );
     }
     
-
+/*
     public void testAddDefaultedColumn() throws Exception {
         Column originalColumn = new Column();
         originalColumn.setType("integer");
@@ -123,5 +134,41 @@ public class PostgreSQLTest extends DdlUtilsDialectTestCase<PostgreSQL> {
             reportMatcher(new AddSingleColumnMatcher(expected));
             return null;
         }
+    }
+    */
+
+    @Override
+    protected String expectedAddStringStatement() {
+        return "ALTER TABLE t ADD COLUMN c TEXT";
+    }
+
+    @Override
+    protected String expectedAddIntegerStatement() {
+        return "ALTER TABLE t ADD COLUMN c INT4";
+    }
+
+    @Override
+    protected String expectedAddFloatStatement() {
+        return "ALTER TABLE t ADD COLUMN c FLOAT4";
+    }
+
+    @Override
+    protected String expectedAddBooleanStatement() {
+        return "ALTER TABLE t ADD COLUMN c BOOLEAN";
+    }
+
+    @Override
+    protected String expectedAddDateStatement() {
+        return "ALTER TABLE t ADD COLUMN c DATE";
+    }
+
+    @Override
+    protected String expectedAddTimeStatement() {
+        return "ALTER TABLE t ADD COLUMN c TIME";
+    }
+
+    @Override
+    protected String expectedAddTimestampStatement() {
+        return "ALTER TABLE t ADD COLUMN c TIMESTAMP";
     }
 }

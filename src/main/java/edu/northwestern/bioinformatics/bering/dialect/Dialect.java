@@ -1,10 +1,9 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
+import edu.northwestern.bioinformatics.bering.Column;
 import edu.northwestern.bioinformatics.bering.TableDefinition;
 
 import java.util.List;
-
-import org.apache.ddlutils.model.Column;
 
 /**
  * @author Rhett Sutphin
@@ -18,7 +17,7 @@ public interface Dialect {
     List<String> renameTable(String table, String newName, boolean hasPrimaryKey);
     List<String> dropTable(String table, boolean hasPrimaryKey);
 
-    List<String> addColumn(String table, Column column);
+    List<String> addColumn(String tableName, Column column);
     List<String> dropColumn(String table, String column);
     List<String> renameColumn(String tableName, String columnName, String newColumnName);
 
