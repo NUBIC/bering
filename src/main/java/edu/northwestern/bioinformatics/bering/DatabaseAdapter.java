@@ -50,12 +50,7 @@ public class DatabaseAdapter implements Adapter {
     }
 
     public void close() {
-        try {
-            dataSource.destroy();
-        } catch (SQLException e) {
-            // TODO: make specific
-            throw new RuntimeException(e);
-        }
+        dataSource.destroy();
     }
 
     public void beginTransaction() {
