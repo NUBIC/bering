@@ -12,7 +12,7 @@
     <property name="build-dir.main" value="build/classes"/>
 
     <property name="src-dir.test" value="src/test/java"/>
-    <property name="res-dir.test" value="src/test/java"/>
+    <property name="res-dir.test" value="src/test/resources"/>
     <property name="build-dir.test" value="build/test-classes"/>
 
     <path id="cp.main">
