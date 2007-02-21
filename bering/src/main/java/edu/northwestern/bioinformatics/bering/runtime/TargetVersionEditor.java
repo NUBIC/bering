@@ -1,13 +1,14 @@
-package edu.northwestern.bioinformatics.bering.ant;
+package edu.northwestern.bioinformatics.bering.runtime;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 
 /**
- * This editor converts a string of the form <code>"M|N"</code> or <code>"N"</code> to a two-position
- * {@link Integer} array where <code>M</code> is in the zeroth position in the array.  If the
- * string is the empty string (<code>""</code>), it will return null in both positions.
- * Both <code>M</code> and <code>N</code> must be integers, if specified.
+ * This editor converts a string of the form <code>"M|N"</code>,  <code>"M-N"</code>, or
+ * <code>"N"</code> to a two-position {@link Integer} array where <code>M</code> is in the
+ * zeroth position in the array.  If the string is the empty string (<code>""</code>), it will
+ * return null in both positions. Both <code>M</code> and <code>N</code> must be integers, if
+ * specified.
  *
  * @author Rhett Sutphin
  */
@@ -29,7 +30,9 @@ public class TargetVersionEditor extends PropertyEditorSupport {
     }
 
     private int findSeparator(String text) {
-        return text.indexOf('|');
+        int pipeSep = text.indexOf('|');
+        if (pipeSep >= 0) return pipeSep;
+        return text.indexOf('-');
     }
 
     public Object getValue() {

@@ -21,6 +21,7 @@ public class MigrateTaskTest extends TestCase {
     private MigrateTask task = new MigrateTask();
     private Project project = new Project();
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         project.addBuildListener(new ConsoleLogger());
@@ -31,89 +32,14 @@ public class MigrateTaskTest extends TestCase {
         assertEquals("db/migrate", task.getMigrationsDir());
     }
 
-    public void testDefaultDialect() throws Exception {
-        assertEquals(AbstractDialect.class.getName(), task.getDialect());
-    }
-    
-    public void testSetDialectBlankDoesNotChangeIt() throws Exception {
-        task.setDialect("");
-        assertEquals(AbstractDialect.class.getName(), task.getDialect());
-    }
-
-    public void testBuildExceptionThrownIfMigrationsDirIsNotADirectory() throws IOException {
-        File tempFile = File.createTempFile("MigrateTaskTest", ".tmp");
-        try {
-            task.getProject().setBaseDir(tempFile.getParentFile());
-            task.setMigrationsDir(tempFile.getName());
-            task.execute();
-            fail("Should have thrown BuildException");
-        } catch (BuildException expected) {
-            String expectedMessage = tempFile.getCanonicalPath() + " is not a directory";
-            assertTrue("exception message does not start with \"" + expectedMessage + "\": "  + expected.getMessage(),
-                    expected.getMessage().startsWith(expectedMessage));
-        }
-    }
-
-    public void testSetTargetVersion() throws Exception {
-        assertTargetVersionSet(5, 9, "5|9");
-        assertTargetVersionSet(null, 11, "11");
-        assertTargetVersionSet(null, null, "");
-    }
-
-    public void testSetInvalidTargetVersion() throws Exception {
-        try {
-            task.setTargetVersion("bad");
-            fail("Exception not thrown");
-        } catch (BuildException be) {
-            assertEquals("Invalid target version (bad).  Should have the form 'R|M' or 'M'.", be.getMessage());
-            assertNotNull(be.getCause());
-        }
-    }
-
-    public void testInvalidDialect() throws Exception {
-        task.setDialect("this is not a class");
-        try {
-            task.createDialect();
-            fail("Exception not thrown");
-        } catch (BuildException e) {
-            assertEquals("Could not find dialect class this is not a class", e.getMessage());
-        }
-    }
-
-    public void testNonDialectDialect() throws Exception {
-        task.setDialect(String.class.getName());
-        try {
-            task.createDialect();
-            fail("Exception not thrown");
-        } catch (BuildException e) {
-            assertEquals("Class java.lang.String does not implement " + Dialect.class.getName(), e.getMessage());
-        }
-    }
-    
-    public void testWhitespaceStrippedFromDialect() throws Exception {
-        task.setDialect(Oracle.class.getName() + '\t');
-        Dialect d = task.createDialect();
-        assertTrue(d instanceof Oracle);
-    }
-
-    private void assertTargetVersionSet(Integer expectedTargetRelease, Integer expectedTargetMigration, String targetVersionString) {
-        task.setTargetVersion(targetVersionString);
-        assertEquals("Target release wrong", expectedTargetRelease, task.getTargetRelease());
-        assertEquals("Target migration wrong", expectedTargetMigration, task.getTargetMigration());
-    }
-
     private static class ConsoleLogger implements BuildLogger {
-        public void setMessageOutputLevel(int level) {
-        }
+        public void setMessageOutputLevel(int level) { }
 
-        public void setOutputPrintStream(PrintStream out) {
-        }
+        public void setOutputPrintStream(PrintStream out) { }
 
-        public void setEmacsMode(boolean emacsMode) {
-        }
+        public void setEmacsMode(boolean emacsMode) { }
 
-        public void setErrorPrintStream(PrintStream error) {
-        }
+        public void setErrorPrintStream(PrintStream error) { }
 
         public void buildStarted(BuildEvent event) {
             messageLogged(event);

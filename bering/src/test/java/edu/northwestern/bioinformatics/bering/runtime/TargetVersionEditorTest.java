@@ -1,4 +1,4 @@
-package edu.northwestern.bioinformatics.bering.ant;
+package edu.northwestern.bioinformatics.bering.runtime;
 
 import junit.framework.TestCase;
 
@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 public class TargetVersionEditorTest extends TestCase {
     private TargetVersionEditor editor;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         editor = new TargetVersionEditor();
@@ -15,6 +16,13 @@ public class TargetVersionEditorTest extends TestCase {
 
     public void testSetAsTextTwoValues() throws Exception {
         editor.setAsText("4|7");
+        Integer[] value = assertValidValue();
+        assertEquals(4, (int) value[0]);
+        assertEquals(7, (int) value[1]);
+    }
+
+    public void testSetAsTextTwoValuesWithDash() throws Exception {
+        editor.setAsText("4-7");
         Integer[] value = assertValidValue();
         assertEquals(4, (int) value[0]);
         assertEquals(7, (int) value[1]);
