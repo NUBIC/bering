@@ -1,0 +1,11 @@
+<project>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>bering-maven-plugin</artifactId>
+                <configuration></configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+

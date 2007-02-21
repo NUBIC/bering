@@ -26,6 +26,27 @@
     </scm>
     <modules>
         <module>bering</module>
-        <!-- <module>bering-maven-plugin</module> -->
+        <module>bering-maven-plugin</module> 
     </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-idea-plugin</artifactId>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <ideaVersion>6.x</ideaVersion>
+                    <jdkName>1.5</jdkName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
