@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.northwestern.bioinformatics</groupId>
     <artifactId>bering-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+    <name>Bering Maven Mojo</name>
+    <version>1.0-SNAPSHOT</version>
     <parent>
         <artifactId>bering-all</artifactId>
         <groupId>edu.northwestern.bioinformatics</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <packaging>maven-plugin</packaging>
-    <name>Bering Maven Mojo</name>
-    <version>1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <artifactId>bering</artifactId>
