@@ -144,6 +144,7 @@ public class DatabaseAdapter implements Adapter {
         Savepoint savepoint = null;
         final Version version = new Version();
         try {
+            beginTransaction();
             savepoint = connection.setSavepoint("versiontabledetect");
             jdbc.query(String.format(
                 "SELECT %s, %s FROM %s", RELEASE_COLUMN_NAME, MIGRATION_COLUMN_NAME, VERSION_TABLE_NAME),
@@ -169,7 +170,10 @@ public class DatabaseAdapter implements Adapter {
             }
             log.info("Creating " + VERSION_TABLE_NAME + " table");
             createTable(VERSION_TABLE);
+            commit();
             return new Version();
+        } finally {
+            rollback();
         }
     }
 
