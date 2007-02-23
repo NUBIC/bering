@@ -12,9 +12,10 @@ import java.sql.SQLException;
 import java.io.File;
 
 /**
+ * Executes any outstanding migrations for the configured database.
+ *
+ * @author Rhett Sutphin
  * @goal migrate
- * Not sure about this:
- * @phase deploy
  */
 public class MigrateMojo extends AbstractMojo {
     /**
@@ -36,9 +37,9 @@ public class MigrateMojo extends AbstractMojo {
 
     /**
      * For resolving relative <code>migrationsDir</code>s
-     * @parameter expression="${basedir}
+     * @parameter expression="${basedir}"
      */
-    private String basedir;
+    private File basedir;
 
     /**
      * The version of the database to which to migrate.  May be specified as "M|N" or "M-N" (where M
@@ -82,32 +83,14 @@ public class MigrateMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            MigrateTaskHelper helper = new MigrateTaskHelper(new MavenCallbacks());
+            MojoCallbacks callbacks = new MojoCallbacks(basedir, driver, url, username, password);
+            MigrateTaskHelper helper = new MigrateTaskHelper(callbacks);
             helper.setMigrationsDir(migrationsDir);
             helper.setTargetVersion(targetVersion);
             helper.setDialectName(dialect);
             helper.execute();
         } catch (BeringTaskException e) {
             throw new MojoExecutionException(e.getMessage(), e);
-        }
-    }
-
-    protected Connection getConnection() {
-        try {
-            return new DriverManagerDataSource(driver, url, username, password).getConnection();
-        } catch (Exception e) {
-            // Can't throw MojoExecutionException here b/c it's checked
-            throw new BeringTaskException("Could not open database connection", e);
-        }
-    }
-
-    private class MavenCallbacks implements MigrateTaskHelper.HelperCallbacks {
-        public Connection getConnection() {
-            return MigrateMojo.this.getConnection();
-        }
-
-        public File resolve(File f) {
-            return new File(basedir, f.getName());
         }
     }
 }
