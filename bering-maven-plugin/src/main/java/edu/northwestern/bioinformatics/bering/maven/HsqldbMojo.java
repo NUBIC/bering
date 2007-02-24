@@ -1,33 +1,28 @@
 package edu.northwestern.bioinformatics.bering.maven;
 
+import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
+import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.commons.io.FileUtils;
 import org.springframework.dao.DataAccessException;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.io.FileWriter;
-import java.sql.SQLException;
-import java.sql.Connection;
-
-import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
-import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
 
 /**
  * Creates a read-only HSQLDB instance from the project's migrations.  The URL for the created
- * database is <code>jdbc:hsqldb:file:${outputDirectory}/hsqldb/test</code> .
+ * database is <code>jdbc:hsqldb:file:${outputDirectory}/${dbName}</code>, with username
+ * <kbd>sa</kbd> and no password.
  *
  * @author Rhett Sutphin
  * @goal hsqldb
  */
 public class HsqldbMojo extends AbstractMojo {
-    private static final String RELATIVE_DIR = "hsqldb";
-    private static final String DB_NAME = "test";
-
     /**
      * @parameter expression="${project}"
      */
@@ -47,27 +42,32 @@ public class HsqldbMojo extends AbstractMojo {
     private String migrationsDir;
 
     /**
-     * The directory in which the HSQLDB schema, etc., files will be created.  Should be something
-     * that's on the test classpath.
-     * @parameter expression="${project.build.directory}/test-classes"
+     * The directory in which the HSQLDB schema, etc., files will be created.
+     *
+     * @parameter expression="${project.build.directory}/hsqldb"
      */
     private File outputDirectory;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        File target = new File(outputDirectory, RELATIVE_DIR);
-        clean(target);
+    /**
+     * @parameter expression="test"
+     */
+    private String dbName;
 
-        String writableUrl = String.format("jdbc:hsqldb:file:%s/%s", target.getAbsolutePath(), DB_NAME);
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        clean(outputDirectory);
+
+        String writableUrl = String.format("jdbc:hsqldb:file:%s/%s",
+            outputDirectory.getAbsolutePath(), dbName);
         executeMigrations(writableUrl);
 
-        File propfile = new File(target, DB_NAME + ".properties");
+        File propfile = new File(outputDirectory, dbName + ".properties");
         markReadOnly(propfile);
     }
 
     private void markReadOnly(File propfile) throws MojoExecutionException {
         try {
             Writer w = new FileWriter(propfile, true);
-            w.append("\nhsqldb.files_readonly=true\n");
+            w.append("hsqldb.files_readonly=true\n");
             w.close();
         } catch (IOException e) {
             throw new MojoExecutionException("Marking database read-only failed", e);
