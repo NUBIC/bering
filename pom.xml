@@ -40,13 +40,36 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-idea-plugin</artifactId>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <ideaVersion>6.x</ideaVersion>
-                    <jdkName>1.5</jdkName>
-                </configuration>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>download.bioinformatics</id>
+            <name>Northwestern University RHLCCC Bioinformatics Core</name>
+            <url>scp://download.bioinformatics.northwestern.edu/var/www/html/download/maven2</url>
+        </repository>
+    </distributionManagement>
 </project>
