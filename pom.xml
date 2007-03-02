@@ -6,9 +6,9 @@
     <groupId>edu.northwestern.bioinformatics</groupId>
     <artifactId>bering-all</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <name>Bering (with submodules)</name>
-    <url>https://svn.bioinformatics.northwestern.edu/bering</url>
+    <url>http://code.google.com/p/bering/</url>
     <description>
         Bering is a tool for database refactoring.  It was inspired by ActiveRecord migrations, a
         part of the Ruby on Rails system.
@@ -20,9 +20,9 @@
         </license>
     </licenses>
     <scm>
-        <url>https://svn.bioinformatics.northwestern.edu/bering</url>
-        <connection>scm:svn:https://svn.bioinformatics.northwestern.edu/bering/trunk</connection>
-        <developerConnection>scm:svn:https://svn.bioinformatics.northwestern.edu/bering/trunk</developerConnection>
+        <url>http://bering.googlecode.com/svn/</url>
+        <connection>scm:svn:http://bering.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://bering.googlecode.com/svn/trunk/</developerConnection>
     </scm>
     <modules>
         <module>bering</module>

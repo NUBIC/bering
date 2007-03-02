@@ -6,17 +6,17 @@
     <artifactId>bering-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>Bering Maven Mojo</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <parent>
         <artifactId>bering-all</artifactId>
         <groupId>edu.northwestern.bioinformatics</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.5-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
             <artifactId>bering</artifactId>
-            <groupId>edu.northwestern.bioinformatics</groupId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>${groupId}</groupId>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
