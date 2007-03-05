@@ -4,11 +4,11 @@
     <artifactId>bering-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>Bering Maven Mojo</name>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
     <parent>
         <artifactId>bering-all</artifactId>
         <groupId>edu.northwestern.bioinformatics</groupId>
-        <version>0.5</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
