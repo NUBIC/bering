@@ -62,6 +62,13 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <tagBase>https://bering.googlecode.com/svn/tags/releases</tagBase>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
