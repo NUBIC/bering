@@ -12,10 +12,16 @@ import java.io.File;
  * @author Moses Hohman
  */
 public class MigrateTask extends JDBCTask {
-    private MigrateTaskHelper helper = new MigrateTaskHelper(new TaskHelperCallbacks());
+    private MigrateTaskHelper helper;
 
     public MigrateTask() {
+        helper = new MigrateTaskHelper(createHelperCallbacks());
         setMigrationsDir("db/migrate");
+    }
+
+    // package-level for testing
+    TaskHelperCallbacks createHelperCallbacks() {
+        return new TaskHelperCallbacks();
     }
 
     @Override
@@ -57,13 +63,13 @@ public class MigrateTask extends JDBCTask {
         }
     }
 
-    private class TaskHelperCallbacks implements MigrateTaskHelper.HelperCallbacks {
+    class TaskHelperCallbacks implements MigrateTaskHelper.HelperCallbacks {
         public Connection getConnection() {
             return MigrateTask.this.getConnection();
         }
 
         public File resolve(File f) {
-            return new File(getProject().getBaseDir(), f.getName());
+            return new File(getProject().getBaseDir(), f.getPath());
         }
     }
 }
