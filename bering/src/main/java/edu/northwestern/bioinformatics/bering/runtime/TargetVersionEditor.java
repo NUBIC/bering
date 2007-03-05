@@ -15,9 +15,10 @@ import java.beans.PropertyEditorSupport;
 public class TargetVersionEditor extends PropertyEditorSupport {
     private Integer[] value = new Integer[2];
 
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         int separatorIndex = findSeparator(text);
-        if (text.length() == 0) {
+        if (text == null || text.length() == 0) {
             value[0] = null;
             value[1] = null;
         } else if (separatorIndex >= 0) {
@@ -30,11 +31,13 @@ public class TargetVersionEditor extends PropertyEditorSupport {
     }
 
     private int findSeparator(String text) {
+        if (text == null) return -2;
         int pipeSep = text.indexOf('|');
         if (pipeSep >= 0) return pipeSep;
         return text.indexOf('-');
     }
 
+    @Override
     public Object getValue() {
         return value;
     }

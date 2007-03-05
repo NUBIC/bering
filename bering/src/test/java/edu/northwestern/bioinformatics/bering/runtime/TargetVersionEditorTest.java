@@ -41,6 +41,13 @@ public class TargetVersionEditorTest extends TestCase {
         assertNull("0 not null", value[0]);
         assertNull("1 not null", value[1]);
     }
+    
+    public void testSetAsTextNull() throws Exception {
+        editor.setAsText(null);
+        Integer[] value = assertValidValue();
+        assertNull("0 not null", value[0]);
+        assertNull("1 not null", value[1]);
+    }
 
     private Integer[] assertValidValue() {
         Object valueObj = editor.getValue();
