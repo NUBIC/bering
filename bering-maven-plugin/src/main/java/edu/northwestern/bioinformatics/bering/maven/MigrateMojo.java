@@ -47,7 +47,7 @@ public class MigrateMojo extends AbstractMojo {
      * release number will be used).  If not specified, will migrate to the the most recent
      * release and script.
      *
-     * @parameter
+     * @parameter expression="${migrate.version}"
      */
     private String targetVersion;
 
