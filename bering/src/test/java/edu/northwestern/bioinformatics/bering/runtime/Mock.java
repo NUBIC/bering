@@ -4,7 +4,7 @@ import edu.northwestern.bioinformatics.bering.IrreversibleMigration;
 import edu.northwestern.bioinformatics.bering.Adapter;
 
 /**
- * @author rsutphin
+ * @author Rhett Sutphin
  */
 public class Mock {
     public static final class Script extends edu.northwestern.bioinformatics.bering.runtime.Script {
@@ -17,18 +17,22 @@ public class Mock {
             this.number = number;
         }
 
+        @Override
         public Class<? extends Migration> loadClass() {
             return Mock.Script.Migration.class;
         }
 
+        @Override
         public edu.northwestern.bioinformatics.bering.Migration createMigrationInstance(Adapter adapter) {
             return new Mock.Script.Migration();
         }
 
+        @Override
         public String getName() {
             return "mock";
         }
 
+        @Override
         public Integer getNumber() {
             return number;
         }
@@ -42,10 +46,12 @@ public class Mock {
         }
 
         private class Migration extends edu.northwestern.bioinformatics.bering.Migration {
+            @Override
             public void up() {
                 upCalled = true;
             }
 
+            @Override
             public void down() throws IrreversibleMigration {
                 downCalled = true;
             }
@@ -61,6 +67,7 @@ public class Mock {
             addScripts(scriptNumbers);
         }
 
+        @Override
         public Integer getNumber() {
             return number;
         }
