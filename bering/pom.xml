@@ -12,11 +12,6 @@
         <groupId>edu.northwestern.bioinformatics</groupId>
         <version>0.5-SNAPSHOT</version>
     </parent>
-    <url>https://svn.bioinformatics.northwestern.edu/bering</url>
-    <description>
-        Bering is a tool for database refactoring.  It was inspired by ActiveRecord migrations, a
-        part of the Ruby on Rails system.
-    </description>
     <licenses>
         <license>
             <name>LGPL</name>
@@ -24,11 +19,10 @@
         </license>
     </licenses>
     <scm>
-        <url>https://svn.bioinformatics.northwestern.edu/bering/trunk/bering</url>
-        <connection>scm:svn:https://svn.bioinformatics.northwestern.edu/bering/trunk/bering</connection>
-        <developerConnection>scm:svn:https://svn.bioinformatics.northwestern.edu/bering/trunk/bering</developerConnection>
+        <url>http://bering.googlecode.com/svn/</url>
+        <connection>scm:svn:http://bering.googlecode.com/svn/trunk/bering</connection>
+        <developerConnection>scm:svn:https://bering.googlecode.com/svn/trunk/bering</developerConnection>
     </scm>
-    <ciManagement></ciManagement>
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -99,6 +93,16 @@
                 <!-- current version (2.2) results in NoClassDefFoundError when
                     loading cglib from easymock -->
                 <version>2.1.3</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/bin.xml</descriptor>
+                    </descriptors>
+                    <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
             </plugin>
         </plugins>
     </build>
