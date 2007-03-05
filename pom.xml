@@ -1,12 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.northwestern.bioinformatics</groupId>
     <artifactId>bering-all</artifactId>
     <packaging>pom</packaging>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <name>Bering (with submodules)</name>
     <url>http://code.google.com/p/bering/</url>
     <description>
@@ -20,9 +17,9 @@
         </license>
     </licenses>
     <scm>
-        <url>http://bering.googlecode.com/svn/</url>
-        <connection>scm:svn:http://bering.googlecode.com/svn/trunk/</connection>
-        <developerConnection>scm:svn:https://bering.googlecode.com/svn/trunk/</developerConnection>
+        <url>https://bering.googlecode.com/svn/tags/releases/0.5</url>
+        <connection>scm:svn:https://bering.googlecode.com/svn/tags/releases/0.5</connection>
+        <developerConnection>scm:svn:https://bering.googlecode.com/svn/tags/releases/0.5</developerConnection>
     </scm>
     <modules>
         <module>bering</module>
