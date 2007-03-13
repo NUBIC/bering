@@ -1,3 +1,9 @@
+0.6
+===
+* Maven plugin can be provided connection configuration using a class which
+  implements DataSourceProvider.  (This is an alternative to plain JDBC 
+  properties.)
+
 0.5
 ===
 * Initial release.  Includes support for PostgreSQL, Oracle, and HSQLDB.

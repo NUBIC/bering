@@ -10,20 +10,23 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
+
 /**
  * @author Rhett Sutphin
  */
 class MojoCallbacks implements MigrateTaskHelper.HelperCallbacks {
     private File basedir;
-    private String driver, url, username, password;
-    private SingleConnectionDataSource ds;
+    private DataSource ds;
 
     public MojoCallbacks(File basedir, String driver, String url, String username, String password) {
         this.basedir = basedir;
-        this.driver = driver;
-        this.url = url;
-        this.username = username;
-        this.password = password;
+        this.ds = new SingleConnectionDataSource(driver, url, username, password, true);
+    }
+
+    public MojoCallbacks(File basedir, DataSource ds) {
+        this.basedir = basedir;
+        this.ds = ds;
     }
 
     public Connection getConnection() {
@@ -39,8 +42,8 @@ class MojoCallbacks implements MigrateTaskHelper.HelperCallbacks {
         return new JdbcTemplate(getDataSource());
     }
 
-    private SingleConnectionDataSource getDataSource() {
-        if (ds == null) ds = new SingleConnectionDataSource(driver, url, username, password, true);
+    // Package-level for testing
+    DataSource getDataSource() {
         return ds;
     }
 

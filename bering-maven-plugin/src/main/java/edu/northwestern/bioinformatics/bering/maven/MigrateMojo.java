@@ -4,15 +4,20 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
 import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
+import edu.northwestern.bioinformatics.bering.DataSourceProvider;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.io.File;
 
 /**
  * Executes any outstanding migrations for the configured database.
+ * <p>
+ *
  *
  * @author Rhett Sutphin
  * @goal migrate
@@ -56,15 +61,22 @@ public class MigrateMojo extends AbstractMojo {
      */
 
     /**
+     * Classname for a class implementing <code>edu.northwestern.bioinformatics.bering.DataSourceProvider</code>.
+     * This class must have a public default constructor and be self-configuring.  If this parameter
+     * is provided, the JDBC connection parameters will be ignored.
+     *
+     * @parameter
+     */
+    private String dataSourceProvider;
+
+    /**
      * JDBC URL to use
-     * @required
      * @parameter
      */
     private String url;
 
     /**
      * Classname for JDBC driver
-     * @required
      * @parameter
      */
     private String driver;
@@ -81,10 +93,41 @@ public class MigrateMojo extends AbstractMojo {
      */
     private String password;
 
+    private DataSource createDataSource() throws MojoExecutionException {
+        if (dataSourceProvider != null) {
+            return getDataSourceFromProvider();
+        } else {
+            return new SingleConnectionDataSource(driver, url, username, password, true);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private DataSource getDataSourceFromProvider() throws MojoExecutionException {
+        Class<DataSourceProvider> clazz;
+        try {
+            clazz = (Class<DataSourceProvider>) Class.forName(dataSourceProvider);
+        } catch (ClassNotFoundException e) {
+            throw new MojoExecutionException("Could not find " + dataSourceProvider, e);
+        }
+
+        DataSourceProvider provider;
+        try {
+            provider = clazz.newInstance();
+        } catch (InstantiationException e) {
+            throw new MojoExecutionException("Could not instantiate " + clazz.getName()
+                + "; does it have a public default constructor?", e);
+        } catch (IllegalAccessException e) {
+            throw new MojoExecutionException("Could not instantiate " + clazz.getName()
+                + "; does it have a public default constructor?", e);
+        }
+
+        return provider.getDataSource();
+    }
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            MojoCallbacks callbacks = new MojoCallbacks(basedir, driver, url, username, password);
-            MigrateTaskHelper helper = new MigrateTaskHelper(callbacks);
+            MojoCallbacks callbacks = new MojoCallbacks(basedir, createDataSource());
+            MigrateTaskHelper helper = createHelper(callbacks);
             helper.setMigrationsDir(migrationsDir);
             helper.setTargetVersion(targetVersion);
             helper.setDialectName(dialect);
@@ -92,5 +135,83 @@ public class MigrateMojo extends AbstractMojo {
         } catch (BeringTaskException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
+    }
+
+    MigrateTaskHelper createHelper(MojoCallbacks callbacks) {
+        return new MigrateTaskHelper(callbacks);
+    }
+
+    ////// BEAN ACCESSORS (for testing)
+
+    public String getDialect() {
+        return dialect;
+    }
+
+    public void setDialect(String dialect) {
+        this.dialect = dialect;
+    }
+
+    public String getMigrationsDir() {
+        return migrationsDir;
+    }
+
+    public void setMigrationsDir(String migrationsDir) {
+        this.migrationsDir = migrationsDir;
+    }
+
+    public File getBasedir() {
+        return basedir;
+    }
+
+    public void setBasedir(File basedir) {
+        this.basedir = basedir;
+    }
+
+    public String getTargetVersion() {
+        return targetVersion;
+    }
+
+    public void setTargetVersion(String targetVersion) {
+        this.targetVersion = targetVersion;
+    }
+
+    public String getDataSourceProvider() {
+        return dataSourceProvider;
+    }
+
+    public void setDataSourceProvider(String dataSourceProvider) {
+        this.dataSourceProvider = dataSourceProvider;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
