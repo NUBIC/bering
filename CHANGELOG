@@ -3,6 +3,8 @@
 * Maven plugin can be provided connection configuration using a class which
   implements DataSourceProvider.  (This is an alternative to plain JDBC 
   properties.)
+* Dialect parameter no longer required.  If not provided, Bering will try to
+  guess which of its built-in dialects to use.
 
 0.5
 ===

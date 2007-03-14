@@ -3,6 +3,7 @@ package edu.northwestern.bioinformatics.bering.runtime;
 import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
 import edu.northwestern.bioinformatics.bering.Main;
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
+import edu.northwestern.bioinformatics.bering.dialect.DialectFactory;
 
 import java.beans.PropertyEditor;
 import java.io.File;
@@ -42,18 +43,8 @@ public class MigrateTaskHelper {
     // package-level for testing
     Dialect createDialect() {
         String d = getDialectName();
-        if (d != null) d = d.trim();
-        try {
-            return (Dialect) Class.forName(d).newInstance();
-        } catch (InstantiationException e) {
-            throw new BeringTaskException("Could not create an instance of dialect " + d, e);
-        } catch (IllegalAccessException e) {
-            throw new BeringTaskException("Could not create an instance of dialect " + d, e);
-        } catch (ClassNotFoundException e) {
-            throw new BeringTaskException("Could not find dialect class " + d, e);
-        } catch (ClassCastException e) {
-            throw new BeringTaskException("Class " + d + " does not implement " + Dialect.class.getName(), e);
-        }
+        if (d == null) return null;
+        return DialectFactory.buildDialect(d);
     }
 
     private File createMigrationDirectory() {

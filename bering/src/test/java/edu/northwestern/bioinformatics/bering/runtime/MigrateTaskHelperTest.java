@@ -16,24 +16,9 @@ import java.io.IOException;
 public class MigrateTaskHelperTest extends BeringTestCase {
     private MigrateTaskHelper helper = new MigrateTaskHelper(new StubCallbacks());
 
-    public void testInvalidDialect() throws Exception {
-        helper.setDialectName("this is not a class");
-        try {
-            helper.createDialect();
-            fail("Exception not thrown");
-        } catch (BeringTaskException e) {
-            assertEquals("Could not find dialect class this is not a class", e.getMessage());
-        }
-    }
-
-    public void testNonDialectDialect() throws Exception {
-        helper.setDialectName(String.class.getName());
-        try {
-            helper.createDialect();
-            fail("Exception not thrown");
-        } catch (BeringTaskException e) {
-            assertEquals("Class java.lang.String does not implement " + Dialect.class.getName(), e.getMessage());
-        }
+    public void testNoExceptionForNullDialectName() throws Exception {
+        helper.setDialectName(null);
+        assertNull("No dialect name => no dialect (delegate to DatabaseAdapter's sniffer)", helper.createDialect());
     }
 
     public void testWhitespaceStrippedFromDialect() throws Exception {

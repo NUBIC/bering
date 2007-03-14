@@ -2,6 +2,9 @@ package edu.northwestern.bioinformatics.bering;
 
 import static edu.northwestern.bioinformatics.bering.DatabaseAdapter.VERSION_TABLE_NAME;
 import edu.northwestern.bioinformatics.bering.dialect.Hsqldb;
+import edu.northwestern.bioinformatics.bering.dialect.Dialect;
+import edu.northwestern.bioinformatics.bering.dialect.PostgreSQL;
+import edu.northwestern.bioinformatics.bering.dialect.Oracle;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 import junit.framework.TestCase;
 
@@ -12,11 +15,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.sql.DatabaseMetaData;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.easymock.classextension.EasyMock;
 
 /**
  * @author rsutphin
@@ -24,7 +30,7 @@ import java.util.Map;
 public class DatabaseAdapterTest extends TestCase {
     private static final String TABLE_NAME = "books";
 
-    private Adapter adapter;
+    private DatabaseAdapter adapter;
     private Connection conn;
     private Statement stmt;
 
@@ -159,7 +165,6 @@ public class DatabaseAdapterTest extends TestCase {
             fail("Exception not thrown");
         } catch (SQLException e) {
             // expected
-            e.printStackTrace();
         }
     }
 
@@ -248,6 +253,11 @@ public class DatabaseAdapterTest extends TestCase {
             any = true;
         }
         assertTrue("Malformed test -- expected rows in " + TABLE_NAME, any);
+    }
+
+    public void testDialectGuessedIfNull() throws Exception {
+        DatabaseAdapter newAdapter = new DatabaseAdapter(conn, null);
+        assertEquals(Hsqldb.class, newAdapter.getDialect().getClass());
     }
 
     private void assertTablePresent(String tableName) throws SQLException {

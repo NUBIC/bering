@@ -25,9 +25,9 @@ import java.io.File;
 public class MigrateMojo extends AbstractMojo {
     /**
      * The Bering dialect to use.  Must be the name of a class which implements
-     * <code>edu.northwestern.bioinformatics.bering.dialect.Dialect</code>.
+     * <code>edu.northwestern.bioinformatics.bering.dialect.Dialect</code>.  If not provided,
+     * Bering will guess based on the database it connects to.
      *
-     * @required
      * @parameter
      */
     private String dialect;
@@ -55,10 +55,6 @@ public class MigrateMojo extends AbstractMojo {
      * @parameter expression="${migrate.version}"
      */
     private String targetVersion;
-
-    /* TODO: there's probably a base class to be extracted from these parameters
-     *  + getConnection
-     */
 
     /**
      * Classname for a class implementing <code>edu.northwestern.bioinformatics.bering.DataSourceProvider</code>.

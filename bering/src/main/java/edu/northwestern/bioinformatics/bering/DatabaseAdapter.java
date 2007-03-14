@@ -1,6 +1,7 @@
 package edu.northwestern.bioinformatics.bering;
 
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
+import edu.northwestern.bioinformatics.bering.dialect.DialectFactory;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
 import java.util.List;
 
 /**
@@ -46,7 +48,15 @@ public class DatabaseAdapter implements Adapter {
         this.connection = connection;
         this.dataSource = new SingleConnectionDataSource(connection, true);
         this.jdbc = new JdbcTemplate(dataSource);
-        this.dialect = dialect;
+        this.dialect = dialect == null ? guessDialect() : dialect;
+    }
+
+    private Dialect guessDialect() {
+        return (Dialect) jdbc.execute(new ConnectionCallback() {
+            public Object doInConnection(Connection connection) throws SQLException, DataAccessException {
+                return DialectFactory.guessDialect(connection.getMetaData().getDatabaseProductName());
+            }
+        });
     }
 
     public void close() {
@@ -84,43 +94,43 @@ public class DatabaseAdapter implements Adapter {
     }
 
     public void createTable(TableDefinition def) {
-        execute(dialect.createTable(def));
+        execute(getDialect().createTable(def));
     }
 
     public void renameTable(String tableName, String newName, boolean hasPrimaryKey) {
-        execute(dialect.renameTable(tableName, newName, hasPrimaryKey));
+        execute(getDialect().renameTable(tableName, newName, hasPrimaryKey));
     }
 
     public void dropTable(String name, boolean hasPrimaryKey) {
-        execute(dialect.dropTable(name, hasPrimaryKey));
+        execute(getDialect().dropTable(name, hasPrimaryKey));
     }
 
     public void addColumn(String tableName, Column column) {
-        execute(dialect.addColumn(tableName, column));
+        execute(getDialect().addColumn(tableName, column));
     }
 
     public void dropColumn(String tableName, String columnName) {
-        execute(dialect.dropColumn(tableName, columnName));
+        execute(getDialect().dropColumn(tableName, columnName));
     }
 
     public void renameColumn(String tableName, String columnName, String newColumnName) {
-        execute(dialect.renameColumn(tableName, columnName, newColumnName));
+        execute(getDialect().renameColumn(tableName, columnName, newColumnName));
     }
 
     public void setDefaultValue(String tableName, String columnName, String newDefault) {
-        execute(dialect.setDefaultValue(tableName, columnName, newDefault));
+        execute(getDialect().setDefaultValue(tableName, columnName, newDefault));
     }
 
     public void setNullable(String tableName, String columnName, boolean nullable) {
-        execute(dialect.setNullable(tableName, columnName, nullable));
+        execute(getDialect().setNullable(tableName, columnName, nullable));
     }
 
     public void execute(String sql) {
-        execute(dialect.separateStatements(sql));
+        execute(getDialect().separateStatements(sql));
     }
 
     public void insert(String tableName, List<String> columnNames, List<Object> values, boolean hasPrimaryKey) {
-        execute(dialect.insert(tableName, columnNames, values, hasPrimaryKey));
+        execute(getDialect().insert(tableName, columnNames, values, hasPrimaryKey));
     }
 
     private void execute(final List<String> statements) {
@@ -137,7 +147,11 @@ public class DatabaseAdapter implements Adapter {
     }
 
     public String getDatabaseName() {
-        return dialect.getDialectName();
+        return getDialect().getDialectName();
+    }
+
+    Dialect getDialect() {
+        return dialect;
     }
 
     public Version loadVersions() {
