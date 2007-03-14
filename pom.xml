@@ -25,6 +25,9 @@
         <module>bering</module>
         <module>bering-maven-plugin</module> 
     </modules>
+    <properties>
+        <spring.version>2.0.3</spring.version>
+    </properties>
     <build>
         <plugins>
             <plugin>

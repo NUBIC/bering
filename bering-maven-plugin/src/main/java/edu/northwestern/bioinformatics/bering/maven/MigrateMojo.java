@@ -5,6 +5,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
 import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
 import edu.northwestern.bioinformatics.bering.DataSourceProvider;
@@ -13,6 +15,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.io.File;
+import java.util.Properties;
 
 /**
  * Executes any outstanding migrations for the configured database.
@@ -58,12 +61,20 @@ public class MigrateMojo extends AbstractMojo {
 
     /**
      * Classname for a class implementing <code>edu.northwestern.bioinformatics.bering.DataSourceProvider</code>.
-     * This class must have a public default constructor and be self-configuring.  If this parameter
+     * This class must have a public default constructor.  If this parameter
      * is provided, the JDBC connection parameters will be ignored.
      *
      * @parameter
      */
     private String dataSourceProvider;
+
+    /**
+     * Properties to apply to the dataSourceProvider after construction.  The dataSourceProvider
+     * class must provide bean-style setters for all the properties given in this parameter.
+     *
+     * @parameter
+     */
+    private Properties dataSourceProviderProperties;
 
     /**
      * JDBC URL to use
@@ -117,6 +128,15 @@ public class MigrateMojo extends AbstractMojo {
                 + "; does it have a public default constructor?", e);
         }
 
+        Properties props = getDataSourceProviderProperties();
+        if (props != null) {
+            BeanWrapper wrapper = new BeanWrapperImpl(provider);
+            for (Object o : props.keySet()) {
+                String propName = (String) o;
+                wrapper.setPropertyValue(propName, props.get(propName));
+            }
+        }
+
         return provider.getDataSource();
     }
 
@@ -133,7 +153,7 @@ public class MigrateMojo extends AbstractMojo {
         }
     }
 
-    MigrateTaskHelper createHelper(MojoCallbacks callbacks) {
+    protected MigrateTaskHelper createHelper(MojoCallbacks callbacks) {
         return new MigrateTaskHelper(callbacks);
     }
 
@@ -209,5 +229,13 @@ public class MigrateMojo extends AbstractMojo {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Properties getDataSourceProviderProperties() {
+        return dataSourceProviderProperties;
+    }
+
+    public void setDataSourceProviderProperties(Properties properties) {
+        this.dataSourceProviderProperties = properties;
     }
 }

@@ -5,11 +5,13 @@ import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
 import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.*;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * @author Rhett Sutphin
@@ -20,12 +22,14 @@ public class MigrateMojoTest extends TestCase {
     private static final String USERNAME = "joe";
     private static final String PASSWORD = "zammen";
 
+    private TestableMojo mojo;
     private MigrateTaskHelper helper;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         helper = createMock(MigrateTaskHelper.class);
+        mojo = new TestableMojo();
     }
 
     private void expectExecute() {
@@ -38,23 +42,22 @@ public class MigrateMojoTest extends TestCase {
     }
 
     public void testDataSourceProviderUsedIfSet() throws Exception {
-        MigrateMojo m = new MigrateMojo() {
-            @Override MigrateTaskHelper createHelper(MojoCallbacks callbacks) {
+        mojo.setVerifier(new CallbackVerifier() {
+            public void verify(MojoCallbacks callbacks) {
                 assertEquals("Wrong data source type", StubDataSource.class, callbacks.getDataSource().getClass());
-                return helper;
             }
-        };
+        });
 
-        m.setDataSourceProvider(TestDataSourceProvider.class.getName());
+        mojo.setDataSourceProvider(TestDataSourceProvider.class.getName());
 
         expectExecute();
-        m.execute();
+        mojo.execute();
         verify(helper);
     }
     
     public void testJdbcPropsUsedIfDataSourceProviderNotSet() throws Exception {
-        MigrateMojo m = new MigrateMojo() {
-            @Override MigrateTaskHelper createHelper(MojoCallbacks callbacks) {
+        mojo.setVerifier(new CallbackVerifier() {
+            public void verify(MojoCallbacks callbacks) {
                 assertEquals("Wrong dataSource type", SingleConnectionDataSource.class,
                     callbacks.getDataSource().getClass());
                 SingleConnectionDataSource actual = (SingleConnectionDataSource) callbacks.getDataSource();
@@ -62,28 +65,104 @@ public class MigrateMojoTest extends TestCase {
                 assertEquals("Wrong driver", DRIVER_CLASS_NAME, actual.getDriverClassName());
                 assertEquals("Wrong username", USERNAME, actual.getUsername());
                 assertEquals("Wrong password", PASSWORD, actual.getPassword());
-                return helper;
             }
-        };
+        });
 
-        m.setDataSourceProvider(null);
-        m.setUrl(URL);
-        m.setDriver(DRIVER_CLASS_NAME);
-        m.setUsername(USERNAME);
-        m.setPassword(PASSWORD);
+        mojo.setDataSourceProvider(null);
+        mojo.setUrl(URL);
+        mojo.setDriver(DRIVER_CLASS_NAME);
+        mojo.setUsername(USERNAME);
+        mojo.setPassword(PASSWORD);
 
         expectExecute();
-        m.execute();
+        mojo.execute();
         verify(helper);
     }
 
+    public void testDataSourceProviderReceivesProperties() throws Exception {
+        final String expectedName = "special";
+        final Integer expectedSerial = 145;
+
+        Properties props = new Properties();
+        props.setProperty("name", expectedName);
+        props.setProperty("serial", expectedSerial.toString());
+        mojo.setDataSourceProviderProperties(props);
+        mojo.setDataSourceProvider(TestDataSourceProvider.class.getName());
+
+        mojo.setVerifier(new CallbackVerifier() {
+            public void verify(MojoCallbacks callbacks) {
+                assertEquals("Wrong data source type", StubDataSource.class, callbacks.getDataSource().getClass());
+                StubDataSource actual = ((StubDataSource) callbacks.getDataSource());
+                assertEquals("String property not set on data source", expectedName, actual.getName());
+                assertEquals("Integer property not set on data source", expectedSerial, actual.getSerial());
+            }
+        });
+
+        expectExecute();
+        mojo.execute();
+        verify(helper);
+    }
+
+    private class TestableMojo extends MigrateMojo {
+        private CallbackVerifier verifier;
+
+        @Override
+        protected MigrateTaskHelper createHelper(MojoCallbacks callbacks) {
+            if (verifier != null) verifier.verify(callbacks);
+            return helper;
+        }
+
+        public void setVerifier(CallbackVerifier verifier) {
+            this.verifier = verifier;
+        }
+    }
+
+    private static interface CallbackVerifier {
+        void verify(MojoCallbacks callbacks);
+    }
+
     public static class TestDataSourceProvider implements DataSourceProvider {
+        private String name;
+        private Integer serial;
+
         public DataSource getDataSource() {
-            return new StubDataSource();
+            return new StubDataSource(name, serial);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Integer getSerial() {
+            return serial;
+        }
+
+        public void setSerial(Integer serial) {
+            this.serial = serial;
         }
     }
 
     public static class StubDataSource implements DataSource {
+        private String name;
+        private Integer serial;
+
+        public StubDataSource(String s, Integer serial) {
+            this.name = s;
+            this.serial = serial;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Integer getSerial() {
+            return serial;
+        }
+
         public Connection getConnection() throws SQLException {
             throw new UnsupportedOperationException("getConnection not implemented");
         }
