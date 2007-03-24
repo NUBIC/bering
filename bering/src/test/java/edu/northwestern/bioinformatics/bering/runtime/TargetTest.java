@@ -1,6 +1,7 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
+import edu.northwestern.bioinformatics.bering.runtime.filesystem.FilesystemMigrationFinder;
 
 /**
  * @author rsutphin
@@ -10,7 +11,7 @@ public class TargetTest extends BeringTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        finder = new MigrationFinder(getClassRelativeFile(getClass(), "../test_db"));
+        finder = new FilesystemMigrationFinder(getClassRelativeFile(getClass(), "../test_db"));
     }
 
     public void testConcreteCreate() throws Exception {

@@ -1,18 +1,21 @@
-package edu.northwestern.bioinformatics.bering.runtime;
+package edu.northwestern.bioinformatics.bering.runtime.filesystem;
 
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
+import edu.northwestern.bioinformatics.bering.runtime.filesystem.FilesystemMigrationFinder;
+import edu.northwestern.bioinformatics.bering.runtime.MigrationFinder;
 
 /**
  * @author rsutphin
  */
-public class MigrationFinderTest extends BeringTestCase {
-    private static final String ROOT = "../test_db";
+public class FilesystemMigrationFinderTest extends BeringTestCase {
+    private static final String ROOT = "../../test_db";
 
     private MigrationFinder finder;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
-        finder = new MigrationFinder(getClassRelativeFile(getClass(), ROOT));
+        finder = new FilesystemMigrationFinder(getClassRelativeFile(getClass(), ROOT));
     }
 
     public void testAllReleasesPresent() throws Exception {

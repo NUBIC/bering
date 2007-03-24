@@ -1,9 +1,10 @@
 package edu.northwestern.bioinformatics.bering;
 
-import edu.northwestern.bioinformatics.bering.runtime.MigrationFinder;
+import edu.northwestern.bioinformatics.bering.runtime.filesystem.FilesystemMigrationFinder;
 import edu.northwestern.bioinformatics.bering.runtime.Version;
 import edu.northwestern.bioinformatics.bering.runtime.Target;
 import edu.northwestern.bioinformatics.bering.runtime.Migrator;
+import edu.northwestern.bioinformatics.bering.runtime.MigrationFinder;
 
 import java.io.File;
 
@@ -25,7 +26,7 @@ public class Main {
      */
     public void migrate(Integer targetReleaseNumber, Integer targetMigrationNumber) {
         // load migration scripts
-        MigrationFinder finder = new MigrationFinder(new File(rootDir));
+        MigrationFinder finder = new FilesystemMigrationFinder(new File(rootDir));
 
         // validate release/migration combination
         Target target = Target.create(finder, targetReleaseNumber, targetMigrationNumber);

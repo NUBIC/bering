@@ -1,7 +1,7 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
-import edu.northwestern.bioinformatics.bering.IrreversibleMigration;
 import edu.northwestern.bioinformatics.bering.Adapter;
+import edu.northwestern.bioinformatics.bering.IrreversibleMigration;
 
 /**
  * @author Rhett Sutphin
@@ -13,7 +13,7 @@ public class Mock {
         private boolean downCalled;
 
         public Script(Release release, Integer number) {
-            super(null, release);
+            super(null, null, release);
             this.number = number;
         }
 
@@ -72,20 +72,18 @@ public class Mock {
             return number;
         }
 
-        public void addScripts(int... scriptNumber) {
+        private void addScripts(int[] scriptNumber) {
             for (int n : scriptNumber) {
                 addScript(new Script(this, n));
             }
         }
     }
 
-    public static final class Finder extends MigrationFinder {
-        public Finder() {
-            super(null);
-        }
-
+    public static final class Finder extends AbstractMigrationFinder {
         public void addRelease(int number, int... scriptNumbers) {
             super.addRelease(new Release(number, scriptNumbers));
         }
     }
+
+    private Mock() { }
 }

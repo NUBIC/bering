@@ -1,12 +1,7 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
-import edu.northwestern.bioinformatics.bering.runtime.MigrationFinder;
-import edu.northwestern.bioinformatics.bering.runtime.Release;
-import edu.northwestern.bioinformatics.bering.runtime.MigrationLoadingException;
-import edu.northwestern.bioinformatics.bering.runtime.Script;
-
 /**
- * @author rsutphin
+ * @author Rhett Sutphin
  */
 public class Target {
     private int releaseNumber, migrationNumber;

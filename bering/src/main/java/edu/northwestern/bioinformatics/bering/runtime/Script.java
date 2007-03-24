@@ -1,19 +1,17 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
-import edu.northwestern.bioinformatics.bering.Migration;
 import edu.northwestern.bioinformatics.bering.Adapter;
+import edu.northwestern.bioinformatics.bering.Migration;
 import groovy.lang.GroovyClassLoader;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Rhett Sutphin
  * @author Moses Hohman
  */
-public class Script extends MigrationFile {
+public class Script extends MigrationElement {
+    private String scriptText;
     private Release release;
 
     private static GroovyClassLoader loader;
@@ -22,12 +20,17 @@ public class Script extends MigrationFile {
         loader = new GroovyClassLoader(Script.class.getClassLoader(), compilerConfiguration);
     }
 
-    public Script(File file, Release release) {
-        super(file);
+    public Script(String scriptName, String scriptText, Release release) {
+        super(scriptName);
         if (getName() == null) {
-            throw new IllegalArgumentException("A name is required for scripts: " + file.getPath());
+            throw new IllegalArgumentException("A name is required for scripts: " + getElementName());
         }
         this.release = release;
+        this.scriptText = scriptText;
+    }
+
+    public String getScriptText() {
+        return scriptText;
     }
 
     public String getClassName() {
@@ -40,18 +43,17 @@ public class Script extends MigrationFile {
         return clsName.toString();
     }
 
+    @SuppressWarnings("unchecked")
     public Class<? extends Migration> loadClass() {
         try {
-            Class<?> migrationClass = loader.parseClass(getFile());
+            Class<?> migrationClass = loader.parseClass(getScriptText(), getElementName());
             if (Migration.class.isAssignableFrom(migrationClass)) {
                 return (Class<? extends Migration>) migrationClass;
             } else {
-                throw new MigrationLoadingException(migrationClass.getName() + " in " + getFile() + " does not extend " + Migration.class.getName());
+                throw new MigrationLoadingException(migrationClass.getName() + " in " + getElementName() + " does not extend " + Migration.class.getName());
             }
-        } catch (IOException e) {
-            throw new MigrationLoadingException("Could not read " + getFile(), e);
         } catch (CompilationFailedException e) {
-            throw new MigrationLoadingException("Compiling " + getFile() + " failed", e);
+            throw new MigrationLoadingException("Compiling " + getElementName() + " failed", e);
         }
     }
 
@@ -85,6 +87,7 @@ public class Script extends MigrationFile {
             .toString();
     }
 
+    @Override
     public String toString() {
         return new StringBuilder()
             .append(getClass().getSimpleName()).append('[')

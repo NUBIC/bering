@@ -12,38 +12,38 @@ import java.io.File;
  * @author rsutphin
  */
 public class ScriptTest extends BeringTestCase {
-    private Script existingScript;
+    private static final String VALID_TEXT
+        = "class AddFrogs extends edu.northwestern.bioinformatics.bering.Migration {\nvoid up() { }\nvoid down() { }\n}";
+    private Script validScript;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
-        existingScript = new Script(
-            getClassRelativeFile(getClass(),
-                "../test_db/001_out_the_door/001_add_frogs.groovy"), null);
+        validScript = new Script("001_add_frogs", VALID_TEXT, null);
     }
 
     public void testNameAndIndexWithName() throws Exception {
-        assertEquals(1, (int) existingScript.getNumber());
-        assertEquals("add_frogs", existingScript.getName());
+        assertEquals(1, (int) validScript.getNumber());
+        assertEquals("add_frogs", validScript.getName());
     }
 
     public void testNameAndIndexWithoutName() throws Exception {
-        String filename = "../test_db/001/003.groovy";
         try {
-            createScript(filename);
+            new Script("003", "", null);
             fail("Exception not thrown");
         } catch (Exception e) {
-            assertEquals("A name is required for scripts: " + filename, e.getMessage());
+            assertEquals("A name is required for scripts: 003", e.getMessage());
         }
     }
 
     public void testClassName() throws Exception {
-        assertEquals("AddFrogs", existingScript.getClassName());
+        assertEquals("AddFrogs", validScript.getClassName());
     }
 
     public void testNaturalOrder() throws Exception {
-        Script s1 = createScript("001_german.groovy");
-        Script s2 = createScript("002_english.groovy");
-        Script s3 = createScript("003_french.groovy");
+        Script s1 = createScript("001_german");
+        Script s2 = createScript("002_english");
+        Script s3 = createScript("003_french");
         assertNegative(s1.compareTo(s2));
         assertNegative(s1.compareTo(s3));
         assertPositive(s2.compareTo(s1));
@@ -53,14 +53,14 @@ public class ScriptTest extends BeringTestCase {
     }
 
     public void testLoadClass() throws Exception {
-        Class<? extends Migration> loaded = existingScript.loadClass();
+        Class<? extends Migration> loaded = validScript.loadClass();
         assertNotNull(loaded);
         assertEquals("AddFrogs", loaded.getSimpleName());
         assertTrue(Migration.class.isAssignableFrom(loaded));
     }
 
     public void testCreateMigrationInstance() throws Exception {
-        Migration migration = existingScript.createMigrationInstance(null);
+        Migration migration = validScript.createMigrationInstance(null);
         assertNotNull(migration);
     }
 
@@ -82,13 +82,14 @@ public class ScriptTest extends BeringTestCase {
         private StubMigration migration = new StubMigration();
 
         public StubScript() {
-            super(new File("001_stub_script.groovy"), null);
+            super("001_stub_script", "", null);
         }
 
         public StubMigration getSingletonMigration() {
             return migration;
         }
 
+        @Override
         public Migration createMigrationInstance(Adapter adapter) {
             migration.setAdapter(adapter);
             return migration;
@@ -99,15 +100,13 @@ public class ScriptTest extends BeringTestCase {
                 return adapter;
             }
 
-            public void up() {
-            }
+            @Override public void up() { }
 
-            public void down() throws IrreversibleMigration {
-            }
+            @Override public void down() throws IrreversibleMigration { }
         }
     }
 
-    private Script createScript(String filename) {
-        return new Script(new File(filename), null);
+    private Script createScript(String elementName) {
+        return new Script(elementName, null, null);
     }
 }
