@@ -8,7 +8,7 @@ import java.util.TreeMap;
  * @author Rhett Sutphin
  */
 public class AbstractMigrationFinder implements MigrationFinder {
-    protected SortedMap<Integer, Release> releases;
+    private SortedMap<Integer, Release> releases;
 
     public AbstractMigrationFinder() {
         this.releases = new TreeMap<Integer, Release>();
