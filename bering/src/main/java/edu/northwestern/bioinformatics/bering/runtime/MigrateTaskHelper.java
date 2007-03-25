@@ -2,6 +2,7 @@ package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
 import edu.northwestern.bioinformatics.bering.Main;
+import edu.northwestern.bioinformatics.bering.runtime.filesystem.FilesystemMigrationFinder;
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
 import edu.northwestern.bioinformatics.bering.dialect.DialectFactory;
 
@@ -29,11 +30,15 @@ public class MigrateTaskHelper {
 
     public void execute() {
         Main command = new Main();
-        command.setRootDir(createMigrationDirectory().getAbsolutePath());
+        command.setFinder(new FilesystemMigrationFinder(getRootDir()));
         DatabaseAdapter adapter = createAdapter();
         command.setAdapter(adapter);
         command.migrate(getTargetRelease(), getTargetMigration());
         adapter.close();
+    }
+
+    private File getRootDir() {
+        return new File(createMigrationDirectory().getAbsolutePath());
     }
 
     private DatabaseAdapter createAdapter() {

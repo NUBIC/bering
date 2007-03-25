@@ -39,7 +39,9 @@ public class ClasspathMigrationFinder extends AbstractMigrationFinder {
     }
 
     private String createPattern() {
-        return String.format("classpath*:" + rootResourcePath + "/*/*.groovy");
+        return String.format("classpath*:%s%s/*/*.groovy",
+            rootResourcePath,
+            rootResourcePath.endsWith("/") ? "" : "/");
     }
 
 }

@@ -9,10 +9,10 @@ import edu.northwestern.bioinformatics.bering.runtime.MigrationFinder;
 import java.io.File;
 
 /**
- * @author rsutphin
+ * @author Rhett Sutphin
  */
 public class Main {
-    private String rootDir;
+    private MigrationFinder finder;
     private Adapter adapter;
 
     /**
@@ -25,9 +25,6 @@ public class Main {
      * @param targetMigrationNumber
      */
     public void migrate(Integer targetReleaseNumber, Integer targetMigrationNumber) {
-        // load migration scripts
-        MigrationFinder finder = new FilesystemMigrationFinder(new File(rootDir));
-
         // validate release/migration combination
         Target target = Target.create(finder, targetReleaseNumber, targetMigrationNumber);
 
@@ -35,17 +32,17 @@ public class Main {
         Version current = adapter.loadVersions();
 
         // walk through scripts, running ones that haven't been run, up to / down to desired release/version
-        createMigrator(finder, current, target).migrate();
+        createMigrator(current, target).migrate();
     }
 
-    protected Migrator createMigrator(MigrationFinder finder, Version current, Target target) {
+    protected Migrator createMigrator(Version current, Target target) {
         return new Migrator(adapter, finder, current, target);
     }
 
     ////// CONFIGURATION
 
-    public void setRootDir(String rootDir) {
-        this.rootDir = rootDir;
+    public void setFinder(MigrationFinder finder) {
+        this.finder = finder;
     }
 
     public void setAdapter(Adapter adapter) {
