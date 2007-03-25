@@ -8,6 +8,20 @@
         <groupId>edu.northwestern.bioinformatics</groupId>
         <version>0.6-SNAPSHOT</version>
     </parent>
+    <repositories>
+        <repository>
+            <!-- for log4j helper -->
+            <id>pyx4j.com</id>
+            <url>http://pyx4j.com/maven2</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <!-- for log4j helper -->
+            <id>pyx4j.com</id>
+            <url>http://pyx4j.com/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
         <dependency>
             <artifactId>bering</artifactId>
@@ -36,6 +50,11 @@
             <artifactId>hsqldb</artifactId>
             <version>1.8.0.7</version>
             <scope>compile</scope> <!-- needed for hsqldb goal only -->
+        </dependency>
+        <dependency>
+            <groupId>com.pyx4j</groupId>
+            <artifactId>maven-plugin-log4j</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <!-- BUILD ONLY DEPS -->

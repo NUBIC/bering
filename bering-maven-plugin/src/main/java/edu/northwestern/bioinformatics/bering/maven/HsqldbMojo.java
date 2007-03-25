@@ -22,24 +22,11 @@ import java.io.Writer;
  * @author Rhett Sutphin
  * @goal hsqldb
  */
-public class HsqldbMojo extends AbstractMojo {
-    /**
-     * @parameter expression="${project}"
-     */
-    private MavenProject project;
-
+public class HsqldbMojo extends AbstractBeringMojo {
     /**
      * @parameter expression="${basedir}"
      */
     private File basedir;
-
-    /**
-     * The base directory containing your numbered release directories.
-     *
-     * @required
-     * @parameter expression="src/main/db/migrate"
-     */
-    private String migrationsDir;
 
     /**
      * The directory in which the HSQLDB schema, etc., files will be created.
@@ -53,7 +40,8 @@ public class HsqldbMojo extends AbstractMojo {
      */
     private String dbName;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    @Override
+    protected void executeInternal() throws MojoExecutionException, MojoFailureException {
         clean(outputDirectory);
 
         String writableUrl = String.format("jdbc:hsqldb:file:%s/%s",
@@ -92,7 +80,7 @@ public class HsqldbMojo extends AbstractMojo {
         try {
             MigrateTaskHelper helper = new MigrateTaskHelper(callbacks);
             helper.setDialectName(edu.northwestern.bioinformatics.bering.dialect.Hsqldb.class.getName());
-            helper.setMigrationsDir(migrationsDir);
+            helper.setMigrationsDir(getMigrationsDir());
             helper.execute();
         } catch (BeringTaskException bte) {
             throw new MojoExecutionException("Running migrations on " + url + " failed", bte);
@@ -104,5 +92,31 @@ public class HsqldbMojo extends AbstractMojo {
         } catch (DataAccessException e) {
             throw new MojoExecutionException("Database interaction failed during shutdown", e);
         }
+    }
+
+    ////// CONFIGURATION
+
+    public File getBasedir() {
+        return basedir;
+    }
+
+    public void setBasedir(File basedir) {
+        this.basedir = basedir;
+    }
+
+    public File getOutputDirectory() {
+        return outputDirectory;
+    }
+
+    public void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 }

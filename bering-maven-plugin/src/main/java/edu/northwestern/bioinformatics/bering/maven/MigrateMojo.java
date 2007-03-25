@@ -25,7 +25,7 @@ import java.util.Properties;
  * @author Rhett Sutphin
  * @goal migrate
  */
-public class MigrateMojo extends AbstractMojo {
+public class MigrateMojo extends AbstractBeringMojo {
     /**
      * The Bering dialect to use.  Must be the name of a class which implements
      * <code>edu.northwestern.bioinformatics.bering.dialect.Dialect</code>.  If not provided,
@@ -34,14 +34,6 @@ public class MigrateMojo extends AbstractMojo {
      * @parameter
      */
     private String dialect;
-
-    /**
-     * The base directory containing your numbered release directories.
-     *
-     * @required
-     * @parameter expression="src/main/db/migrate"
-     */
-    private String migrationsDir;
 
     /**
      * For resolving relative <code>migrationsDir</code>s
@@ -140,11 +132,12 @@ public class MigrateMojo extends AbstractMojo {
         return provider.getDataSource();
     }
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    @Override
+    protected void executeInternal() throws MojoExecutionException, MojoFailureException {
         try {
             MojoCallbacks callbacks = new MojoCallbacks(basedir, createDataSource());
             MigrateTaskHelper helper = createHelper(callbacks);
-            helper.setMigrationsDir(migrationsDir);
+            helper.setMigrationsDir(getMigrationsDir());
             helper.setTargetVersion(targetVersion);
             helper.setDialectName(dialect);
             helper.execute();
@@ -165,14 +158,6 @@ public class MigrateMojo extends AbstractMojo {
 
     public void setDialect(String dialect) {
         this.dialect = dialect;
-    }
-
-    public String getMigrationsDir() {
-        return migrationsDir;
-    }
-
-    public void setMigrationsDir(String migrationsDir) {
-        this.migrationsDir = migrationsDir;
     }
 
     public File getBasedir() {
