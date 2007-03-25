@@ -23,4 +23,8 @@ public class DeployedMigratorTest extends BeringTestCase {
         assertNotNull(actual);
         assertSame(expectedDS, actual.getDataSource());
     }
+    
+    public void testDefaultResourcePath() throws Exception {
+        assertEquals(DeployedMigrator.DEFAULT_RESOURCE_PATH, migrator.getResourcePath());
+    }
 }

@@ -22,9 +22,11 @@ import edu.northwestern.bioinformatics.bering.Main;
  * @author Rhett Sutphin
  */
 public class DeployedMigrator {
+    public final static String DEFAULT_RESOURCE_PATH = "db/migrate";
+
+    private String resourcePath = DEFAULT_RESOURCE_PATH;
     private JdbcTemplate jdbcTemplate;
     private DataSource dataSource;
-    private String resourcePath;
     private Dialect dialect;
 
     public void migrate() {
