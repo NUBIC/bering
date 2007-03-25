@@ -1,0 +1,1 @@
+UPDATE frogs SET name='New name' WHERE id=9;

@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * @author Rhett Sutphin
@@ -44,11 +47,15 @@ public class ReleaseFactory {
     }
 
     private Script createScript(String scriptName, Resource resource, Release release) {
+        URL url = null;
         try {
-            String scriptText = IOUtils.toString(resource.getInputStream());
-            return new Script(scriptName, scriptText, release);
+            url = resource.getURL();
+            URI uri = url.toURI();
+            return new Script(scriptName, uri, release);
         } catch (IOException e) {
             throw new MigrationLoadingException("Could not read contents of resource " + resource, e);
+        } catch (URISyntaxException e) {
+            throw new MigrationLoadingException("Could not convert resource URL (" + url + ") to URI", e);
         }
     }
 

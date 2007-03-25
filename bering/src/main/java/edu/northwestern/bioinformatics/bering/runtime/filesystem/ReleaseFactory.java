@@ -6,6 +6,8 @@ import edu.northwestern.bioinformatics.bering.runtime.Script;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import org.apache.commons.io.FilenameUtils;
+
 /**
  * @author Rhett Sutphin
 */
@@ -19,10 +21,16 @@ final class ReleaseFactory {
     public Release create() {
         Release r = new Release(directory.getName());
         for (File scriptFile : listScripts()) {
-            Script script = new ScriptFactory(scriptFile, r).create();
-            r.addScript(script);
+            r.addScript(createScript(scriptFile, r));
         }
         return r;
+    }
+
+    private Script createScript(File scriptFile, Release release) {
+        return new Script(
+            FilenameUtils.getBaseName(scriptFile.getName()),
+            scriptFile.toURI(),
+            release);
     }
 
     private File[] listScripts() {

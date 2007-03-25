@@ -5,13 +5,19 @@ import edu.northwestern.bioinformatics.bering.Migration;
 import groovy.lang.GroovyClassLoader;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.apache.commons.io.IOUtils;
+
+import java.net.URI;
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.io.IOException;
 
 /**
  * @author Rhett Sutphin
  * @author Moses Hohman
  */
 public class Script extends MigrationElement {
-    private String scriptText;
+    private URI uri;
     private Release release;
 
     private static GroovyClassLoader loader;
@@ -20,17 +26,26 @@ public class Script extends MigrationElement {
         loader = new GroovyClassLoader(Script.class.getClassLoader(), compilerConfiguration);
     }
 
-    public Script(String scriptName, String scriptText, Release release) {
+    public Script(String scriptName, URI uri, Release release) {
         super(scriptName);
         if (getName() == null) {
-            throw new IllegalArgumentException("A name is required for scripts: " + getElementName());
+            throw new MigrationLoadingException("A name is required for scripts: " + getElementName());
         }
         this.release = release;
-        this.scriptText = scriptText;
+        this.uri = uri;
     }
 
     public String getScriptText() {
-        return scriptText;
+        URL url = null;
+        try {
+            url = getUri().toURL();
+            return IOUtils.toString(url.openStream());
+        } catch (MalformedURLException e) {
+            throw new MigrationLoadingException(
+                "Script URI is not convertable to a URL: " + getUri(), e);
+        } catch (IOException e) {
+            throw new MigrationLoadingException("Could not read script from " + url, e);
+        }
     }
 
     public String getClassName() {
@@ -57,6 +72,10 @@ public class Script extends MigrationElement {
         }
     }
 
+    public URI getUri() {
+        return uri;
+    }
+
     public Release getRelease() {
         return release;
     }
@@ -65,6 +84,7 @@ public class Script extends MigrationElement {
         try {
             Migration instance = loadClass().newInstance();
             instance.setAdapter(adapter);
+            instance.setSourceUri(getUri());
             return instance;
         } catch (InstantiationException e) {
             throw new MigrationLoadingException(e);

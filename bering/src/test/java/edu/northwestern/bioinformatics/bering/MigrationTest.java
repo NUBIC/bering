@@ -9,6 +9,7 @@ import java.util.Collections;
 import static java.util.Collections.singletonMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.net.URI;
 
 /**
  * @author rsutphin
@@ -17,10 +18,13 @@ public class MigrationTest extends BeringTestCase {
     private Adapter adapter;
     private Migration migration = new StubMigration();
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         adapter = registerMockFor(Adapter.class);
         migration.setAdapter(adapter);
+        migration.setSourceUri(new URI(getClass().getResource(
+            "test_db/001_out_the_door/001_add_frogs.groovy").toString()));
     }
 
     public void testCreatedColumnTypes() throws Exception {
@@ -170,6 +174,14 @@ public class MigrationTest extends BeringTestCase {
 
         migration.insert(Collections.singletonMap(PRIMARY_KEY_KEY, (Object) Boolean.TRUE),
             tableName, Collections.singletonMap("1", (Object) "one"));
+        verifyMocks();
+    }
+    
+    public void testExternal() throws Exception {
+        adapter.execute("UPDATE frogs SET name='New name' WHERE id=9;");
+
+        replayMocks();
+        migration.external("extra.sql");
         verifyMocks();
     }
 

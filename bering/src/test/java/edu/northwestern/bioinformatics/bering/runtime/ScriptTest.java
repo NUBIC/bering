@@ -5,8 +5,10 @@ import edu.northwestern.bioinformatics.bering.BeringTestCase;
 import edu.northwestern.bioinformatics.bering.IrreversibleMigration;
 import edu.northwestern.bioinformatics.bering.Migration;
 import org.easymock.EasyMock;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.net.URI;
 
 /**
  * @author rsutphin
@@ -15,11 +17,13 @@ public class ScriptTest extends BeringTestCase {
     private static final String VALID_TEXT
         = "class AddFrogs extends edu.northwestern.bioinformatics.bering.Migration {\nvoid up() { }\nvoid down() { }\n}";
     private Script validScript;
+    private URI validUri;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        validScript = new Script("001_add_frogs", VALID_TEXT, null);
+        validUri = getClass().getResource("../test_db/001_out_the_door/001_add_frogs.groovy").toURI();
+        validScript = new Script("001_add_frogs", validUri, null);
     }
 
     public void testNameAndIndexWithName() throws Exception {
@@ -29,11 +33,16 @@ public class ScriptTest extends BeringTestCase {
 
     public void testNameAndIndexWithoutName() throws Exception {
         try {
-            new Script("003", "", null);
+            new Script("003", null, null);
             fail("Exception not thrown");
         } catch (Exception e) {
             assertEquals("A name is required for scripts: 003", e.getMessage());
         }
+    }
+    
+    public void testGetScriptText() throws Exception {
+        String contents = IOUtils.toString(validUri.toURL().openStream());
+        assertEquals(contents, validScript.getScriptText());
     }
 
     public void testClassName() throws Exception {
@@ -82,7 +91,7 @@ public class ScriptTest extends BeringTestCase {
         private StubMigration migration = new StubMigration();
 
         public StubScript() {
-            super("001_stub_script", "", null);
+            super("001_stub_script", null, null);
         }
 
         public StubMigration getSingletonMigration() {

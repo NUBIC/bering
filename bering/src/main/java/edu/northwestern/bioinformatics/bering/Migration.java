@@ -8,12 +8,22 @@ import java.util.Map;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
+import java.net.URI;
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.io.IOException;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Moses Hohman
  * @author Rhett Sutphin
  */
 public abstract class Migration {
+    private static final Log log = LogFactory.getLog(Migration.class);
+
     public static final String NULLABLE_KEY      = "nullable";
     public static final String LIMIT_KEY         = "limit";
     public static final String PRECISION_KEY     = "precision";
@@ -33,6 +43,7 @@ public abstract class Migration {
     }
 
     protected Adapter adapter;
+    protected URI sourceUri;
 
     ////// METHODS FOR MIGRATIONS TO OVERRIDE
 
@@ -139,11 +150,40 @@ public abstract class Migration {
         adapter.execute(sql);
     }
 
+    /**
+     * Execute the contents of an external SQL script.  The path will be resolved relative to
+     * the current script.
+     *
+     * @param relativePath
+     */
+    protected void external(String relativePath) {
+        if (sourceUri == null) {
+            throw new MigrationExecutionException(
+                "Cannot resolve external resource; source URI not set. " +
+                "(You probably need to pick a different migration finder.)");
+        }
+
+        URL externalUrl = null;
+        try {
+            externalUrl = sourceUri.resolve(relativePath).toURL();
+            if (log.isDebugEnabled()) log.debug("Loading external SQL from " + externalUrl.toString());
+            String script = IOUtils.toString(externalUrl.openStream());
+            execute(script);
+        } catch (MalformedURLException e) {
+            throw new MigrationExecutionException("Resolving " + relativePath + " against "
+                + sourceUri + " failed", e);
+        } catch (IOException e) {
+            throw new MigrationExecutionException("Reading " + externalUrl + " failed", e);
+        }
+    }
+
     ////// IMPLEMENTATION METHODS
 
-    // TODO: maybe this should be moved somewhere else
-    // visible to collaborators (e.g., TableDefinition)
     public final void setAdapter(Adapter adapter) {
         this.adapter = adapter;
+    }
+
+    public final void setSourceUri(URI sourceUri) {
+        this.sourceUri = sourceUri;
     }
 }
