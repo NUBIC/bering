@@ -2,9 +2,9 @@ package edu.northwestern.bioinformatics.bering;
 
 import junit.framework.TestCase;
 
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.Types;
 
 /**
  * @author Moses Hohman

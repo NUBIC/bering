@@ -2,9 +2,7 @@ package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
 
-import java.util.Collections;
 import java.util.Arrays;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
@@ -13,6 +11,7 @@ import java.util.TreeSet;
 public class VersionTest extends BeringTestCase {
     private Version version = new Version();
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         version.updateRelease(1, 4);

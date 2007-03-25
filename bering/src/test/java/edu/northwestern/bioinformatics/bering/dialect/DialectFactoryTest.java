@@ -1,9 +1,7 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
-import static edu.northwestern.bioinformatics.bering.dialect.DialectFactory.*;
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
-import edu.northwestern.bioinformatics.bering.BeringException;
-import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
+import static edu.northwestern.bioinformatics.bering.dialect.DialectFactory.*;
 
 /**
  * @author Rhett Sutphin

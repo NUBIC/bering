@@ -1,12 +1,12 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
-import edu.northwestern.bioinformatics.bering.BeringTestCase;
 import edu.northwestern.bioinformatics.bering.Adapter;
+import edu.northwestern.bioinformatics.bering.BeringTestCase;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
 
 /**
  * @author rsutphin
@@ -15,6 +15,7 @@ public class MigratorTest extends BeringTestCase {
     private Mock.Finder finder;
     private Adapter adapter;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         finder = new Mock.Finder();

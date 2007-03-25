@@ -1,20 +1,10 @@
 package edu.northwestern.bioinformatics.bering.ant;
 
 import junit.framework.TestCase;
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.BuildLogger;
-import org.apache.tools.ant.BuildEvent;
-import org.easymock.classextension.EasyMock;
 import static org.easymock.classextension.EasyMock.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import edu.northwestern.bioinformatics.bering.dialect.AbstractDialect;
-import edu.northwestern.bioinformatics.bering.dialect.Dialect;
-import edu.northwestern.bioinformatics.bering.dialect.Oracle;
 
 /**
  * @author Moses Hohman

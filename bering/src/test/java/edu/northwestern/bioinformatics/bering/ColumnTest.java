@@ -4,8 +4,8 @@ import static edu.northwestern.bioinformatics.bering.Column.createColumn;
 import static edu.northwestern.bioinformatics.bering.Migration.*;
 
 import java.sql.Types;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Rhett Sutphin

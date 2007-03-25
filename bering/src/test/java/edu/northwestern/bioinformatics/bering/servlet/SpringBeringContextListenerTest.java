@@ -1,17 +1,11 @@
 package edu.northwestern.bioinformatics.bering.servlet;
 
-import static org.easymock.EasyMock.expect;
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContext;
-
+import static org.easymock.EasyMock.expect;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.easymock.classextension.EasyMock;
-import static org.easymock.classextension.EasyMock.*;
+
+import javax.servlet.ServletContextEvent;
 
 /**
  * @author Rhett Sutphin

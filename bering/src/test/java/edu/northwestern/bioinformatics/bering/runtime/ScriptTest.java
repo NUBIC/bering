@@ -2,20 +2,17 @@ package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.Adapter;
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
-import edu.northwestern.bioinformatics.bering.IrreversibleMigration;
 import edu.northwestern.bioinformatics.bering.Migration;
-import org.easymock.EasyMock;
+import edu.northwestern.bioinformatics.bering.StubMigration;
 import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
 
-import java.io.File;
 import java.net.URI;
 
 /**
  * @author rsutphin
  */
 public class ScriptTest extends BeringTestCase {
-    private static final String VALID_TEXT
-        = "class AddFrogs extends edu.northwestern.bioinformatics.bering.Migration {\nvoid up() { }\nvoid down() { }\n}";
     private Script validScript;
     private URI validUri;
 
@@ -102,16 +99,6 @@ public class ScriptTest extends BeringTestCase {
         public Migration createMigrationInstance(Adapter adapter) {
             migration.setAdapter(adapter);
             return migration;
-        }
-
-        private static class StubMigration extends Migration {
-            public Adapter getAdapter() {
-                return adapter;
-            }
-
-            @Override public void up() { }
-
-            @Override public void down() throws IrreversibleMigration { }
         }
     }
 

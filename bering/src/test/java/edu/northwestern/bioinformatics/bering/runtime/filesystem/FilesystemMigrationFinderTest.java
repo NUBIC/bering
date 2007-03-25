@@ -1,7 +1,6 @@
 package edu.northwestern.bioinformatics.bering.runtime.filesystem;
 
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
-import edu.northwestern.bioinformatics.bering.runtime.filesystem.FilesystemMigrationFinder;
 import edu.northwestern.bioinformatics.bering.runtime.MigrationFinder;
 
 /**

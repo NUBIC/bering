@@ -1,8 +1,8 @@
 package edu.northwestern.bioinformatics.bering.servlet;
 
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * @author Rhett Sutphin

@@ -4,11 +4,9 @@ import edu.northwestern.bioinformatics.bering.BeringTestCase;
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
 import edu.northwestern.bioinformatics.bering.dialect.Oracle;
 
-import org.apache.tools.ant.BuildException;
-
-import java.sql.Connection;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 
 /**
  * @author Rhett Sutphin

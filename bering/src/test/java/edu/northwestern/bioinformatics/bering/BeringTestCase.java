@@ -1,17 +1,14 @@
 package edu.northwestern.bioinformatics.bering;
 
 import junit.framework.TestCase;
+import org.easymock.classextension.EasyMock;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URISyntaxException;
 import java.net.URI;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.LinkedList;
-
-import org.easymock.classextension.EasyMock;
+import java.util.List;
 
 /**
  * @author rsutphin

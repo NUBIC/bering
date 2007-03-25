@@ -9,6 +9,7 @@ import edu.northwestern.bioinformatics.bering.runtime.filesystem.FilesystemMigra
 public class TargetTest extends BeringTestCase {
     private MigrationFinder finder;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         finder = new FilesystemMigrationFinder(getClassRelativeFile(getClass(), "../test_db"));

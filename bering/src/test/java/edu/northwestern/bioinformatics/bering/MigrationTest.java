@@ -3,13 +3,13 @@ package edu.northwestern.bioinformatics.bering;
 import static edu.northwestern.bioinformatics.bering.Migration.PRIMARY_KEY_KEY;
 import org.easymock.classextension.EasyMock;
 
+import java.net.URI;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.Collections;
 import static java.util.Collections.singletonMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.net.URI;
 
 /**
  * @author rsutphin
