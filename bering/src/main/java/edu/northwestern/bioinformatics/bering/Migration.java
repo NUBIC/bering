@@ -16,6 +16,7 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import edu.northwestern.bioinformatics.bering.tools.UriTools;
 
 /**
  * @author Moses Hohman
@@ -165,7 +166,10 @@ public abstract class Migration {
 
         URL externalUrl = null;
         try {
-            externalUrl = sourceUri.resolve(relativePath).toURL();
+            if (log.isDebugEnabled()) log.debug("Attempting to resolve " + relativePath + " against " + sourceUri.toString());
+            URI resolvedUri = UriTools.resolve(sourceUri, relativePath);
+            if (log.isDebugEnabled()) log.debug("Resolved as " + resolvedUri.toString());
+            externalUrl = resolvedUri.toURL();
             if (log.isDebugEnabled()) log.debug("Loading external SQL from " + externalUrl.toString());
             String script = IOUtils.toString(externalUrl.openStream());
             execute(script);
