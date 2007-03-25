@@ -1,18 +1,16 @@
 package edu.northwestern.bioinformatics.bering.servlet;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ConnectionCallback;
+import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
+import edu.northwestern.bioinformatics.bering.Main;
+import edu.northwestern.bioinformatics.bering.dialect.Dialect;
+import edu.northwestern.bioinformatics.bering.runtime.classpath.ClasspathMigrationFinder;
 import org.springframework.dao.DataAccessException;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import edu.northwestern.bioinformatics.bering.dialect.Dialect;
-import edu.northwestern.bioinformatics.bering.runtime.classpath.ClasspathMigrationFinder;
-import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
-import edu.northwestern.bioinformatics.bering.Main;
 
 /**
  * In conjunction with {@link edu.northwestern.bioinformatics.bering.servlet.BeringContextListener},
@@ -73,7 +71,6 @@ public class DeployedMigrator {
         this.dialect = dialect;
     }
 
-    @Required
     public String getResourcePath() {
         return resourcePath;
     }
