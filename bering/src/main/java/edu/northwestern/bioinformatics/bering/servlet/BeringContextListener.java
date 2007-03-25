@@ -15,9 +15,19 @@ import javax.servlet.ServletContextListener;
 public abstract class BeringContextListener implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        ServletContext servletContext = servletContextEvent.getServletContext();
-        getDeployedMigrator(servletContext).migrate();
+        try {
+            ServletContext servletContext = servletContextEvent.getServletContext();
+            getDeployedMigrator(servletContext).migrate();
+        } finally {
+            onMigrationComplete();
+        }
     }
+
+    /**
+     * Template method called after all migrations are complete.  Subclasses may use it
+     * to perform cleanup.
+     */
+    protected void onMigrationComplete() { }
 
     protected abstract DeployedMigrator getDeployedMigrator(ServletContext servletContext);
 

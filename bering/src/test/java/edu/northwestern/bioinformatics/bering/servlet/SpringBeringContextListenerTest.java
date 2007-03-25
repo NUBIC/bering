@@ -10,11 +10,9 @@ import javax.servlet.ServletContextEvent;
 /**
  * @author Rhett Sutphin
  */
-public class SpringBeringContextListenerTest extends BeringTestCase {
+public class SpringBeringContextListenerTest extends ContextListenerTestCase {
     private SpringBeringContextListener listener;
 
-    private MockServletContext servletContext;
-    private ServletContextEvent event;
     private WebApplicationContext applicationContext;
     private DeployedMigrator migrator;
 
@@ -22,8 +20,6 @@ public class SpringBeringContextListenerTest extends BeringTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         listener = new SpringBeringContextListener();
-        servletContext = new MockServletContext();
-        event = new ServletContextEvent(servletContext);
 
         applicationContext = registerMockFor(WebApplicationContext.class);
         servletContext.setAttribute(

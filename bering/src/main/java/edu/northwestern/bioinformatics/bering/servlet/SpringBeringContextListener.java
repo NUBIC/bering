@@ -15,6 +15,9 @@ import javax.servlet.ServletContext;
  * By default, it looks for a {@link DeployedMigrator} as a bean named <code>beringMigrator</code>.
  * This name can be changed by setting the <code>beringMigratorBeanName</code> context
  * initialization parameter.
+ * <p>
+ * If initializing the singletons in your application context requires your database schema to be
+ * up-to-date (e.g., a Hibernate SessionFactory), this listener will not work.
  *
  * @author Rhett Sutphin
  */
@@ -31,7 +34,7 @@ public class SpringBeringContextListener extends BeringContextListener {
         return (DeployedMigrator) getApplicationContext(servletContext).getBean(beanName);
     }
 
-    private ApplicationContext getApplicationContext(ServletContext servletContext) {
+    protected ApplicationContext getApplicationContext(ServletContext servletContext) {
         return WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
     }
 
