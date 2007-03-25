@@ -4,7 +4,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import com.pyx4j.log4j.MavenLogAppender;
 
 /**
  * @author Rhett Sutphin
@@ -24,15 +23,8 @@ public abstract class AbstractBeringMojo extends AbstractMojo {
     private String migrationsDir;
 
     public final void execute() throws MojoExecutionException, MojoFailureException {
-        // MavenLogAppender doesn't work in some cases
-        // (when the logged message doesn't include an exception)
-        
-        // MavenLogAppender.startPluginLog(this);
-        // try {
-            executeInternal();
-        // } finally {
-        //    MavenLogAppender.endPluginLog(this);
-        // }
+        // TODO: fix/re-enable MavenLogAppender
+        executeInternal();
     }
 
     protected abstract void executeInternal() throws MojoExecutionException, MojoFailureException;
