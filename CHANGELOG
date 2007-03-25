@@ -1,10 +1,26 @@
 0.6
 ===
+Features
+--------
 * Maven plugin can be provided connection configuration using a class which
   implements DataSourceProvider.  (This is an alternative to plain JDBC 
   properties.)
 * Dialect parameter no longer required.  If not provided, Bering will try to
   guess which of its built-in dialects to use.
+* Added BeringContextListener and DeployedMigrator for automatically running
+  migrations at web application startup.
+* Added SpringBeringContextListener implementation of BeringContextListener
+  for use in applications which use a Spring WebApplicationContext.
+* Added "resources" goal to maven plugin -- automatically registers your
+  migrations directory as a resource path for seamless deployment alongside
+  your classes.
+
+Technical
+---------
+* Refactored script discovery to support different ways of accessing
+  migrations.  Initial implementation supports file-based loading.
+* Added support for loading migrations scripts from the classpath.
+
 
 0.5
 ===
