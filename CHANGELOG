@@ -7,10 +7,15 @@ Features
   properties.)
 * Dialect parameter no longer required.  If not provided, Bering will try to
   guess which of its built-in dialects to use.
+* Added "external" migration function for executing external sql scripts
+  located alongside your migration scripts.
 * Added BeringContextListener and DeployedMigrator for automatically running
   migrations at web application startup.
 * Added SpringBeringContextListener implementation of BeringContextListener
   for use in applications which use a Spring WebApplicationContext.
+* Added SeparateApplicationContextBeringContextListener implementation of
+  BeringContextListener for deployments where the main application context
+  is dependent on the schema being up to date.
 * Added "resources" goal to maven plugin -- automatically registers your
   migrations directory as a resource path for seamless deployment alongside
   your classes.
