@@ -53,8 +53,8 @@ public class OracleTest extends HibernateBasedDialectTestCase<Oracle> {
 
         assertStatements(
             getDialect().createTable(createTestTable()),
-            "CREATE SEQUENCE seq_feast_id",
-            expectedCreateTable
+            expectedCreateTable,
+            "CREATE SEQUENCE seq_feast_id"
         );
     }
 
@@ -88,8 +88,8 @@ public class OracleTest extends HibernateBasedDialectTestCase<Oracle> {
         def.addColumn("length", "integer");
         assertStatements(
             getDialect().createTable(def),
-            "CREATE SEQUENCE seq_superfeast0123456789012_id",
-            expectedCreateTable
+            expectedCreateTable,
+            "CREATE SEQUENCE seq_superfeast0123456789012_id"
         );
         verifyMocks();
     }
