@@ -34,10 +34,10 @@ public class Oracle extends HibernateBasedDialect {
     @Override
     public List<String> createTable(TableDefinition def) {
         List<String> statements = new ArrayList<String>(2);
+        statements.addAll(super.createTable(def));
         if (def.getIncludePrimaryKey()) {
             statements.add(String.format("CREATE SEQUENCE %s", createIdSequenceName(def.getName())));
         }
-        statements.addAll(super.createTable(def));
         return statements;
     }
 
