@@ -20,6 +20,10 @@ Features
   migrations directory as a resource path for seamless deployment alongside
   your classes.
 
+Minor
+----
+* Better exception handling / reporting in maven plugin
+
 Technical
 ---------
 * Refactored script discovery to support different ways of accessing

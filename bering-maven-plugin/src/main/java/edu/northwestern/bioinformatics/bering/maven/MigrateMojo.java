@@ -7,6 +7,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.dao.DataAccessException;
 import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
 import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
 import edu.northwestern.bioinformatics.bering.DataSourceProvider;
@@ -142,6 +143,8 @@ public class MigrateMojo extends AbstractBeringMojo {
             helper.setDialectName(dialect);
             helper.execute();
         } catch (BeringTaskException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } catch (DataAccessException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }

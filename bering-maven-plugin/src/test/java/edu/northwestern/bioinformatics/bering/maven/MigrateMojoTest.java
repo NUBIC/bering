@@ -5,6 +5,7 @@ import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
 import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.*;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import javax.sql.DataSource;
@@ -33,12 +34,20 @@ public class MigrateMojoTest extends TestCase {
     }
 
     private void expectExecute() {
-        // default to expecting null for parameter setters
-        helper.setDialectName(null);   expectLastCall().anyTimes();
-        helper.setMigrationsDir(null); expectLastCall().anyTimes();
-        helper.setTargetVersion(null); expectLastCall().anyTimes();
+        expectNullParameters();
+
         helper.execute();
         replay(helper);
+    }
+
+    private void expectNullParameters() {
+        // default to expecting null for parameter setters
+        helper.setDialectName(null);
+        expectLastCall().anyTimes();
+        helper.setMigrationsDir(null);
+        expectLastCall().anyTimes();
+        helper.setTargetVersion(null);
+        expectLastCall().anyTimes();
     }
 
     public void testDataSourceProviderUsedIfSet() throws Exception {
@@ -101,6 +110,23 @@ public class MigrateMojoTest extends TestCase {
         expectExecute();
         mojo.execute();
         verify(helper);
+    }
+
+    public void testBadSqlGrammarRethrownAsMojoException() throws Exception {
+        mojo.setDataSourceProvider(TestDataSourceProvider.class.getName());
+        BadSqlGrammarException expected = new BadSqlGrammarException("It's happening again", null, null);
+        expectNullParameters();
+        helper.execute();
+        expectLastCall().andThrow(expected);
+
+        replay(helper);
+        try {
+            mojo.execute();
+            fail("Exception not thrown");
+        } catch (MojoExecutionException mee) {
+            assertEquals(expected.getMessage(), mee.getMessage());
+            assertSame(expected, mee.getCause());
+        }
     }
 
     private class TestableMojo extends MigrateMojo {
