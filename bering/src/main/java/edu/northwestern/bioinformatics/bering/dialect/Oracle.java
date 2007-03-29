@@ -120,7 +120,12 @@ public class Oracle extends HibernateBasedDialect {
     public List<String> separateStatements(String script) {
         List<String> statments = new LinkedList<String>();
 
-        // First, split by '/' on a line by itself
+        // Filter out \r\n
+        script = script.replaceAll("\r\n", "\n");
+        // Filter out lone \r
+        script = script.replaceAll("\r", "\n");
+
+        // Split by '/' on a line by itself
         String[] blocks = script.split("[\\r\\n]+/[\\r\\n]+");
 
         // For each resulting block (except the last),

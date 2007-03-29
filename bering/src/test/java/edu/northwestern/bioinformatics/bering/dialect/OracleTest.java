@@ -214,6 +214,33 @@ public class OracleTest extends HibernateBasedDialectTestCase<Oracle> {
             "GHI"
         );
     }
+    
+    public void testSeparateStatementsConvertsCRLFtoLFandLoneCRtoLF() throws Exception {
+        String input =
+            "CREATE TRIGGER\rtrg_foo_id " +
+            "BEFORE INSERT\r\n" +
+            "ON foo\n" +
+            "FOR EACH ROW\r\n" +
+            "BEGIN\n" +
+            "  SELECT FOO_SEQ.NEXTVAL\n" +
+            "  INTO :NEW.ID\n" +
+            "  FROM DUAL;\n" +
+            "END\n/\n;";
+        String expected =
+            "CREATE TRIGGER\ntrg_foo_id " +
+            "BEFORE INSERT\n" +
+            "ON foo\n" +
+            "FOR EACH ROW\n" +
+            "BEGIN\n" +
+            "  SELECT FOO_SEQ.NEXTVAL\n" +
+            "  INTO :NEW.ID\n" +
+            "  FROM DUAL;\n" +
+            "END";
+        assertStatements(
+            getDialect().separateStatements(input),
+            expected
+        );
+    }
 
     public void testInsert() throws Exception {
         assertStatements(
