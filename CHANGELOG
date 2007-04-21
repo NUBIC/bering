@@ -19,6 +19,7 @@ Features
 * Added "resources" goal to maven plugin -- automatically registers your
   migrations directory as a resource path for seamless deployment alongside
   your classes.
+* Added "numeric" column type.
 
 Minor
 ----

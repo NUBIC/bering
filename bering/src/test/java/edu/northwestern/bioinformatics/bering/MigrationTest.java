@@ -35,7 +35,7 @@ public class MigrationTest extends BeringTestCase {
         assertEquals(Types.VARCHAR,   getCreatedColumnType("string"));
         assertEquals(Types.FLOAT,     getCreatedColumnType("float"));
         assertEquals(Types.INTEGER,   getCreatedColumnType("integer"));
-//        assertEquals(Types.NUMERIC,   getCreatedColumnType("numeric"));
+        assertEquals(Types.NUMERIC,   getCreatedColumnType("numeric"));
     }
 
     public void testInvalidTypeThrowsException() throws Exception {

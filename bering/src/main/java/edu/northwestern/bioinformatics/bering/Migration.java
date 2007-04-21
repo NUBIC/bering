@@ -37,7 +37,7 @@ public abstract class Migration {
         NAMES_TO_JDBC_TYPES.put("string",    Types.VARCHAR);
         NAMES_TO_JDBC_TYPES.put("integer",   Types.INTEGER);
         NAMES_TO_JDBC_TYPES.put("float",     Types.FLOAT);
-//        NAMES_TO_JDBC_TYPES.put("numeric",   Types.NUMERIC);
+        NAMES_TO_JDBC_TYPES.put("numeric",   Types.NUMERIC);
         NAMES_TO_JDBC_TYPES.put("boolean",   Types.BIT);
         NAMES_TO_JDBC_TYPES.put("date",      Types.DATE);
         NAMES_TO_JDBC_TYPES.put("time",      Types.TIME);
