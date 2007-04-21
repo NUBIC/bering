@@ -1,6 +1,7 @@
 package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.Adapter;
+import edu.northwestern.bioinformatics.bering.MigrationExecutionException;
 
 import java.util.List;
 import java.util.Collections;
@@ -97,7 +98,7 @@ public class Migrator {
                 adapter.commit();
             } catch (RuntimeException e) {
                 adapter.rollback();
-                throw e;
+                throw new MigrationExecutionException(e);
             }
         }
 
@@ -120,10 +121,12 @@ public class Migrator {
             super(script, script.getNumber());
         }
 
+        @Override
         protected void run() {
             getScript().up(adapter);
         }
 
+        @Override
         protected String direction() {
             return "up";
         }
@@ -134,10 +137,12 @@ public class Migrator {
             super(script, script.getNumber() - 1);
         }
 
+        @Override
         protected void run() {
             getScript().down(adapter);
         }
 
+        @Override
         protected String direction() {
             return "down";
         }

@@ -2,6 +2,7 @@ package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.Adapter;
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
+import edu.northwestern.bioinformatics.bering.MigrationExecutionException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,7 +66,6 @@ public class MigratorTest extends BeringTestCase {
         Version v = new Version();
         v.updateRelease(1, 1);
 
-
         runTest(createMigrator(v, 1, 5), execExpect);
     }
 
@@ -106,12 +106,50 @@ public class MigratorTest extends BeringTestCase {
         runTest(createMigrator(v, 2, 1), execExpect);
     }
 
+    public void testUpWithException() throws Exception {
+        RuntimeException expected = new RuntimeException("Bad trouble");
+        ExecutionExpectation execExpect = expectUp()
+            .expectExecute(1,    2, 3, 4)
+            .expectThrow(1, 5, expected);
+
+        Version v = new Version();
+        v.updateRelease(1, 1);
+
+        runTest(createMigrator(v, 1, 5), execExpect, expected);
+    }
+
+    public void testDownWithException() throws Exception {
+        RuntimeException expected = new RuntimeException("Bad trouble");
+        ExecutionExpectation execExpect = expectDown()
+            .expectExecute(1,    5, 4, 3)
+            .expectThrow(1, 2, expected);
+
+        Version v = new Version();
+        v.updateRelease(1, 5);
+
+        runTest(createMigrator(v, 1, 1), execExpect, expected);
+    }
+
     private void runTest(Migrator migrator, ExecutionExpectation execExpectation) {
-        execExpectation.expectSuccessfulTransactions();
-        replayMocks();
-        migrator.migrate();
-        execExpectation.assertExecutions();
-        verifyMocks();
+        try {
+            execExpectation.expectTransactions();
+            replayMocks();
+            migrator.migrate();
+        } finally {
+            execExpectation.assertExecutions();
+            verifyMocks();
+        }
+    }
+
+    private void runTest(
+        Migrator migrator, ExecutionExpectation execExpectation, RuntimeException expectedException
+    ) {
+        try {
+            runTest(migrator, execExpectation);
+            fail("Exception not thrown");
+        } catch (MigrationExecutionException mee) {
+            assertSame(expectedException, mee.getCause());
+        }
     }
 
     private ExecutionExpectation expectUp() {
@@ -126,6 +164,8 @@ public class MigratorTest extends BeringTestCase {
         // maps from release number to expected scripts, in order of execution
         private Map<Integer, List<Integer>> expectedExecutions
             = new HashMap<Integer, List<Integer>>();
+        private RuntimeException expectedException;
+        private int[] exceptionVersion = new int[2];
 
         private boolean up;
 
@@ -138,7 +178,14 @@ public class MigratorTest extends BeringTestCase {
             return this;
         }
 
-        public void expectSuccessfulTransactions() {
+        public ExecutionExpectation expectThrow(Integer releaseNumber, Integer migration, RuntimeException exception) {
+            expectedException = exception;
+            exceptionVersion[0] = releaseNumber;
+            exceptionVersion[1] = migration;
+            return this;
+        }
+
+        public void expectTransactions() {
             for (Map.Entry<Integer, List<Integer>> entry : expectedExecutions.entrySet()) {
                 for (Integer migrationNumber : entry.getValue()) {
                     adapter.beginTransaction();
@@ -146,6 +193,13 @@ public class MigratorTest extends BeringTestCase {
                     adapter.updateVersion(entry.getKey(), newMigrationNumber);
                     adapter.commit();
                 }
+            }
+            if (expectedException != null) {
+                Mock.Script script
+                    = (Mock.Script) finder.getRelease(exceptionVersion[0]).getScript(exceptionVersion[1]);
+                script.setRunException(expectedException);
+                adapter.beginTransaction();
+                adapter.rollback();
             }
         }
 

@@ -2,7 +2,9 @@ package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.Adapter;
 import edu.northwestern.bioinformatics.bering.Migration;
+import edu.northwestern.bioinformatics.bering.MigrationExecutionException;
 import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyRuntimeException;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.apache.commons.io.IOUtils;
@@ -94,7 +96,7 @@ public class Script extends MigrationElement {
     }
 
     public void up(Adapter adapter) {
-        createMigrationInstance(adapter).up();
+        createMigrationInstance (adapter).up();
     }
 
     public void down(Adapter adapter) {

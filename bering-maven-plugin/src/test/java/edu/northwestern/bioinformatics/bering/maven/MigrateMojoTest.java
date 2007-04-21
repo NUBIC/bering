@@ -112,23 +112,6 @@ public class MigrateMojoTest extends TestCase {
         verify(helper);
     }
 
-    public void testBadSqlGrammarRethrownAsMojoException() throws Exception {
-        mojo.setDataSourceProvider(TestDataSourceProvider.class.getName());
-        BadSqlGrammarException expected = new BadSqlGrammarException("It's happening again", null, null);
-        expectNullParameters();
-        helper.execute();
-        expectLastCall().andThrow(expected);
-
-        replay(helper);
-        try {
-            mojo.execute();
-            fail("Exception not thrown");
-        } catch (MojoExecutionException mee) {
-            assertEquals(expected.getMessage(), mee.getMessage());
-            assertSame(expected, mee.getCause());
-        }
-    }
-
     private class TestableMojo extends MigrateMojo {
         private CallbackVerifier verifier;
 

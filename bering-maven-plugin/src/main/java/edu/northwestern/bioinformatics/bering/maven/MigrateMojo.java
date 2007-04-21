@@ -1,20 +1,15 @@
 package edu.northwestern.bioinformatics.bering.maven;
 
-import org.apache.maven.plugin.AbstractMojo;
+import edu.northwestern.bioinformatics.bering.BeringException;
+import edu.northwestern.bioinformatics.bering.DataSourceProvider;
+import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.dao.DataAccessException;
-import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
-import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
-import edu.northwestern.bioinformatics.bering.DataSourceProvider;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.io.File;
 import java.util.Properties;
 
@@ -142,9 +137,7 @@ public class MigrateMojo extends AbstractBeringMojo {
             helper.setTargetVersion(targetVersion);
             helper.setDialectName(dialect);
             helper.execute();
-        } catch (BeringTaskException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
-        } catch (DataAccessException e) {
+        } catch (BeringException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }

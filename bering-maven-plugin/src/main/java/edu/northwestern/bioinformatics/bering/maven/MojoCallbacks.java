@@ -4,6 +4,7 @@ import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
 import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.io.File;
 
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -32,7 +33,7 @@ class MojoCallbacks implements MigrateTaskHelper.HelperCallbacks {
     public Connection getConnection() {
         try {
             return getDataSource().getConnection();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Can't throw MojoExecutionException here b/c it's checked
             throw new BeringTaskException("Could not open database connection", e);
         }

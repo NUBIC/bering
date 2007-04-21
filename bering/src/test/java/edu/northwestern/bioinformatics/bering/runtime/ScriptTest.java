@@ -3,9 +3,11 @@ package edu.northwestern.bioinformatics.bering.runtime;
 import edu.northwestern.bioinformatics.bering.Adapter;
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
 import edu.northwestern.bioinformatics.bering.Migration;
+import edu.northwestern.bioinformatics.bering.MigrationExecutionException;
 import edu.northwestern.bioinformatics.bering.StubMigration;
+import groovy.lang.GroovyRuntimeException;
 import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
+import org.easymock.classextension.EasyMock;
 
 import java.net.URI;
 
@@ -74,14 +76,14 @@ public class ScriptTest extends BeringTestCase {
         StubScript script = new StubScript();
         Adapter adapter = EasyMock.createMock(Adapter.class);
         script.up(adapter);
-        assertEquals(adapter, script.getSingletonMigration().getAdapter());
+        assertSame(adapter, script.getSingletonMigration().getAdapter());
     }
 
     public void testDownSetsAdapterOnMigration() {
         StubScript script = new StubScript();
         Adapter adapter = EasyMock.createMock(Adapter.class);
         script.down(adapter);
-        assertEquals(adapter, script.getSingletonMigration().getAdapter());
+        assertSame(adapter, script.getSingletonMigration().getAdapter());
     }
 
     private static class StubScript extends Script {

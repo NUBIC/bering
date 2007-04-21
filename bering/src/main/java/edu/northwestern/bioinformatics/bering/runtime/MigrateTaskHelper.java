@@ -2,6 +2,8 @@ package edu.northwestern.bioinformatics.bering.runtime;
 
 import edu.northwestern.bioinformatics.bering.DatabaseAdapter;
 import edu.northwestern.bioinformatics.bering.Main;
+import edu.northwestern.bioinformatics.bering.BeringException;
+import edu.northwestern.bioinformatics.bering.MigrationExecutionException;
 import edu.northwestern.bioinformatics.bering.runtime.filesystem.FilesystemMigrationFinder;
 import edu.northwestern.bioinformatics.bering.dialect.Dialect;
 import edu.northwestern.bioinformatics.bering.dialect.DialectFactory;
@@ -29,12 +31,22 @@ public class MigrateTaskHelper {
     }
 
     public void execute() {
-        Main command = new Main();
-        command.setFinder(new FilesystemMigrationFinder(getRootDir()));
-        DatabaseAdapter adapter = createAdapter();
-        command.setAdapter(adapter);
-        command.migrate(getTargetRelease(), getTargetMigration());
-        adapter.close();
+        DatabaseAdapter adapter = null;
+        try {
+            Main command = new Main();
+            command.setFinder(new FilesystemMigrationFinder(getRootDir()));
+            adapter = createAdapter();
+            command.setAdapter(adapter);
+            command.migrate(getTargetRelease(), getTargetMigration());
+        } catch (BeringException e) {
+            // Pass through bering exceptions
+            throw e;
+        } catch (RuntimeException re) {
+            // wrap and rethrow all others
+            throw new MigrationExecutionException(re);
+        } finally {
+            if (adapter != null) adapter.close();
+        }
     }
 
     private File getRootDir() {

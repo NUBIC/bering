@@ -2,6 +2,7 @@ package edu.northwestern.bioinformatics.bering.maven;
 
 import edu.northwestern.bioinformatics.bering.runtime.BeringTaskException;
 import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
+import edu.northwestern.bioinformatics.bering.BeringException;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -82,8 +83,8 @@ public class HsqldbMojo extends AbstractBeringMojo {
             helper.setDialectName(edu.northwestern.bioinformatics.bering.dialect.Hsqldb.class.getName());
             helper.setMigrationsDir(getMigrationsDir());
             helper.execute();
-        } catch (BeringTaskException bte) {
-            throw new MojoExecutionException("Running migrations on " + url + " failed", bte);
+        } catch (BeringException be) {
+            throw new MojoExecutionException("Running migrations on " + url + " failed", be);
         }
 
         try {

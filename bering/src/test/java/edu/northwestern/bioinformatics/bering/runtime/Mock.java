@@ -11,10 +11,15 @@ public class Mock {
         private int number;
         private boolean upCalled;
         private boolean downCalled;
+        private RuntimeException runException;
 
         public Script(Release release, Integer number) {
             super(null, null, release);
             this.number = number;
+        }
+
+        public void setRunException(RuntimeException runException) {
+            this.runException = runException;
         }
 
         @Override
@@ -48,11 +53,13 @@ public class Mock {
         private class Migration extends edu.northwestern.bioinformatics.bering.Migration {
             @Override
             public void up() {
+                if (runException != null) throw runException;
                 upCalled = true;
             }
 
             @Override
             public void down() throws IrreversibleMigration {
+                if (runException != null) throw runException;
                 downCalled = true;
             }
         }
