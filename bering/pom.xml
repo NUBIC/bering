@@ -55,6 +55,22 @@
             <artifactId>hibernate</artifactId>
             <version>3.2.1.ga</version>
             <scope>compile</scope>
+            <exclusions>
+                <!-- These artifacts aren't used (we only use the dialects in hibernate),
+                     plus they conflict with the cglib dep in easymock. -->
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-attrs</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- COMPILE-ONLY DEPS (i.e., provided) -->
