@@ -50,6 +50,11 @@ public class HsqldbTest extends HibernateBasedDialectTestCase<Hsqldb> {
     }
 
     @Override
+    protected String expectedAddNumericStatement() {
+        return "ALTER TABLE t ADD COLUMN c NUMERIC";
+    }
+
+    @Override
     protected String expectedAddBooleanStatement() {
         return "ALTER TABLE t ADD COLUMN c BIT";
     }

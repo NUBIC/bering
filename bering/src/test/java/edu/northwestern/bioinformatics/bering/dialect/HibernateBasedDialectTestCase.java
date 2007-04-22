@@ -30,6 +30,13 @@ public abstract class HibernateBasedDialectTestCase<D extends HibernateBasedDial
         );
     }
 
+    public void testAddNumericColumn() throws Exception {
+        assertStatements(
+            getDialect().addColumn("t", Column.createColumn(null, "c", "numeric")),
+            expectedAddNumericStatement()
+        );
+    }
+
     public void testAddBooleanColumn() throws Exception {
         assertStatements(
             getDialect().addColumn("t", Column.createColumn(null, "c", "boolean")),
@@ -63,6 +70,8 @@ public abstract class HibernateBasedDialectTestCase<D extends HibernateBasedDial
     protected abstract String expectedAddIntegerStatement();
 
     protected abstract String expectedAddFloatStatement();
+
+    protected abstract String expectedAddNumericStatement();
 
     protected abstract String expectedAddBooleanStatement();
 

@@ -272,6 +272,11 @@ public class OracleTest extends HibernateBasedDialectTestCase<Oracle> {
     }
 
     @Override
+    protected String expectedAddNumericStatement() {
+        return "ALTER TABLE t ADD (c NUMBER)";
+    }
+
+    @Override
     protected String expectedAddBooleanStatement() {
         return "ALTER TABLE t ADD (c NUMBER(1,0))";
     }

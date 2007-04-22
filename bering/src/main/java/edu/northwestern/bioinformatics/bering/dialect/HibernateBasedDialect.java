@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Rhett Sutphin
@@ -16,6 +19,7 @@ import java.util.List;
 public abstract class HibernateBasedDialect extends AbstractDialect {
     /* These values are from org.hibernate.mapping.Column */
     private static final TypeQualifiers GLOBAL_DEFAULT_TYPE_QUALIFIERS = new TypeQualifiers(255, 19, 2);
+    private static final Pattern TYPE_QUALIFIER_IN_NAME_PATTERN = Pattern.compile("\\(.*?\\$.*?\\)");
 
     private org.hibernate.dialect.Dialect hibernateDialect;
 
@@ -145,7 +149,10 @@ public abstract class HibernateBasedDialect extends AbstractDialect {
             int typeCode = column.getTypeCode();
             TypeQualifiers effective = effectiveTypeQualifiers();
             if (effective.isEmpty()) {
-                return getHibernateDialect().getTypeName(typeCode).toUpperCase();
+                String name = getHibernateDialect().getTypeName(typeCode);
+                // strip out qualifier params
+                name = StringUtils.join(TYPE_QUALIFIER_IN_NAME_PATTERN.split(name), "");
+                return name.toUpperCase();
             } else {
                 return getHibernateDialect().getTypeName(
                     typeCode, effective.getLimit(), effective.getPrecision(), effective.getScale()

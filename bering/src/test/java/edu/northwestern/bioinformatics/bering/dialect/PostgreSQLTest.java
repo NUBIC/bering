@@ -153,6 +153,11 @@ public class PostgreSQLTest extends HibernateBasedDialectTestCase<PostgreSQL> {
     }
 
     @Override
+    protected String expectedAddNumericStatement() {
+        return "ALTER TABLE t ADD COLUMN c NUMERIC";
+    }
+
+    @Override
     protected String expectedAddBooleanStatement() {
         return "ALTER TABLE t ADD COLUMN c BOOLEAN";
     }
