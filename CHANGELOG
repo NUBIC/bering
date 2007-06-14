@@ -1,3 +1,12 @@
+0.7
+===
+Fixes
+-----
+Modified default migrationsDir property for all maven mojos to work around
+bug in Maven.  (Maven's javadoc indicates that the Directory of a FileSet
+is interpreted relative to the POM, but the resources plugin [at least] does
+not behave this way.)
+
 0.6
 ===
 Features

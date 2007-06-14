@@ -18,7 +18,7 @@ public abstract class AbstractBeringMojo extends AbstractMojo {
      * The base directory containing your numbered release directories.
      *
      * @required
-     * @parameter expression="src/main/db/migrate"
+     * @parameter expression="${basedir}/src/main/db/migrate"
      */
     private String migrationsDir;
 

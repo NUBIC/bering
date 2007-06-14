@@ -24,7 +24,12 @@ public class ResourcesMojo extends AbstractBeringMojo {
         Resource resource = new Resource();
         resource.setTargetPath(getTargetPath());
         resource.setDirectory(getMigrationsDir());
-        
+
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Adding resource to copy migrations from " + getMigrationsDir()
+                + " using target path " + getTargetPath());
+        }
+
         getProject().addResource(resource);
     }
 
