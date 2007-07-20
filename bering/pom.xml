@@ -6,7 +6,7 @@
     <parent>
         <artifactId>bering-all</artifactId>
         <groupId>edu.northwestern.bioinformatics</groupId>
-        <version>0.7-SNAPSHOT</version>
+        <version>0.6.1</version>
     </parent>
     <licenses>
         <license>
@@ -15,9 +15,9 @@
         </license>
     </licenses>
     <scm>
-        <url>http://bering.googlecode.com/svn/</url>
-        <connection>scm:svn:http://bering.googlecode.com/svn/trunk/bering</connection>
-        <developerConnection>scm:svn:https://bering.googlecode.com/svn/trunk/bering</developerConnection>
+        <url>scm:svn:https://bering.googlecode.com/svn/tags/releases/0.6.1</url>
+        <connection>scm:svn:http://bering.googlecode.com/svn/tags/releases/0.6.1bering</connection>
+        <developerConnection>scm:svn:https://bering.googlecode.com/svn/tags/releases/0.6.1bering</developerConnection>
     </scm>
     <dependencies>
         <dependency>
