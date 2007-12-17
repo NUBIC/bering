@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * @author Moses Hohman
@@ -61,6 +62,6 @@ public class TableDefinition {
         List<Column> finalCols = new ArrayList<Column>(1 + columns.size());
         if (includeDefaultPrimaryKey) finalCols.add(Column.AUTOMATIC_PK);
         finalCols.addAll(columns);
-        return finalCols;
+        return Collections.unmodifiableList(finalCols);
     }
 }

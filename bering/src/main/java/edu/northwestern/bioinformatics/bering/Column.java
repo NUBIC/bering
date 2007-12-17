@@ -17,6 +17,7 @@ public class Column {
     private boolean nullable = true;
     private Object defaultValue = null;
     private boolean primaryKey = false;
+    private String tableReference = null;
 
     public static final Column AUTOMATIC_PK = new Column();
     public static final Column VERSION_COLUMN = new Column();
@@ -51,6 +52,9 @@ public class Column {
             }
             if (parameters.containsKey(SCALE_KEY)) {
                 column.getTypeQualifiers().setScale((Integer) parameters.get(SCALE_KEY));
+            }
+            if (parameters.containsKey(REFERENCES_KEY)) {
+                column.setTableReference((String) parameters.get(REFERENCES_KEY));
             }
             column.setPrimaryKey(hasPrimaryKey(parameters, false));
         }
@@ -109,5 +113,13 @@ public class Column {
 
     public void setDefaultValue(Object defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public String getTableReference() {
+        return tableReference;
+    }
+
+    public void setTableReference(String tableReference) {
+        this.tableReference = tableReference;
     }
 }

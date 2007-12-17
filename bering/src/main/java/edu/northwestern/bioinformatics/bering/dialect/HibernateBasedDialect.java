@@ -47,6 +47,9 @@ public abstract class HibernateBasedDialect extends AbstractDialect {
                 tableConstraints.add("PRIMARY KEY(id)");
             } else {
                 colDeclarations.add(new ColumnDeclaration(col).toSql());
+                if (col.getTableReference() != null) {
+                    tableConstraints.add(createForeignKeyConstraintClause(table.getName(), col));
+                }
             }
         }
         StringBuilder statement = new StringBuilder(
@@ -67,6 +70,16 @@ public abstract class HibernateBasedDialect extends AbstractDialect {
 
         statement.append(')');
         return Arrays.asList(statement.toString());
+    }
+
+    protected String createForeignKeyConstraintClause(String tableName, Column col) {
+        return String.format("CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s(id)",
+            createForeignKeyConstraintName(tableName, col),
+            col.getName(), col.getTableReference());
+    }
+
+    protected String createForeignKeyConstraintName(String tableName, Column column) {
+        return String.format("fk_%s_%s", tableName, column.getTableReference());
     }
 
     /**
@@ -106,11 +119,19 @@ public abstract class HibernateBasedDialect extends AbstractDialect {
     }
 
     public List<String> addColumn(String table, Column column) {
-        return Arrays.asList(String.format(
+        List<String> statements = new ArrayList<String>(2);
+        statements.add(String.format(
             "ALTER TABLE %s ADD COLUMN %s",
             table,
             new ColumnDeclaration(column).toSql()
         ));
+        if (column.getTableReference() != null) {
+            statements.add(String.format(
+                "ALTER TABLE %s ADD %s",
+                table, createForeignKeyConstraintClause(table, column)
+            ));
+        }
+        return statements;
     }
 
     protected class ColumnDeclaration {

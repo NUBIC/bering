@@ -74,4 +74,10 @@ public class ColumnTest extends BeringTestCase {
         Column actual = createColumn(parameters, "id", "integer");
         assertFalse(actual.isPrimaryKey());
     }
+
+    public void testCreateColumnWithReference() throws Exception {
+        parameters.put(REFERENCES_KEY, "rooms");
+        Column actual = createColumn(parameters, "room_id", "integer");
+        assertEquals("rooms", actual.getTableReference());
+    }
 }

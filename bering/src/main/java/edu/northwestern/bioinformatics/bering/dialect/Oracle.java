@@ -76,11 +76,20 @@ public class Oracle extends HibernateBasedDialect {
 
     @Override
     public List<String> addColumn(String table, Column column) {
-        return Arrays.asList(String.format(
+        List<String> statements = new ArrayList<String>(2);
+        statements.add(String.format(
             "ALTER TABLE %s ADD (%s)",
             table,
             new ColumnDeclaration(column).toSql()
         ));
+        if (column.getTableReference() != null) {
+            statements.add(String.format(
+                "ALTER TABLE %s ADD %s",
+                table,
+                createForeignKeyConstraintClause(table, column)
+            ));
+        }
+        return statements;
     }
 
     @Override
@@ -97,6 +106,13 @@ public class Oracle extends HibernateBasedDialect {
 
     private String createPkConstraintName(String tableName) {
         return createIdentifier("pk_", tableName, null);
+    }
+
+    protected String createForeignKeyConstraintName(String tableName, Column column) {
+        int subnamelen = (MAX_IDENTIFIER_LENGTH - 4) / 2;
+        return String.format("fk_%s_%s",
+            truncate(tableName, subnamelen),
+            truncate(column.getTableReference(), subnamelen));
     }
 
     private String createIdentifier(String prefix, String basename, String suffix) {

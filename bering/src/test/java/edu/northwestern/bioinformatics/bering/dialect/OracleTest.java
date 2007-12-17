@@ -2,6 +2,7 @@ package edu.northwestern.bioinformatics.bering.dialect;
 
 import edu.northwestern.bioinformatics.bering.Migration;
 import edu.northwestern.bioinformatics.bering.TableDefinition;
+import edu.northwestern.bioinformatics.bering.Column;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -94,6 +95,35 @@ public class OracleTest extends HibernateBasedDialectTestCase<Oracle> {
         verifyMocks();
     }
 
+    public void testCreateTableWithFKWhenTableHasLongName() throws Exception {
+        TableDefinition def = new TableDefinition("superfeast01234567890123456789");
+        def.setIncludePrimaryKey(false);
+        def.addColumn(Collections.singletonMap("references", (Object) "rooms"), "room_id", "integer");
+        assertStatements(
+            getDialect().createTable(def),
+            "CREATE TABLE superfeast01234567890123456789 (\n  room_id NUMBER(10,0),\n  CONSTRAINT fk_superfeast012_rooms FOREIGN KEY (room_id) REFERENCES rooms(id)\n)"
+        );
+    }
+
+    public void testCreateTableWithFKWhenReferencedTableHasLongName() throws Exception {
+        TableDefinition def = new TableDefinition("rooms");
+        def.setIncludePrimaryKey(false);
+        def.addColumn(Collections.singletonMap("references", (Object) "superfeast01234567890123456789"), "superfeast_id", "integer");
+        assertStatements(
+            getDialect().createTable(def),
+            "CREATE TABLE rooms (\n  superfeast_id NUMBER(10,0),\n  CONSTRAINT fk_rooms_superfeast012 FOREIGN KEY (superfeast_id) REFERENCES superfeast01234567890123456789(id)\n)"
+        );
+    }
+
+    public void testAddColumnWithFK() throws Exception {
+        assertStatements(
+            getDialect().addColumn("superfeast01234567890123456789", 
+                Column.createColumn(Collections.singletonMap("references", (Object) "rooms"), "superfeast_id", "integer")),
+            "ALTER TABLE superfeast01234567890123456789 ADD (superfeast_id NUMBER(10,0))",
+            "ALTER TABLE superfeast01234567890123456789 ADD CONSTRAINT fk_superfeast012_rooms FOREIGN KEY (superfeast_id) REFERENCES rooms(id)"
+        );
+    }
+
     public void testDropTable() throws Exception {
         String expectedDropTable = "DROP TABLE feast";
         String tableName = "feast";
@@ -104,7 +134,6 @@ public class OracleTest extends HibernateBasedDialectTestCase<Oracle> {
             "DROP SEQUENCE seq_feast_id"
         );
     }
-
 
     public void testRenameTableWithPk() throws Exception {
         String tableName = "test";

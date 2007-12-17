@@ -31,6 +31,7 @@ public abstract class Migration {
     public static final String SCALE_KEY         = "scale";
     public static final String DEFAULT_VALUE_KEY = "defaultValue";
     public static final String PRIMARY_KEY_KEY   = "primaryKey";
+    public static final String REFERENCES_KEY    = "references";
 
     public static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
     static {
