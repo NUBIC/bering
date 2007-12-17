@@ -1,12 +1,14 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
+import edu.northwestern.bioinformatics.bering.Column;
 import edu.northwestern.bioinformatics.bering.Migration;
 import edu.northwestern.bioinformatics.bering.TableDefinition;
-import edu.northwestern.bioinformatics.bering.Column;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @author Rhett Sutphin
@@ -121,6 +123,18 @@ public class OracleTest extends HibernateBasedDialectTestCase<Oracle> {
                 Column.createColumn(Collections.singletonMap("references", (Object) "rooms"), "superfeast_id", "integer")),
             "ALTER TABLE superfeast01234567890123456789 ADD (superfeast_id NUMBER(10,0))",
             "ALTER TABLE superfeast01234567890123456789 ADD CONSTRAINT fk_superfeast012_rooms FOREIGN KEY (superfeast_id) REFERENCES rooms(id)"
+        );
+    }
+
+    public void testAddColumnWithFKAndExplicitConstraintName() throws Exception {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("references", "rooms");
+        params.put("referenceName", "fk_random");
+        assertStatements(
+            getDialect().addColumn("feast",
+                Column.createColumn(params, "room_id", "integer")),
+            "ALTER TABLE feast ADD (room_id NUMBER(10,0))",
+            "ALTER TABLE feast ADD CONSTRAINT fk_random FOREIGN KEY (room_id) REFERENCES rooms(id)"
         );
     }
 

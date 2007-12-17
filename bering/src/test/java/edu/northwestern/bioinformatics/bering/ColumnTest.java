@@ -80,4 +80,11 @@ public class ColumnTest extends BeringTestCase {
         Column actual = createColumn(parameters, "room_id", "integer");
         assertEquals("rooms", actual.getTableReference());
     }
+
+    public void testCreateColumnWithReferenceAndExplicitConstraintName() throws Exception {
+        parameters.put(REFERENCES_KEY, "rooms");
+        parameters.put(REFERENCE_NAME_KEY, "fk_etc");
+        Column actual = createColumn(parameters, "room_id", "integer");
+        assertEquals("fk_etc", actual.getTableReferenceName());
+    }
 }

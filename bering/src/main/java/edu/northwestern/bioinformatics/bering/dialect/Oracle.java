@@ -109,10 +109,14 @@ public class Oracle extends HibernateBasedDialect {
     }
 
     protected String createForeignKeyConstraintName(String tableName, Column column) {
-        int subnamelen = (MAX_IDENTIFIER_LENGTH - 4) / 2;
-        return String.format("fk_%s_%s",
-            truncate(tableName, subnamelen),
-            truncate(column.getTableReference(), subnamelen));
+        if (column.getTableReferenceName() != null) {
+            return column.getTableReferenceName();
+        } else {
+            int subnamelen = (MAX_IDENTIFIER_LENGTH - 4) / 2;
+            return String.format("fk_%s_%s",
+                truncate(tableName, subnamelen),
+                truncate(column.getTableReference(), subnamelen));
+        }
     }
 
     private String createIdentifier(String prefix, String basename, String suffix) {

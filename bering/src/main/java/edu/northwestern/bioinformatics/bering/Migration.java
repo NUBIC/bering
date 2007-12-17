@@ -25,13 +25,14 @@ import edu.northwestern.bioinformatics.bering.tools.UriTools;
 public abstract class Migration {
     private static final Log log = LogFactory.getLog(Migration.class);
 
-    public static final String NULLABLE_KEY      = "nullable";
-    public static final String LIMIT_KEY         = "limit";
-    public static final String PRECISION_KEY     = "precision";
-    public static final String SCALE_KEY         = "scale";
-    public static final String DEFAULT_VALUE_KEY = "defaultValue";
-    public static final String PRIMARY_KEY_KEY   = "primaryKey";
-    public static final String REFERENCES_KEY    = "references";
+    public static final String NULLABLE_KEY       = "nullable";
+    public static final String LIMIT_KEY          = "limit";
+    public static final String PRECISION_KEY      = "precision";
+    public static final String SCALE_KEY          = "scale";
+    public static final String DEFAULT_VALUE_KEY  = "defaultValue";
+    public static final String PRIMARY_KEY_KEY    = "primaryKey";
+    public static final String REFERENCES_KEY     = "references";
+    public static final String REFERENCE_NAME_KEY = "referenceName";
 
     public static final Map<String, Integer> NAMES_TO_JDBC_TYPES = new HashMap<String, Integer>();
     static {

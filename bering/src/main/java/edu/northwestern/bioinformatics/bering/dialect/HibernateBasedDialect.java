@@ -79,7 +79,11 @@ public abstract class HibernateBasedDialect extends AbstractDialect {
     }
 
     protected String createForeignKeyConstraintName(String tableName, Column column) {
-        return String.format("fk_%s_%s", tableName, column.getTableReference());
+        if (column.getTableReferenceName() != null) {
+            return column.getTableReferenceName();
+        } else {
+            return String.format("fk_%s_%s", tableName, column.getTableReference());
+        }
     }
 
     /**

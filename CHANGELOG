@@ -2,7 +2,10 @@
 ===
 Features
 --------
-* Foreign key support.
+* Foreign key support using the "references" parameter when adding a column
+  to a new or existing table.
+* Explicit override of the generated FK constraint name using the
+  "referenceName" parameter.
 
 0.6.1
 =====
