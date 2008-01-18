@@ -1,8 +1,11 @@
 package edu.northwestern.bioinformatics.bering.runtime.classpath;
 
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import edu.northwestern.bioinformatics.bering.runtime.Release;
 import edu.northwestern.bioinformatics.bering.runtime.MigrationLoadingException;
 import edu.northwestern.bioinformatics.bering.runtime.Script;
@@ -19,6 +22,8 @@ import java.net.URL;
  * @author Rhett Sutphin
  */
 public class ReleaseFactory {
+    private static final Log log = LogFactory.getLog(ReleaseFactory.class);
+
     private ScriptResource[] scriptResources;
     private Map<String,Release> releasesByName;
 
@@ -49,13 +54,23 @@ public class ReleaseFactory {
     private Script createScript(String scriptName, Resource resource, Release release) {
         URL url = null;
         try {
-            url = resource.getURL();
+            url = getUrl(resource);
             URI uri = url.toURI();
             return new Script(scriptName, uri, release);
         } catch (IOException e) {
             throw new MigrationLoadingException("Could not read contents of resource " + resource, e);
         } catch (URISyntaxException e) {
             throw new MigrationLoadingException("Could not convert resource URL (" + url + ") to URI", e);
+        }
+    }
+
+    // Workaround for http://jira.springframework.org/browse/SPR-3899 .
+    // Only affects Windows.  The bug is fixed in Spring 2.5
+    private static URL getUrl(Resource resource) throws IOException {
+        if (resource instanceof FileSystemResource) {
+            return resource.getFile().toURI().toURL();
+        } else {
+            return resource.getURL();
         }
     }
 
@@ -73,7 +88,7 @@ public class ReleaseFactory {
 
         private String getURL() {
             try {
-                return resource.getURL().toString();
+                return getUrl(resource).toString();
             } catch (IOException e) {
                 throw new MigrationLoadingException("Could not get URL for " + resource, e);
             }

@@ -7,6 +7,10 @@ Features
 * Explicit override of the generated FK constraint name using the
   "referenceName" parameter.
 
+Fixes
+-----
+* Implemented workaround for incorrect URL generation for scripts on Windows
+
 0.6.1
 =====
 Fixes
