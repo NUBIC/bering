@@ -1,8 +1,11 @@
 package edu.northwestern.bioinformatics.bering.dialect;
 
 import edu.northwestern.bioinformatics.bering.TableDefinition;
+import edu.northwestern.bioinformatics.bering.Column;
 
 import java.util.List;
+import java.util.Collections;
+import java.sql.Types;
 
 /**
  * @author Rhett Sutphin
@@ -60,7 +63,18 @@ public class PostgreSQLTest extends HibernateBasedDialectTestCase<PostgreSQL> {
             "ALTER TABLE test RENAME TO t_test"
         );
     }
-    
+
+    public void testAddConstrainedString() throws Exception {
+        Column col = new Column();
+        col.getTypeQualifiers().setLimit(14);
+        col.setName("n");
+        col.setTypeCode(Types.VARCHAR);
+        assertStatements(
+            getDialect().addColumn("feast", col),
+            "ALTER TABLE feast ADD COLUMN n VARCHAR(14)"
+        );
+    }
+
     @Override
     protected String expectedAddStringStatement() {
         return "ALTER TABLE t ADD COLUMN c TEXT";

@@ -22,6 +22,7 @@ public class ImprovedPostgreSQLDialect extends PostgreSQLDialect {
     public ImprovedPostgreSQLDialect() {
         super();
         registerColumnType(Types.VARCHAR, "text");
+        registerColumnType(Types.VARCHAR, Integer.MAX_VALUE, "varchar($l)");
         registerColumnType(Types.BIT, "boolean");
     }
 
