@@ -11,7 +11,7 @@ import java.sql.Types;
  */
 public class SqlServerTest extends HibernateBasedDialectTestCase<SqlServer> {
 
-    private String strSetNullabilityPrefix = "declare @column_data_type varchar(256) Select @column_data_type = [data_type] from INFORMATION_SCHEMA.COLUMNS where table_name='feast' and column_name='length' declare @column_length varchar(256) declare @maxlen varchar(256) Select @maxlen = [character_maximum_length] from INFORMATION_SCHEMA.COLUMNS where character_maximum_length>=1 and table_name='feast' and column_name='length' if (@column_data_type = 'VARCHAR') Set @column_length = '(' + @maxlen + ')' else Set @column_length='' exec('ALTER TABLE feast ALTER COLUMN length ' + @column_data_type + @column_length + ";
+    private static final String SET_NULLABILITY_PREFIX = "declare @column_data_type varchar(256) Select @column_data_type = [data_type] from INFORMATION_SCHEMA.COLUMNS where table_name='feast' and column_name='length' declare @column_length varchar(256) declare @maxlen varchar(256) Select @maxlen = [character_maximum_length] from INFORMATION_SCHEMA.COLUMNS where character_maximum_length>=1 and table_name='feast' and column_name='length' if (@column_data_type = 'VARCHAR') Set @column_length = '(' + @maxlen + ')' else Set @column_length='' exec('ALTER TABLE feast ALTER COLUMN length ' + @column_data_type + @column_length + ";
     
     @Override
     protected Class<SqlServer> getDialectClass() {
@@ -33,14 +33,14 @@ public class SqlServerTest extends HibernateBasedDialectTestCase<SqlServer> {
     public void testSetNullable() throws Exception {
         assertStatements(
             getDialect().setNullable("feast", "length", true),
-            strSetNullabilityPrefix + "' NULL')"
+            SET_NULLABILITY_PREFIX + "' NULL')"
         );
     }
 
     public void testSetNotNullable() throws Exception {
         assertStatements(
             getDialect().setNullable("feast", "length", false),
-            strSetNullabilityPrefix + "' NOT NULL')"
+            SET_NULLABILITY_PREFIX + "' NOT NULL')"
         );
     }
 

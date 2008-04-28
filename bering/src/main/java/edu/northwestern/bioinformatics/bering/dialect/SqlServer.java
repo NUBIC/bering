@@ -32,7 +32,10 @@ public class SqlServer extends HibernateBasedDialect {
         List<String> statements = new LinkedList<String>();
         
         if (!automaticPrimaryKey) {
-            statements.add("if (OBJECTPROPERTY(object_id('" + table + "'), 'TableHasIdentity') = 1) SET IDENTITY_INSERT " + table + " ON");
+            statements.add(String.format(
+                "if (OBJECTPROPERTY(object_id('%s'), 'TableHasIdentity') = 1) SET IDENTITY_INSERT %s ON",
+                table, table
+            ));
 
              statements.add(String.format(
                 "INSERT INTO %s (%s) VALUES (%s)",
@@ -41,7 +44,10 @@ public class SqlServer extends HibernateBasedDialect {
                     createInsertValueString(values)
             ));            
        
-            statements.add("if (OBJECTPROPERTY(object_id('" + table + "'), 'TableHasIdentity') = 1) SET IDENTITY_INSERT " + table + " OFF");
+            statements.add(String.format(
+                "if (OBJECTPROPERTY(object_id('%s'), 'TableHasIdentity') = 1) SET IDENTITY_INSERT %s OFF",
+                table, table
+            ));
         } else {
             statements.addAll(super.insert(table, columns, values, automaticPrimaryKey));
         }
@@ -98,8 +104,14 @@ public class SqlServer extends HibernateBasedDialect {
     
     @Override
     public List<String> setNullable(String table, String column, boolean nullable) {
-        String dataTypeSQL = "declare @column_data_type varchar(256) Select @column_data_type = [data_type] from INFORMATION_SCHEMA.COLUMNS where table_name='" + table + "' and column_name='" + column + '\'';
-        String lengthSQL = "declare @column_length varchar(256) declare @maxlen varchar(256) Select @maxlen = [character_maximum_length] from INFORMATION_SCHEMA.COLUMNS where character_maximum_length>=1 and table_name='" + table + "' and column_name='" + column + "' if (@column_data_type = 'VARCHAR') Set @column_length = '(' + @maxlen + ')' else Set @column_length=''";
+        String dataTypeSQL = String.format(
+            "declare @column_data_type varchar(256) Select @column_data_type = [data_type] from INFORMATION_SCHEMA.COLUMNS where table_name='%s' and column_name='%s'",
+            table, column
+        );
+        String lengthSQL = String.format(
+            "declare @column_length varchar(256) declare @maxlen varchar(256) Select @maxlen = [character_maximum_length] from INFORMATION_SCHEMA.COLUMNS where character_maximum_length>=1 and table_name='%s' and column_name='%s' if (@column_data_type = 'VARCHAR') Set @column_length = '(' + @maxlen + ')' else Set @column_length=''",
+            table, column
+        );
         
         return Arrays.asList(String.format(
             "%s %s exec('ALTER TABLE %s ALTER COLUMN %s ' + @column_data_type + @column_length + ' %sNULL')", dataTypeSQL, lengthSQL, table, column, nullable ? "" : "NOT "
@@ -113,31 +125,41 @@ public class SqlServer extends HibernateBasedDialect {
         ));
     }    
     
-    protected String removeDefaultConstraint(String table, String column)
-    {
-        String columnDefaultVariableName = "default_name_" + table + '_' + column;
+    protected String removeDefaultConstraint(String table, String column) {
+        String columnDefaultVariableName = String.format("default_name_%s_%s", table, column);
         
-        String setVariableSelect = "@" + columnDefaultVariableName + " = [name]";
+        String setVariableSelect = String.format("@%s = [name]", columnDefaultVariableName);
         String checkExistenceSelect = "[name]";
         
-        String fromAndWhere = "from sys.default_constraints where parent_object_id = object_id('" + table + "') and col_name(parent_object_id, parent_column_id) = '" + column + "'";
+        String fromAndWhere = String.format(
+            "from sys.default_constraints where parent_object_id = object_id('%s') and col_name(parent_object_id, parent_column_id) = '%s'",
+            table, column
+        );
         
-        String setVariableSQL = "select " + setVariableSelect + ' ' + fromAndWhere;
-        String checkExistenceSQL = "select " + checkExistenceSelect + ' ' + fromAndWhere;
-        return String.format("declare @" + columnDefaultVariableName + " varchar(256) " + setVariableSQL + " if exists (" + checkExistenceSQL + ") exec('alter table " + table + " drop constraint ' + @" + columnDefaultVariableName + ")");
+        String setVariableSQL = String.format("select %s %s", setVariableSelect, fromAndWhere);
+        String checkExistenceSQL = String.format("select %s %s", checkExistenceSelect, fromAndWhere);
+        return String.format(
+            "declare @%s varchar(256) %s if exists (%s) exec('alter table %s drop constraint ' + @%s)",
+            columnDefaultVariableName, setVariableSQL, checkExistenceSQL, table, columnDefaultVariableName
+        );
     }
     
-    protected String removeForeignKeyConstraint(String table, String column)
-    {
-        String columnfkVariableName = "fk_name_" + table + '_' + column;
+    protected String removeForeignKeyConstraint(String table, String column) {
+        String columnfkVariableName = String.format("fk_name_%s_%s", table, column);
         
-        String setVariableSelect = "@" + columnfkVariableName + " = f.name";
+        String setVariableSelect = String.format("@%s = f.name", columnfkVariableName);
         String checkExistenceSelect = "f.name";
         
-        String fromAndWhere = "FROM sys.foreign_keys AS f INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id where OBJECT_NAME(f.parent_object_id)='" + table + "' and COL_NAME(fc.parent_object_id, fc.parent_column_id)='" + column + "'";
+        String fromAndWhere = String.format(
+            "FROM sys.foreign_keys AS f INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id where OBJECT_NAME(f.parent_object_id)='%s' and COL_NAME(fc.parent_object_id, fc.parent_column_id)='%s'",
+            table, column
+        );
         
-        String setVariableSQL = "select " + setVariableSelect + ' ' + fromAndWhere;
-        String checkExistenceSQL = "select " + checkExistenceSelect + ' ' + fromAndWhere;
-        return String.format("declare @" + columnfkVariableName + " varchar(256) " + setVariableSQL + " if exists (" + checkExistenceSQL + ") exec('alter table " + table + " drop constraint ' + @" + columnfkVariableName + ")");
+        String setVariableSQL = String.format("select %s %s", setVariableSelect, fromAndWhere);
+        String checkExistenceSQL = String.format("select %s %s", checkExistenceSelect, fromAndWhere);
+        return String.format(
+            "declare @%s varchar(256) %s if exists (%s) exec('alter table %s drop constraint ' + @%s)",
+            columnfkVariableName, setVariableSQL, checkExistenceSQL, table, columnfkVariableName
+        );
     }
 }
