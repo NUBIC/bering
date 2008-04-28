@@ -6,6 +6,7 @@ Features
   to a new or existing table.
 * Explicit override of the generated FK constraint name using the
   "referenceName" parameter.
+* MS SQL Server dialect.  (Contributed by Eric Wyles.)
 
 Fixes
 -----
