@@ -49,6 +49,12 @@ public class DialectFactoryTest extends BeringTestCase {
         assertTrue(guessed instanceof Oracle);
     }
 
+    public void testGuessDialectForSqlServer() throws Exception {
+        Dialect guessed = guessDialect("Microsoft SQL Server Database");
+        assertNotNull(guessed);
+        assertTrue(guessed instanceof SqlServer);
+    }
+
     public void testGuessUnknownDialect() throws Exception {
         try {
             guessDialect("SuperDB");

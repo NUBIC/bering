@@ -16,7 +16,7 @@ public class DialectFactory {
         SUBSTRING_MAPS.put("postgres", DialectFactory.class.getPackage().getName() + ".PostgreSQL");
         SUBSTRING_MAPS.put("oracle", DialectFactory.class.getPackage().getName() + ".Oracle");
         SUBSTRING_MAPS.put("hsql", DialectFactory.class.getPackage().getName() + ".Hsqldb");
-        SUBSTRING_MAPS.put("sql server", DialectFactory.class.getPackage().getName() + ".SQLServer");
+        SUBSTRING_MAPS.put("sql server", DialectFactory.class.getPackage().getName() + ".SqlServer");
     }
 
     public static Dialect buildDialect(String dialectClassName) {
