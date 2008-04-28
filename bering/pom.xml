@@ -14,11 +14,6 @@
             <url>http://www.gnu.org/licenses/lgpl.txt</url>
         </license>
     </licenses>
-    <scm>
-        <url>http://bering.googlecode.com/svn/</url>
-        <connection>scm:svn:http://bering.googlecode.com/svn/trunk/bering</connection>
-        <developerConnection>scm:svn:https://bering.googlecode.com/svn/trunk/bering</developerConnection>
-    </scm>
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
