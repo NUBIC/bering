@@ -84,7 +84,7 @@
         <repository>
             <id>download.bioinformatics</id>
             <name>Northwestern University RHLCCC Bioinformatics Core</name>
-            <url>scp://download.bioinformatics.northwestern.edu/var/www/html/download/maven2</url>
+            <url>scp://download.bioinformatics.northwestern.edu/var/www/sites/download/download/maven2</url>
         </repository>
     </distributionManagement>
 </project>
