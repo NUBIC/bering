@@ -1,3 +1,9 @@
+0.7.1
+=====
+Fixes
+-----
+* Correct resolution of external scripts inside jars when the path to the jar has spaces in it. (#4)
+
 0.7
 ===
 Features

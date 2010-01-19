@@ -29,4 +29,14 @@ public class UriToolsTest extends BeringTestCase {
             actual.toString()
         );
     }
+
+    public void testJarFileUriWithSpacesHandled() throws Exception {
+        URI jarFile = URI.create(
+            "jar:file:/Program%20Files/is%20a/silly/thing.jar!/db/migrate/001_out_the_door/001_add_frogs.groovy");
+        URI actual = UriTools.resolve(jarFile, "extra.sql");
+        assertEquals(
+            "jar:file:/Program%20Files/is%20a/silly/thing.jar!/db/migrate/001_out_the_door/extra.sql",
+            actual.toString()
+        );
+    }
 }

@@ -15,10 +15,12 @@ public class UriTools {
      */
     public static URI resolve(URI base, String path) {
         if (JAR_SCHEME.equals(base.getScheme()) && base.isOpaque()) {
-            URI nested = URI.create(base.getSchemeSpecificPart());
+            URI nested = URI.create(base.getRawSchemeSpecificPart());
             URI nestedResolved = nested.resolve(path);
             try {
-                return new URI(JAR_SCHEME, nestedResolved.toString(), null);
+                // have to manually build the URI string because otherwise URI will re-escape
+                // the scheme-specific part
+                return new URI(JAR_SCHEME + ':' + nestedResolved.toString());
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException(
                     "Unable to resolve " + path + " against " + base.toString(), e);
@@ -27,7 +29,6 @@ public class UriTools {
             return base.resolve(path);
         }
     }
-
 
     private UriTools() { }
 }
