@@ -3,7 +3,7 @@
     <groupId>edu.northwestern.bioinformatics</groupId>
     <artifactId>bering-all</artifactId>
     <packaging>pom</packaging>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.7.1</version>
     <name>Bering (with submodules)</name>
     <url>http://code.google.com/p/bering/</url>
     <description>
@@ -17,9 +17,9 @@
         </license>
     </licenses>
     <scm>
-        <url>scm:svn:https://bering.googlecode.com/svn/tags/releases/0.7</url>
-        <connection>scm:svn:http://bering.googlecode.com/svn/tags/releases/0.7</connection>
-        <developerConnection>scm:svn:https://bering.googlecode.com/svn/tags/releases/0.7</developerConnection>
+        <url>scm:svn:https://bering.googlecode.com/svn/tags/releases/0.7.1</url>
+        <connection>scm:svn:http://bering.googlecode.com/svn/tags/releases/0.7.1</connection>
+        <developerConnection>scm:svn:https://bering.googlecode.com/svn/tags/releases/0.7.1</developerConnection>
     </scm>
     <modules>
         <module>bering</module>

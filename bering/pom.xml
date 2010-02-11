@@ -6,7 +6,7 @@
     <parent>
         <artifactId>bering-all</artifactId>
         <groupId>edu.northwestern.bioinformatics</groupId>
-        <version>0.8-SNAPSHOT</version>
+        <version>0.7.1</version>
     </parent>
     <licenses>
         <license>
