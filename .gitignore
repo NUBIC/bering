@@ -1,0 +1,8 @@
+# IDEA project files -- use buildr idea:generate
+*.iml
+*.ipr
+*.iws
+
+# build artifacts
+target
+reports

@@ -1,3 +1,15 @@
+0.8.0
+=====
+
+Changes
+-------
+* Artifacts changed. Maven-required `bering-all` artifact removed,
+  `bering` renamed to `bering-core`.
+
+Build
+-----
+* Switched to `buildr` from maven 2.
+
 0.7.1
 =====
 Fixes

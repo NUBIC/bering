@@ -3,16 +3,15 @@ package edu.northwestern.bioinformatics.bering.maven;
 import edu.northwestern.bioinformatics.bering.DataSourceProvider;
 import edu.northwestern.bioinformatics.bering.runtime.MigrateTaskHelper;
 import junit.framework.TestCase;
-import static org.easymock.classextension.EasyMock.*;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.jdbc.BadSqlGrammarException;
-import org.apache.maven.plugin.MojoExecutionException;
 
 import javax.sql.DataSource;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Properties;
+
+import static org.easymock.classextension.EasyMock.*;
 
 /**
  * @author Rhett Sutphin
@@ -53,7 +52,8 @@ public class MigrateMojoTest extends TestCase {
     public void testDataSourceProviderUsedIfSet() throws Exception {
         mojo.setVerifier(new CallbackVerifier() {
             public void verify(MojoCallbacks callbacks) {
-                assertEquals("Wrong data source type", StubDataSource.class, callbacks.getDataSource().getClass());
+                assertTrue("Wrong data source type",
+                    NamedDataSource.class.isAssignableFrom(callbacks.getDataSource().getClass()));
             }
         });
 
@@ -100,8 +100,7 @@ public class MigrateMojoTest extends TestCase {
 
         mojo.setVerifier(new CallbackVerifier() {
             public void verify(MojoCallbacks callbacks) {
-                assertEquals("Wrong data source type", StubDataSource.class, callbacks.getDataSource().getClass());
-                StubDataSource actual = ((StubDataSource) callbacks.getDataSource());
+                NamedDataSource actual = ((NamedDataSource) callbacks.getDataSource());
                 assertEquals("String property not set on data source", expectedName, actual.getName());
                 assertEquals("Integer property not set on data source", expectedSerial, actual.getSerial());
             }
@@ -126,7 +125,7 @@ public class MigrateMojoTest extends TestCase {
         }
     }
 
-    private static interface CallbackVerifier {
+    private interface CallbackVerifier {
         void verify(MojoCallbacks callbacks);
     }
 
@@ -134,8 +133,14 @@ public class MigrateMojoTest extends TestCase {
         private String name;
         private Integer serial;
 
+        /**
+         * Using a proxy rather than the preferable static stub implementation so that
+         * this class can be compiled on both Java 5 and Java 6.
+         */
         public DataSource getDataSource() {
-            return new StubDataSource(name, serial);
+            return (DataSource) Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class[] { NamedDataSource.class },
+                new StubDataSourceBehavior());
         }
 
         public String getName() {
@@ -153,47 +158,22 @@ public class MigrateMojoTest extends TestCase {
         public void setSerial(Integer serial) {
             this.serial = serial;
         }
+
+        private class StubDataSourceBehavior implements InvocationHandler {
+            public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
+                if ("getName".equals(method.getName())) {
+                    return name;
+                } else if ("getSerial".equals(method.getName())) {
+                    return serial;
+                } else {
+                    throw new UnsupportedOperationException(method.getName() + " not implemented");
+                }
+            }
+        }
     }
 
-    public static class StubDataSource implements DataSource {
-        private String name;
-        private Integer serial;
-
-        public StubDataSource(String s, Integer serial) {
-            this.name = s;
-            this.serial = serial;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Integer getSerial() {
-            return serial;
-        }
-
-        public Connection getConnection() throws SQLException {
-            throw new UnsupportedOperationException("getConnection not implemented");
-        }
-
-        public Connection getConnection(String username, String password) throws SQLException {
-            throw new UnsupportedOperationException("getConnection not implemented");
-        }
-
-        public PrintWriter getLogWriter() throws SQLException {
-            throw new UnsupportedOperationException("getLogWriter not implemented");
-        }
-
-        public void setLogWriter(PrintWriter out) throws SQLException {
-            throw new UnsupportedOperationException("setLogWriter not implemented");
-        }
-
-        public void setLoginTimeout(int seconds) throws SQLException {
-            throw new UnsupportedOperationException("setLoginTimeout not implemented");
-        }
-
-        public int getLoginTimeout() throws SQLException {
-            throw new UnsupportedOperationException("getLoginTimeout not implemented");
-        }
+    private interface NamedDataSource extends DataSource {
+        String getName();
+        Integer getSerial();
     }
 }
