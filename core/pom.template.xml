@@ -1,13 +1,13 @@
+<!--
+  This POM is for distribution only.  The project is built/tested with buildr.
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>bering</artifactId>
+    <groupId>edu.northwestern.bioinformatics</groupId>
+    <artifactId>bering-core</artifactId>
+    <version>@VERSION_NUMBER@</version>
     <packaging>jar</packaging>
     <name>Bering</name>
-    <parent>
-        <artifactId>bering-all</artifactId>
-        <groupId>edu.northwestern.bioinformatics</groupId>
-        <version>0.8-SNAPSHOT</version>
-    </parent>
     <licenses>
         <license>
             <name>LGPL</name>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring</artifactId>
-            <version>${spring.version}</version>
+            <version>2.0.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -67,61 +67,5 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- COMPILE-ONLY DEPS (i.e., provided) -->
-
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.6.5</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.3</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- TEST-ONLY DEPS -->
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
-            <version>2.2.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.8.0.7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-mock</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <descriptors>
-                        <descriptor>src/main/assembly/bin.xml</descriptor>
-                    </descriptors>
-                    <tarLongFileMode>gnu</tarLongFileMode>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
