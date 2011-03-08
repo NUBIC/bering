@@ -11,19 +11,20 @@ define 'bering' do
   compile.options.source = '1.5'
   compile.options.other = %w(-encoding UTF-8)
 
-  package_with_sources
-  package_with_javadoc
-
   define 'core' do
     compile.with SPRING, GROOVY, ANT, SERVLET, HIBERNATE, JAKARTA_COMMONS
     test.compile.with UNIT_TEST, HSQLDB
     test.resources
-    package(:jar)
+    package(:jar,     :id => 'bering')
+    package(:javadoc, :id => 'bering')
+    package(:sources, :id => 'bering')
   end
 
   define 'maven-plugin' do
     compile.with project('core').and_dependencies, MAVEN, HSQLDB
     test.compile.with UNIT_TEST
     package(:jar)
+    package(:javadoc)
+    package(:sources)
   end
 end

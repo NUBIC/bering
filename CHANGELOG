@@ -3,12 +3,12 @@
 
 Changes
 -------
-* Artifacts changed. Maven-required `bering-all` artifact removed,
-  `bering` renamed to `bering-core`.
+* Maven-required `bering-all` parent artifact removed.
 
-Build
------
-* Switched to `buildr` from maven 2.
+Internal
+--------
+* Build switched to Buildr from Maven 2.
+* Project moved to Github from Google Code.
 
 0.7.1
 =====

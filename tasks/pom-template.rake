@@ -18,8 +18,10 @@ module PomTemplate
           run
         mv File.join(File.dirname(pom), File.basename(tmpl)), pom
       end
-      project.package(:jar).enhance [pom]
-      project.package(:jar).pom.from pom
+      project.packages.detect { |p| p.type == :jar }.tap do |jar|
+        jar.enhance [pom]
+        jar.pom.from pom
+      end
     end
   end
 end
