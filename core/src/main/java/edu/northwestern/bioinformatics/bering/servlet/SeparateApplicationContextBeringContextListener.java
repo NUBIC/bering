@@ -55,6 +55,7 @@ public class SeparateApplicationContextBeringContextListener extends SpringBerin
     private ConfigurableWebApplicationContext createApplicationContext(ServletContext servletContext) {
         log.info("Loading local application context for " + getClass().getSimpleName());
         ConfigurableWebApplicationContext wac = createEmptyApplicationContext();
+        wac.setServletContext(servletContext);
         String configLocation = servletContext.getInitParameter(CONFIG_LOCATION_PARAM);
         if (configLocation != null) {
             wac.setConfigLocations(StringUtils.tokenizeToStringArray(configLocation,

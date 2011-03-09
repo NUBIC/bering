@@ -28,6 +28,7 @@ public class SeparateApplicationContextBeringContextListenerTest extends Context
         servletContext.addInitParameter(CONFIG_LOCATION_PARAM,
             "classpath:abc.xml;file:local.xml\n\nclasspath*:org/**/app*.xml");
 
+        mockApplicationContext.setServletContext(servletContext);
         mockApplicationContext.setConfigLocations(EasyMock.aryEq(new String[] { "classpath:abc.xml", "file:local.xml", "classpath*:org/**/app*.xml" }));
         mockApplicationContext.refresh();
         replayMocks();
@@ -37,6 +38,7 @@ public class SeparateApplicationContextBeringContextListenerTest extends Context
     }
 
     public void testCloseOnComplete() throws Exception {
+        mockApplicationContext.setServletContext(servletContext);
         mockApplicationContext.refresh();
         mockApplicationContext.close();
         replayMocks();

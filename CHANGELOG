@@ -1,5 +1,10 @@
 0.8.0
 =====
+Fixes
+-----
+* SeparateApplicationContextBeringContextListener now supports
+  context-relative paths in the `beringContextConfigLocation` init
+  param.
 
 Changes
 -------
