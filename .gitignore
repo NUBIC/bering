@@ -1,3 +1,6 @@
+# local buildr config
+build.rb
+
 # IDEA project files -- use buildr idea:generate
 *.iml
 *.ipr

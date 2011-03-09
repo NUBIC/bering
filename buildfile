@@ -3,6 +3,8 @@
 VERSION_NUMBER = '0.8.0-SNAPSHOT'
 GROUP = 'edu.northwestern.bioinformatics'
 
+repositories.release_to[:url] = "sftp://ligand/var/www/sites/download/download/maven2"
+
 define 'bering' do
   project.version = VERSION_NUMBER
   project.group = GROUP
