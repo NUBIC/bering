@@ -3,9 +3,7 @@ package edu.northwestern.bioinformatics.bering.runtime;
 import edu.northwestern.bioinformatics.bering.Adapter;
 import edu.northwestern.bioinformatics.bering.BeringTestCase;
 import edu.northwestern.bioinformatics.bering.Migration;
-import edu.northwestern.bioinformatics.bering.MigrationExecutionException;
 import edu.northwestern.bioinformatics.bering.StubMigration;
-import groovy.lang.GroovyRuntimeException;
 import org.apache.commons.io.IOUtils;
 import org.easymock.classextension.EasyMock;
 
@@ -21,7 +19,10 @@ public class ScriptTest extends BeringTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        validUri = getClass().getResource("../test_db/001_out_the_door/001_add_frogs.groovy").toURI();
+        validUri = getClass().getResource(String.format(
+            "/%s/test_db/001_out_the_door/001_add_frogs.groovy",
+            getClass().getPackage().getName().replace('.', '/').replace("/runtime", "")
+        )).toURI();
         validScript = new Script("001_add_frogs", validUri, null);
     }
 
