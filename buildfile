@@ -1,6 +1,6 @@
 # buildfile for bering
 
-VERSION_NUMBER = '0.8.0'
+VERSION_NUMBER = '0.8.0-SNAPSHOT'
 GROUP = 'edu.northwestern.bioinformatics'
 
 define 'bering' do
