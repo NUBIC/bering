@@ -1,6 +1,6 @@
 # buildfile for bering
 
-VERSION_NUMBER = '0.8.0-SNAPSHOT'
+VERSION_NUMBER = "0.8.0"
 GROUP = 'edu.northwestern.bioinformatics'
 
 repositories.release_to[:url] = "sftp://ligand/var/www/sites/download/download/maven2"
