@@ -1,3 +1,10 @@
+0.8.1
+=====
+Fixes
+-----
+* Ensure that bering can initialize a clean database using PostgreSQL
+  9's JDBC adapter. (GH-3)
+
 0.8.0
 =====
 Fixes

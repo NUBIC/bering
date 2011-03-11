@@ -17,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
-import java.sql.DatabaseMetaData;
 import java.util.List;
 
 /**
@@ -182,12 +181,21 @@ public class DatabaseAdapter implements Adapter {
             } catch (SQLException rollbackE) {
                 throw new RuntimeException(VERSION_TABLE_NAME + " does not exist and an attempt to create it has failed", rollbackE);
             }
+            // created below
+        } finally {
+            rollback();
+        }
+
+        try {
+            beginTransaction();
             log.info("Creating " + VERSION_TABLE_NAME + " table");
             createTable(VERSION_TABLE);
             commit();
             return new Version();
-        } finally {
+        } catch (Exception e) {
             rollback();
+            throw new RuntimeException(
+                VERSION_TABLE_NAME + " does not exist and an attempt to create it has failed", e);
         }
     }
 
