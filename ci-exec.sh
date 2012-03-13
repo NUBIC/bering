@@ -24,6 +24,8 @@ set -xe
 
 which ruby
 ruby -v
+echo $JAVA_HOME
+$JAVA_HOME/bin/java -version
 
 ruby install_gems.rb
 
