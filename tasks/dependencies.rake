@@ -1,24 +1,23 @@
-repositories.remote << 'http://www.ibiblio.org/maven2'
+repositories.remote << 'http://repo1.maven.org'
 
 ###
 # Helpers
 module Deps
   # Versions for libraries with more than one artifact
   VERSIONS = Buildr.struct(
-    :spring => '2.0.3',
+    :spring => '3.0.7.RELEASE',
     :maven  => '2.0.5'
   )
 
   def self.spring(name)
-    "org.springframework:#{name}:jar:#{VERSIONS.spring}"
+    "org.springframework:spring-#{name}:jar:#{VERSIONS.spring}"
   end
 end
 
 ###
 
-# TODO: split this up
 SPRING = struct(
-  :all => Deps.spring('spring')
+  %w(core beans context jdbc web tx).inject({}) { |s, v| s[v] = Deps.spring(v); s }
 )
 
 GROOVY = struct(
@@ -45,7 +44,7 @@ JAKARTA_COMMONS = struct(
 UNIT_TEST = struct(
   :easymock     => 'org.easymock:easymock:jar:2.2',
   :easymock_clz => 'org.easymock:easymockclassextension:jar:2.2.1',
-  :spring_mock  => Deps.spring('spring-mock')
+  :spring_mock  => Deps.spring('test')
 )
 
 HSQLDB = 'hsqldb:hsqldb:jar:1.8.0.7'

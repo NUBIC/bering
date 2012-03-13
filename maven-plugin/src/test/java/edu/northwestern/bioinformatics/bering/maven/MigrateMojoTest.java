@@ -71,7 +71,6 @@ public class MigrateMojoTest extends TestCase {
                     callbacks.getDataSource().getClass());
                 SingleConnectionDataSource actual = (SingleConnectionDataSource) callbacks.getDataSource();
                 assertEquals("Wrong URL", URL, actual.getUrl());
-                assertEquals("Wrong driver", DRIVER_CLASS_NAME, actual.getDriverClassName());
                 assertEquals("Wrong username", USERNAME, actual.getUsername());
                 assertEquals("Wrong password", PASSWORD, actual.getPassword());
             }

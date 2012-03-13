@@ -4,6 +4,10 @@ Changes
 -------
 * Package Bering core for OSGi. (GH-4)
 
+Internal
+--------
+* Test against Spring 3.0.7. (No production code changes required.)
+
 0.8.1
 =====
 Fixes
