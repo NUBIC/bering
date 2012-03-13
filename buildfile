@@ -2,7 +2,7 @@
 
 require 'buildr/bnd'
 
-VERSION_NUMBER = "0.8.2-SNAPSHOT"
+VERSION_NUMBER = "0.8.2"
 GROUP = 'edu.northwestern.bioinformatics'
 
 repositories.release_to[:url] = "sftp://ligand/var/www/sites/download/download/maven2"
