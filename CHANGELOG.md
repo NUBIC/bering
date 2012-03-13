@@ -1,3 +1,9 @@
+0.8.2
+=====
+Changes
+-------
+* Package Bering core for OSGi. (GH-4)
+
 0.8.1
 =====
 Fixes

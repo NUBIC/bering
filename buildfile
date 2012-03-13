@@ -1,5 +1,7 @@
 # buildfile for bering
 
+require 'buildr/bnd'
+
 VERSION_NUMBER = "0.8.2-SNAPSHOT"
 GROUP = 'edu.northwestern.bioinformatics'
 
@@ -17,7 +19,18 @@ define 'bering' do
     compile.with SPRING, GROOVY, ANT, SERVLET, HIBERNATE, JAKARTA_COMMONS
     test.compile.with UNIT_TEST, HSQLDB
     test.resources
-    package(:jar,     :id => 'bering')
+    package(:bundle,  :id => 'bering').tap do |bundle|
+      bundle['Export-Package'] = [
+        'ant', 'dialect', 'dialect.hibernate',
+        'runtime', 'runtime.classpath', 'runtime.filesystem',
+        'servlet', 'tools', nil
+      ].collect { |sub| ["edu.northwestern.bioinformatics.bering", sub].compact.join('.') }.
+        join(',')
+      bundle['Import-Package'] = '*;resolution:=optional'
+      bundle['Bundle-Name'] = 'Bering'
+      bundle['Bundle-Description'] = 'Bering, a database refactoring and migration system.'
+      bundle['DynamicImport-Package'] = '*' # for JDBC drivers
+    end
     package(:javadoc, :id => 'bering')
     package(:sources, :id => 'bering')
   end
